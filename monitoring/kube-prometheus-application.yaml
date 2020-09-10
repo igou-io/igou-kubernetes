@@ -9,6 +9,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
+    repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
     helm:
       valueFiles:
