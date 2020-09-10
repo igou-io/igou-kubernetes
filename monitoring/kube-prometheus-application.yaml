@@ -45,6 +45,9 @@ spec:
               resolve_timeout: 5m
           ingress:
             enabled: true
+            annotations: 
+              ingress.kubernetes.io/auth-secret: ingress-auth
+              ingress.kubernetes.io/auth-type: basic
             hosts:
             - "alertmanager.igou.io"
             tls:
@@ -157,6 +160,9 @@ spec:
         prometheus:
           ingress:
             enabled: true
+            annotations: 
+              ingress.kubernetes.io/auth-secret: ingress-auth
+              ingress.kubernetes.io/auth-type: basic
             hosts:
             - "prometheus.igou.io"
             tls:
