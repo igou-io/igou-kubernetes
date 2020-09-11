@@ -8,6 +8,9 @@ spec:
     namespace: monitoring
     server: https://kubernetes.default.svc
   project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     targetRevision: 9.3.4
@@ -47,7 +50,8 @@ spec:
               resolve_timeout: 5m
           ingress:
             enabled: true
-            annotations: 
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
               ingress.kubernetes.io/auth-secret: ingress-auth
               ingress.kubernetes.io/auth-type: basic
             hosts:
@@ -55,6 +59,7 @@ spec:
             tls:
             - hosts:
               - "alertmanager.igou.io"
+              secretName: alertmanager-acme-certificate
         nodeExporter:
           serviceMonitor:
             relabelings:
@@ -74,18 +79,20 @@ spec:
             enabled: false
           ingress:
             enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
             hosts:
             - "grafana.igou.io"
             tls:
             - hosts:
               - "grafana.igou.io"
+              secretName: grafana-acme-certificate
           sidecar:
             image: 
               repository: kiwigrid/k8s-sidecar
               tag: 0.1.193
             datasources:
               enabled: true
-              # Disable for thanos
               defaultDatasourceEnabled: true
             dashboards:
               enabled: true
@@ -118,11 +125,6 @@ spec:
               nginx-dashboard:
                 url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
                 datasource: Prometheus
-              # Ref: https://grafana.com/grafana/dashboards/11310
-              # version-checker:
-              #   gnetId: 12833
-              #   revision: 1
-              #   datasource: Prometheus
           additionalDataSources:
           - name: loki
             type: loki
@@ -162,7 +164,8 @@ spec:
         prometheus:
           ingress:
             enabled: true
-            annotations: 
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
               ingress.kubernetes.io/auth-secret: ingress-auth
               ingress.kubernetes.io/auth-type: basic
             hosts:
@@ -170,9 +173,8 @@ spec:
             tls:
             - hosts:
               - "prometheus.igou.io"
+              secretName: prometheus-acme-certificate
           prometheusSpec:
-            # replicas: 2
-            # replicaExternalLabelName: "replica"
             ruleSelector: {}
             ruleNamespaceSelector: {}
             ruleSelectorNilUsesHelmValues: false
