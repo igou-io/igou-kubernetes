@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: default
+spec:
+  destination:
+    namespace: cert-manager
+    server: https://kubernetes.default.svc
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: https://charts.jetstack.io
+    targetRevision: v1.0.1
+    chart: cert-manager
+    helm:
+      valueFiles:
+      - values.yaml
+      values: |-
+        installCRDs: true
+        ingressShim:
+          defaultIssuerName: letsencrypt-prod
+          defaultIssuerKind: ClusterIssuer
+        nodeSelector:
+          beta.kubernetes.io/arch: arm64
+        prometheus:
+          servicemonitor:
+            enabled: true
+        webhook:
+          nodeSelector:
+            beta.kubernetes.io/arch: arm64
+        cainjector:
+          nodeSelector:
+            beta.kubernetes.io/arch: arm64
