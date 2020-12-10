@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keepalived-operator
+  namespace: keepalived-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: keepalived-operator
+  template:
+    metadata:
+      labels:
+        name: keepalived-operator
+    spec:
+      serviceAccountName: keepalived-operator
+      nodeSelector:
+        kubernetes.io/arch: arm64 
+      containers:
+        - name: keepalived-operator
+          # Replace this with the built image name
+          image: quay.io/igou/keepalived-operator-multiarch:latest
+          command:
+          - keepalived-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              value: ""
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KEEPALIVED_OPERATOR_IMAGE_NAME
+              value: quay.io/igou/keepalived-operator-multiarch:latest
+            - name: KEEPALIVEDGROUP_TEMPLATE_FILE_NAME
+              value: /templates/keepalived-template.yaml                      
+            - name: OPERATOR_NAME
+              value: "keepalived-operator"
