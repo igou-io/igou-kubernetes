@@ -286,7 +286,7 @@ spec:
         app: rook-ceph-operator
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
+        node-role.kubernetes.io/storage: ""
       serviceAccountName: rook-ceph-system
       containers:
       - name: rook-ceph-operator
