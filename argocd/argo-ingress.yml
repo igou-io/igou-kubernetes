@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    ingress.kubernetes.io/whitelist-x-forwarded-for: "true"
+  labels:
+    igou-app: website
+  name: igou-website-ingress
+  namespace: default
+spec:
+  rules:
+  - host: argo.igou.io
+    http:
+      paths:
+      - backend:
+          serviceName: argocd-server
+          servicePort: https
+        path: /
+  tls:
+  - hosts:
+    - argo.igou.io
+  - secretName: argo-acme-certificate
