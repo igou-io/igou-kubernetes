@@ -1,0 +1,130 @@
+# These plans are adapted from work by Dax McDonald (https://github.com/daxmc99) and Hussein Galal (https://github.com/galal-hussein)
+# in support of Rancher v2 managed k3s upgrades. See Also: https://rancher.com/docs/k3s/latest/en/upgrades/automated/
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: k3s-server
+  namespace: system-upgrade
+  labels:
+    k3s-upgrade: server
+spec:
+  concurrency: 1
+  version: v1.18.9+k3s1
+  nodeSelector:
+    matchExpressions:
+      - {key: k3s-upgrade, operator: Exists}
+      - {key: k3s-upgrade, operator: NotIn, values: ["disabled", "false"]}
+      - {key: k3s.io/hostname, operator: Exists}
+      - {key: k3os.io/mode, operator: DoesNotExist}
+      - {key: node-role.kubernetes.io/master, operator: In, values: [""]}
+  serviceAccountName: system-upgrade
+  cordon: true
+#  drain:
+#    force: true
+  upgrade:
+    image: rancher/k3s-upgrade
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: k3s-agent
+  namespace: system-upgrade
+  labels:
+    k3s-upgrade: agent
+spec:
+  concurrency: 3 # in general, this should be the number of workers - 1
+  version: v1.18.9+k3s1
+  nodeSelector:
+    matchExpressions:
+      - {key: k3s-upgrade, operator: Exists}
+      - {key: k3s-upgrade, operator: NotIn, values: ["disabled", "false"]}
+      - {key: k3s.io/hostname, operator: Exists}
+      - {key: k3os.io/mode, operator: DoesNotExist}
+      - {key: node-role.kubernetes.io/master, operator: NotIn, values: [""]}
+  serviceAccountName: system-upgrade
+  tolerations:
+  - {key: iot, effect: NoSchedule, operator: Exists}
+  prepare:
+    # Since v0.5.0-m1 SUC will use the resolved version of the plan for the tag on the prepare container.
+    # image: rancher/k3s-upgrade:v1.17.4-k3s1
+    image: rancher/k3s-upgrade
+    args: ["prepare", "k3s-server"]
+  drain:
+    force: true
+    skipWaitForDeleteTimeout: 60 # set this to prevent upgrades from hanging on small clusters since k8s v1.18
+  upgrade:
+    image: rancher/k3s-upgrade
+---
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: k3os-latest
+  namespace: system-upgrade
+spec:
+  concurrency: 1
+  channel: https://github.com/rancher/k3os/releases/latest
+  version: v0.11.1
+  nodeSelector:
+    matchExpressions:
+      # This limits application of this upgrade only to nodes that have opted in by applying this label.
+      # Additionally, a value of `disabled` for this label on a node will cause the controller to skip over the node.
+      # NOTICE THAT THE NAME PORTION OF THIS LABEL MATCHES THE PLAN NAME. This is related to the fact that the
+      # system-upgrade-controller will tag the node with this very label having the value of the applied plan.status.latestHash.
+      - {key: plan.upgrade.cattle.io/k3os-latest, operator: Exists}
+      # This label is set by k3OS, therefore a node without it should not apply this upgrade.
+      - {key: k3os.io/mode, operator: Exists}
+      # Additionally, do not attempt to upgrade nodes booted from "live" CDROM.
+      - {key: k3os.io/mode, operator: NotIn, values: ["live"]}
+
+  # The service account for the pod to use. As with normal pods, if not specified the `default` service account from the namespace will be assigned.
+  # See https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  serviceAccountName: system-upgrade
+
+  # Specify which node taints should be tolerated by pods applying the upgrade.
+  # Anything specified here is appended to the default of:
+  # - {key: node.kubernetes.io/unschedulable, effect: NoSchedule, operator: Exists}
+  tolerations:
+  - {effect: NoSchedule, operator: Exists}
+
+  # The prepare init container, if specified, is run before cordon/drain which is run before the upgrade container.
+  # Shares the same format as the `upgrade` container.
+  prepare:
+    # If not present, the tag portion of the image will be the value from `.status.latestVersion` a.k.a. the resolved version for this plan.
+    image: alpine:3.11
+    command: [sh, -c]
+    args: ["echo '### ENV ###'; env | sort; echo '### RUN ###'; find /run/system-upgrade | sort"]
+
+  # If left unspecified, no drain will be performed.
+  # See:
+  # - https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/
+  # - https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#drain
+  drain:
+    # deleteLocalData: true  # default
+    # ignoreDaemonSets: true # default
+    force: true
+    # Use `disableEviction == true` and/or `skipWaitForDeleteTimeout > 0` to prevent upgrades from hanging on small clusters.
+    # disableEviction: false # default, only available with kubectl >= 1.18
+    # skipWaitForDeleteTimeout: 0 # default, only available with kubectl >= 1.18
+
+  # If `drain` is specified, the value for `cordon` is ignored.
+  # If neither `drain` nor `cordon` are specified and the node is marked as `schedulable=false` it will not be marked as `schedulable=true` when the apply job completes.
+  cordon: true
+
+  upgrade:
+    # If not present, the tag portion of the image will be the value from `.status.latestVersion` a.k.a. the resolved version for this plan.
+    image: rancher/k3os
+    command: [k3os, --debug]
+    # It is safe to specify `--kernel` on overlay installations as the destination path will not exist and so the
+    # upgrade of the kernel component will be skipped (with a warning in the log).
+    args:
+      - upgrade
+      - --kernel
+      - --rootfs
+      - --remount
+      - --sync
+      - --reboot
+      - --lock-file=/host/run/k3os/upgrade.lock
+      - --source=/k3os/system
+      - --destination=/host/k3os/system
