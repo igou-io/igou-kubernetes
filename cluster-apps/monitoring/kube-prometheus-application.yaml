@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: kube-prometheus
-  namespace: default
+  namespace: argocd
 spec:
   destination:
     namespace: monitoring
@@ -88,7 +88,7 @@ spec:
               - "grafana.igou.io"
               secretName: grafana-acme-certificate
           sidecar:
-            image: 
+            image:
               repository: kiwigrid/k8s-sidecar
               tag: 0.1.193
             datasources:
@@ -190,13 +190,9 @@ spec:
             storageSpec:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: "rook-ceph-block"
+                  selector:
+                    matchLabels:
+                      app: prometheus
                   resources:
                     requests:
                       storage: 50Gi
-            additionalScrapeConfigs:
-            - job_name: 'minio'
-              metrics_path: /minio/prometheus/metrics
-              static_configs:
-              - targets:
-                - 192.168.1.2:80
