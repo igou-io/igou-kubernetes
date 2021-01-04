@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: keepalived-operator
-  namespace: keepalived-operator
+  namespace: ingress-internal
 spec:
   replicas: 1
   selector:

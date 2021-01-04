@@ -2,9 +2,9 @@ apiVersion: redhatcop.redhat.io/v1alpha1
 kind: KeepalivedGroup
 metadata:
   name: keepalivedgroup-internal
-  namespace: keepalived-operator
+  namespace: ingress-internal
 spec:
   interface: eth0
   image: angelnu/keepalived
   nodeSelector:
-    node-role.kubernetes.io/loadbalancer-internal: ""
+    node-role.kubernetes.io/ingress-internal: ""

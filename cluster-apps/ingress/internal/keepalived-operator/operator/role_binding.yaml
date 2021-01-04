@@ -18,7 +18,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: keepalived-operator
-  namespace: keepalived-operator 
+  namespace: ingress-internal 
 roleRef:
   kind: ClusterRole
   name: keepalived-operator
