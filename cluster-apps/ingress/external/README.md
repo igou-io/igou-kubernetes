@@ -1,3 +1,3 @@
 # External ingress
 
-AWS EIP -> HAproxy -> Loadbalanced between ingress nodes via Klipper-lb -> ingress-nginx
+AWS EIP -> HAproxy -> ingress node running ingress-nginx w/ nodeport
