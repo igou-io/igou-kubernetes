@@ -52,8 +52,9 @@ spec:
             enabled: true
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
-              ingress.kubernetes.io/auth-secret: ingress-auth
-              ingress.kubernetes.io/auth-type: basic
+              nginx.ingress.kubernetes.io/auth-secret: ingress-auth
+              nginx.ingress.kubernetes.io/auth-type: basic
+              nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
               kubernetes.io/ingress.class: "external"
             hosts:
             - "alertmanager.igou.io"
@@ -83,6 +84,9 @@ spec:
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
               kubernetes.io/ingress.class: "external"
+              nginx.ingress.kubernetes.io/auth-secret: ingress-auth
+              nginx.ingress.kubernetes.io/auth-type: basic
+              nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
             hosts:
             - "grafana.igou.io"
             tls:
@@ -168,8 +172,9 @@ spec:
             enabled: true
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
-              ingress.kubernetes.io/auth-secret: ingress-auth
-              ingress.kubernetes.io/auth-type: basic
+              nginx.ingress.kubernetes.io/auth-secret: ingress-auth
+              nginx.ingress.kubernetes.io/auth-type: basic
+              nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
               kubernetes.io/ingress.class: "external"
             hosts:
             - "prometheus.igou.io"
