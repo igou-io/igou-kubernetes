@@ -13,7 +13,7 @@ spec:
       - CreateNamespace=true
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 9.3.4
+    targetRevision: 12.12.1
     chart: kube-prometheus-stack
     helm:
       valueFiles:
@@ -34,16 +34,16 @@ spec:
           tlsProxy:
             enabled: false
           image:
-            repository: carlosedp/prometheus-operator
-            tag: v0.40.0
+            repository: quay.io/prometheus-operator/prometheus-operator
+            tag: v0.44.0
             pullPolicy: IfNotPresent
           createCustomResource: true
           prometheusConfigReloaderImage:
-            repository: quay.io/coreos/prometheus-config-reloader
-            tag: v0.39.0
+            repository: quay.io/prometheus-operator/prometheus-config-reloader
+            tag: v0.44.0
           configmapReloadImage:
             repository: jimmidyson/configmap-reload
-            tag: v0.3.0
+            tag: v0.4.0
         alertmanager:
           config:
             global:
@@ -54,6 +54,7 @@ spec:
               cert-manager.io/cluster-issuer: letsencrypt-prod
               ingress.kubernetes.io/auth-secret: ingress-auth
               ingress.kubernetes.io/auth-type: basic
+              kubernetes.io/ingress.class: "external"
             hosts:
             - "alertmanager.igou.io"
             tls:
@@ -81,6 +82,7 @@ spec:
             enabled: true
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
+              kubernetes.io/ingress.class: "external"
             hosts:
             - "grafana.igou.io"
             tls:
@@ -147,11 +149,11 @@ spec:
             repository: "carlosedp/kube-state-metrics"
             tag: "v1.9.6"
         kubeEtcd:
-          enabled: true
+          enabled: false
         kubeControllerManager:
-          enabled: true
+          enabled: false
         kubeScheduler:
-          enabled: true
+          enabled: false
         kubeProxy:
           enabled: true
         kubelet:
@@ -168,6 +170,7 @@ spec:
               cert-manager.io/cluster-issuer: letsencrypt-prod
               ingress.kubernetes.io/auth-secret: ingress-auth
               ingress.kubernetes.io/auth-type: basic
+              kubernetes.io/ingress.class: "external"
             hosts:
             - "prometheus.igou.io"
             tls:
@@ -184,6 +187,8 @@ spec:
             podMonitorSelector: {}
             podMonitorNamespaceSelector: {}
             podMonitorSelectorNilUsesHelmValues: false
+            nodeSelector:
+              kubernetes.io/arch: arm64
             retention: 14d
             enableAdminAPI: true
             walCompression: true
