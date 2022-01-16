@@ -2607,7 +2607,7 @@ spec:
         - "20"
         - --operation-processors
         - "10"
-        image: alinbalutoiu/argocd:v1.7.4
+        image: alinbalutoiu/argocd:v2.2.2
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -2649,7 +2649,7 @@ spec:
       - command:
         - /shared/argocd-util
         - rundex
-        image: quay.io/dexidp/dex:v2.22.0
+        image: quay.io/dexidp/dex:v2.30.0
         imagePullPolicy: Always
         name: dex
         ports:
@@ -2665,7 +2665,7 @@ spec:
         - -n
         - /usr/local/bin/argocd-util
         - /shared
-        image: alinbalutoiu/argocd:v1.7.4
+        image: alinbalutoiu/argocd:v2.2.2
         imagePullPolicy: Always
         name: copyutil
         volumeMounts:
@@ -2701,7 +2701,7 @@ spec:
         - ""
         - --appendonly
         - "no"
-        image: redis:5.0.8
+        image: redis:6.2.6-alpine
         imagePullPolicy: Always
         name: redis
         ports:
@@ -2738,7 +2738,7 @@ spec:
         - argocd-repo-server
         - --redis
         - argocd-redis:6379
-        image: alinbalutoiu/argocd:v1.7.4
+        image: alinbalutoiu/argocd:v2.2.2
         imagePullPolicy: Always
         name: argocd-repo-server
         ports:
@@ -2795,7 +2795,7 @@ spec:
         - argocd-server
         - --staticassets
         - /shared/app
-        image: alinbalutoiu/argocd:v1.7.4
+        image: alinbalutoiu/argocd:v2.2.2
         imagePullPolicy: Always
         name: argocd-server
         ports:
