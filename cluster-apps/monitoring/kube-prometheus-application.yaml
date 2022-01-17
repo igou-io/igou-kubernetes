@@ -13,7 +13,7 @@ spec:
       - CreateNamespace=true
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 12.12.1
+    targetRevision: 30.0.1
     chart: kube-prometheus-stack
     helm:
       valueFiles:
@@ -23,6 +23,7 @@ spec:
           rules:
             kubeApiserverAvailability: true
             kubeApiserver: true
+            etcd: false
         server:
           resources:
             requests:
@@ -35,15 +36,8 @@ spec:
             enabled: false
           image:
             repository: quay.io/prometheus-operator/prometheus-operator
-            tag: v0.44.0
             pullPolicy: IfNotPresent
           createCustomResource: true
-          prometheusConfigReloaderImage:
-            repository: quay.io/prometheus-operator/prometheus-config-reloader
-            tag: v0.44.0
-          configmapReloadImage:
-            repository: jimmidyson/configmap-reload
-            tag: v0.4.0
         alertmanager:
           config:
             global:
@@ -55,7 +49,7 @@ spec:
               nginx.ingress.kubernetes.io/auth-secret: ingress-auth
               nginx.ingress.kubernetes.io/auth-type: basic
               nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
-              kubernetes.io/ingress.class: "external"
+            ingressClassName: external
             hosts:
             - "alertmanager.igou.io"
             tls:
@@ -74,7 +68,6 @@ spec:
         grafana:
           image:
             repository: grafana/grafana
-            tag: 7.1.5
           deploymentStrategy:
             type: Recreate
           persistence:
@@ -83,10 +76,10 @@ spec:
             enabled: true
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
-              kubernetes.io/ingress.class: "external"
               nginx.ingress.kubernetes.io/auth-secret: ingress-auth
               nginx.ingress.kubernetes.io/auth-type: basic
               nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
+            ingressClassName: external
             hosts:
             - "grafana.igou.io"
             tls:
@@ -94,9 +87,6 @@ spec:
               - "grafana.igou.io"
               secretName: grafana-acme-certificate
           sidecar:
-            image:
-              repository: kiwigrid/k8s-sidecar
-              tag: 0.1.193
             datasources:
               enabled: true
               defaultDatasourceEnabled: true
@@ -148,10 +138,6 @@ spec:
               mode: console
             grafana_net:
               url: https://grafana.net
-        kube-state-metrics:
-          image:
-            repository: "carlosedp/kube-state-metrics"
-            tag: "v1.9.6"
         kubeEtcd:
           enabled: false
         kubeControllerManager:
@@ -175,7 +161,7 @@ spec:
               nginx.ingress.kubernetes.io/auth-secret: ingress-auth
               nginx.ingress.kubernetes.io/auth-type: basic
               nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
-              kubernetes.io/ingress.class: "external"
+            ingressClassName: external
             hosts:
             - "prometheus.igou.io"
             tls:
@@ -197,12 +183,12 @@ spec:
             retention: 14d
             enableAdminAPI: true
             walCompression: true
-            storageSpec:
-              volumeClaimTemplate:
-                spec:
-                  selector:
-                    matchLabels:
-                      app: prometheus
-                  resources:
-                    requests:
-                      storage: 50Gi
+#            storageSpec:
+#              volumeClaimTemplate:
+#                spec:
+#                  selector:
+#                    matchLabels:
+#                      app: prometheus
+#                  resources:
+#                    requests:
+#                      storage: 50Gi
