@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: cert-manager
-  namespace: default
+  namespace: argocd
 spec:
   destination:
     namespace: cert-manager
@@ -13,7 +13,7 @@ spec:
       - CreateNamespace=true
   source:
     repoURL: https://charts.jetstack.io
-    targetRevision: v1.0.1
+    targetRevision: v1.6.1
     chart: cert-manager
     helm:
       valueFiles:
