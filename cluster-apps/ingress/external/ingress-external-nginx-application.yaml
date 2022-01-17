@@ -24,7 +24,8 @@ spec:
             enabled: false
           hostport:
             enabled: true
-          ingressClass: external
+          ingressClassResource:
+            name: external
           hostNetwork: true
           nodeSelector:
             node-role.kubernetes.io/ingress-external: ""
