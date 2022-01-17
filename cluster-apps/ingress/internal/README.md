@@ -1,3 +1,2 @@
-# Internal ingress
+# to be overhauled
 
-Keepalived floating IP -> ingress-nginx
