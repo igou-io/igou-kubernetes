@@ -183,12 +183,12 @@ spec:
             retention: 14d
             enableAdminAPI: true
             walCompression: true
-#            storageSpec:
-#              volumeClaimTemplate:
-#                spec:
-#                  selector:
-#                    matchLabels:
-#                      app: prometheus
-#                  resources:
-#                    requests:
-#                      storage: 50Gi
+            storageSpec: # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/storage.md
+              volumeClaimTemplate:
+                spec:
+                  selector:
+                    matchLabels:
+                      app.kubernetes.io/name: prometheus
+                  resources:
+                    requests:
+                      storage: 50Gi
