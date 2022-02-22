@@ -1,0 +1,6 @@
+loki-stack:
+  loki:
+    nodeSelector:
+      kubernetes.io/arch: arm64
+    persistence:
+      enabled: false
