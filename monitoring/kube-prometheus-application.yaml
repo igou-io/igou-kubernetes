@@ -180,6 +180,7 @@ spec:
             podMonitorSelectorNilUsesHelmValues: false
             nodeSelector:
               kubernetes.io/arch: arm64
+              node-role.kubernetes.io/worker: ""
             retention: 14d
             enableAdminAPI: true
             walCompression: true
