@@ -26,9 +26,8 @@ kube-prometheus-stack:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/auth-secret: ingress-auth
-        nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
+        nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
+        nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
       ingressClassName: external
       hosts:
       - "alertmanager.igou.io"
@@ -56,9 +55,8 @@ kube-prometheus-stack:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/auth-secret: ingress-auth
-        nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
+        nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
+        nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
       ingressClassName: external
       hosts:
       - "grafana.igou.io"
@@ -138,9 +136,8 @@ kube-prometheus-stack:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/auth-secret: ingress-auth
-        nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication'
+        nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
+        nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
       ingressClassName: external
       hosts:
       - "prometheus.igou.io"
