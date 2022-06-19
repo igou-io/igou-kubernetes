@@ -6,18 +6,5 @@ loki-stack:
       enabled: false
   promtail:
     tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
       - effect: NoSchedule
-        key: ingress-external
         operator: Exists
-      - key: iot
-        operator: Exists
-        effect: NoSchedule
-      - key: node.kubernetes.io/unschedulable
-        operator: Exists
-        effect: NoSchedule
