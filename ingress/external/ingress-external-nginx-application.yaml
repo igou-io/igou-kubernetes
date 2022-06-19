@@ -41,6 +41,8 @@ spec:
             enabled: false
           metrics:
             enabled: true
+          serviceMonitor:
+            enabled: true
           config:
             use-proxy-protocol: "true"
             use-forwarded-headers: "true"
