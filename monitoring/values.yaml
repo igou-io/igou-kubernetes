@@ -45,6 +45,8 @@ kube-prometheus-stack:
         - __meta_kubernetes_pod_node_name
         targetLabel: kubernetes_node
   grafana:
+    env:
+      DS_PROMETHEUS: "prometheus"
     image:
       repository: grafana/grafana
     deploymentStrategy:
