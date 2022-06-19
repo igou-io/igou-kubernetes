@@ -108,7 +108,7 @@ kube-prometheus-stack:
     - name: loki
       type: loki
       access: proxy
-      url: http://loki.logging:3100
+      url: http://logging-loki.logging.svc.cluster.local:3100
     grafana.ini:
       paths:
         data: /var/lib/grafana/data
