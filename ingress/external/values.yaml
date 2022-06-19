@@ -1,0 +1,28 @@
+ingress-nginx:
+  controller:
+    admissionWebhooks:
+      enabled: false
+    hostport:
+      enabled: true
+    ingressClassResource:
+      name: external
+    hostNetwork: true
+    nodeSelector:
+      node-role.kubernetes.io/ingress-external: ""
+    tolerations:
+    - effect: NoSchedule
+      key: ingress-external
+      operator: "Equal"
+      value: "true"
+    replicaCount: 2
+    service:
+      enabled: false
+    publishService:
+      enabled: false
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+    config:
+      use-proxy-protocol: "true"
+      use-forwarded-headers: "true"
