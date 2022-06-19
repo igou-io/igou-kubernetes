@@ -99,11 +99,14 @@ kube-prometheus-stack:
         nginx-dashboard:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
           datasource: Prometheus
+        bsbmp-exporter-basic:
+          url: https://raw.githubusercontent.com/David-Igou/bsbmp-exporter/master/grafana/bsbmp-exporter-basic.json
+          datasource: Prometheus
     additionalDataSources:
     - name: loki
       type: loki
       access: proxy
-      url: http://loki:3100
+      url: http://loki.logging:3100
     grafana.ini:
       paths:
         data: /var/lib/grafana/data
@@ -123,7 +126,7 @@ kube-prometheus-stack:
   kubeScheduler:
     enabled: false
   kubeProxy:
-    enabled: true
+    enabled: false
   kubelet:
     serviceMonitor:
       metricRelabelings:
