@@ -15,3 +15,9 @@ loki-stack:
       - effect: NoSchedule
         key: ingress-external
         operator: Exists
+      - key: iot
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/unschedulable
+        operator: Exists
+        effect: NoSchedule
