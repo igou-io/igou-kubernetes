@@ -9,7 +9,7 @@ ingress-nginx:
     ingressClass:
       name: external
     updateStrategy:
-      type: recreate
+      type: Recreate
     hostNetwork: true
     nodeSelector:
       node-role.kubernetes.io/ingress-external: ""
