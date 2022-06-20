@@ -6,8 +6,7 @@ ingress-nginx:
       enabled: true
     ingressClassResource:
       name: external
-    ingressClass:
-      name: external
+    ingressClass: external
     updateStrategy:
       type: Recreate
     hostNetwork: true
