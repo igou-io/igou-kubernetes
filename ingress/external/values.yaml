@@ -6,6 +6,8 @@ ingress-nginx:
       enabled: true
     ingressClassResource:
       name: external
+    ingressClass:
+      name: external
     hostNetwork: true
     nodeSelector:
       node-role.kubernetes.io/ingress-external: ""
