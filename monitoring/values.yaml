@@ -19,9 +19,20 @@ kube-prometheus-stack:
       pullPolicy: IfNotPresent
     createCustomResource: true
   alertmanager:
+    alertmanagerSpec:
+      secrets:
+        - slackurl
     config:
       global:
         resolve_timeout: 5m
+        slack_api_url_file: /etc/alertmanager/slackurl
+      route:
+        receiver: 'slack'
+        group_by: ["alertname", "job"]
+      receivers:
+      - name: 'slack'
+        slack_configs:
+        - send_resolved: true
     ingress:
       enabled: true
       annotations:
