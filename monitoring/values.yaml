@@ -33,6 +33,7 @@ kube-prometheus-stack:
       - name: 'slack'
         slack_configs:
         - send_resolved: true
+      - name: 'null'
     ingress:
       enabled: true
       annotations:
