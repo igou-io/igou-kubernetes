@@ -20,6 +20,9 @@ kube-prometheus-stack:
     createCustomResource: true
   alertmanager:
     alertmanagerSpec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        node-role.kubernetes.io/worker: ""
       secrets:
         - slackurl
     config:
