@@ -209,10 +209,10 @@ stackrox-central-services:
   #  logLevel: INFO
   #
   #  # Settings related to autoscaling the scanner deployment.
-  #  autoscaling:
+    autoscaling:
   #    # If true, autoscaling will be disabled. None of the other settings in this section will
   #    # have any effect.
-  #    disable: false
+      disable: true
   #    minReplicas: 1
   #    maxReplicas: 5
   #
