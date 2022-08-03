@@ -62,11 +62,11 @@ stackrox-central-services:
   #  registry: stackrox.io
   #
   ## Settings regarding the installation environment
-  #env:
+  env:
   #  # Treat the environment as an OpenShift cluster. Leave this unset to use auto-detection
   #  # based on available API resources on the server.
   #  # Possible values: null, false, true, 3, 4
-  #  openshift: null
+    openshift: false
   #
   #  # Treat the environment as Istio-enabled. Leave this unset to use auto-detection based on
   #  # available API resources on the server.
@@ -162,13 +162,13 @@ stackrox-central-services:
         memory: "4Gi"
         cpu: "1"
   #
-  #  persistence:
+    persistence:
   #    hostPath: null
-  #    persistentVolumeClaim:
-  #      claimName: null
-  #      createClaim: null
+      persistentVolumeClaim:
+        claimName: stackrox-db
+        createClaim: true
   #      storageClass: null
-  #      size: null
+        size: 20Gi
   #    none: null
   #
   #
