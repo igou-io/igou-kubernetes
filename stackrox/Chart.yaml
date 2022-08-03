@@ -1,0 +1,7 @@
+name: stackrox
+apiVersion: v2
+version: 1.0.0
+dependencies:
+  - name: stackrox-central-services
+    version: 71.0.0
+    repository: https://raw.githubusercontent.com/stackrox/helm-charts/main/opensource/
