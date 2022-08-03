@@ -9,5 +9,5 @@ spec:
   resources:
     requests:
       storage: 20Gi
-  storageClassName: local-path-immediate
+#  storageClassName: local-path-immediate
   volumeMode: Filesystem
