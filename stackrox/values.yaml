@@ -167,7 +167,7 @@ stackrox-central-services:
       persistentVolumeClaim:
         claimName: stackrox-db
         createClaim: true
-  #      storageClass: null
+        storageClass: local-path-immediate
         size: 20Gi
   #    none: null
   #
