@@ -5,3 +5,23 @@ resources:
 namespace: argo-rollouts
 commonAnnotations:
   env: igoucorp
+patches:
+ - target:
+     kind: Deployment
+   patch: |-
+     apiVersion: apps/v1
+     kind: Deployment
+     metadata:
+       name: deploy
+     spec:
+       template:
+         spec:
+           nodeSelector:
+             node-role.kubernetes.io/infra: ""
+           tolerations:
+           - effect: NoSchedule
+             key: node-role.kubernetes.io/infra
+             value: reserved
+           - effect: NoExecute
+             key: node-role.kubernetes.io/infra
+             value: reserved
