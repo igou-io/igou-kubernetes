@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth.igou.io/oauth2/start
+    nginx.ingress.kubernetes.io/auth-url: https://oauth.igou.io/oauth2/auth
+  name: tekton-ingress
+  namespace: tekton-pipelines
+spec:
+  ingressClassName: external
+  rules:
+  - http:
+      paths:
+      - pathType: ImplementationSpecific
+        backend:
+          service:
+            name: tekton-dashboard
+            port:
+              number: 9097
+    host: tekton.igou.io
+  tls:
+  - hosts:
+    - tekton.igou.io
+    secretName: tekton-acme-certificate
