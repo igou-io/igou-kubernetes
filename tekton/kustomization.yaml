@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.38.2/release.yaml
   - https://github.com/tektoncd/dashboard/releases/download/v0.28.0/tekton-dashboard-release.yaml
+  - tekton-dashboard-ingress.yaml
 patches:
  - target:
      kind: StatefulSet
