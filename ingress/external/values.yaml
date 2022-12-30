@@ -17,7 +17,7 @@ ingress-nginx:
       key: ingress-external
       operator: "Equal"
       value: "true"
-    replicaCount: 2
+    replicaCount: 1
     service:
       enabled: false
     publishService:
