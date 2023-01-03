@@ -11,6 +11,9 @@ spec:
       name: example-issuer-account-key
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     solvers:
-    - http01:
-        ingress: {}
-      selector: {}
+    - dns01:
+        cloudflare:
+          email: igou.david@gmail.com
+          apiKeySecretRef:
+            name: dns-token
+            key: dns-token
