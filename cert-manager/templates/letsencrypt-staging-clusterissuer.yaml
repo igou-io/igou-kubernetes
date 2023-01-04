@@ -12,7 +12,12 @@ spec:
     solvers:
     - dns01:
         cloudflare:
-          email: igou.david@gmail.com
-          apiKeySecretRef:
-            name: dns-token
+          apiTokenSecretRef:
             key: dns-token
+            name: dns-token
+          email: igou.david@gmail.com
+      selector:
+        dnsZones:
+          - igou.io
+    - http01:
+        ingress: {}
