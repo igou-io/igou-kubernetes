@@ -14,9 +14,6 @@ kube-prometheus-stack:
   prometheusOperator:
     tlsProxy:
       enabled: false
-    image:
-      repository: quay.io/prometheus-operator/prometheus-operator
-      pullPolicy: IfNotPresent
     createCustomResource: true
   alertmanager:
     alertmanagerSpec:
@@ -61,8 +58,6 @@ kube-prometheus-stack:
   grafana:
     env:
       DS_PROMETHEUS: "prometheus"
-    image:
-      repository: grafana/grafana
     deploymentStrategy:
       type: Recreate
     persistence:
