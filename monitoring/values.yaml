@@ -198,7 +198,7 @@ kube-prometheus-stack:
         kubernetes.io/hostname: worker-4
       resources:
         requests:
-          memory: "4Gi
+          memory: 4Gi
       retention: 14d
       enableAdminAPI: true
       walCompression: true
