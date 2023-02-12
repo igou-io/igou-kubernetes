@@ -18,7 +18,7 @@ kube-prometheus-stack:
   alertmanager:
     alertmanagerSpec:
       nodeSelector:
-        node-role.kubernetes.io/worker: ""
+        kubernetes.io/hostname: worker-4
       secrets:
         - slackurl
     config:
@@ -86,14 +86,7 @@ kube-prometheus-stack:
     persistence:
       enabled: false
     nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - effect: NoSchedule
-      key: node-role.kubernetes.io/infra
-      value: reserved
-    - effect: NoExecute
-      key: node-role.kubernetes.io/infra
-      value: reserved
+      kubernetes.io/hostname: worker-4
     ingress:
       enabled: true
       annotations:
@@ -202,14 +195,10 @@ kube-prometheus-stack:
       podMonitorNamespaceSelector: {}
       podMonitorSelectorNilUsesHelmValues: false
       nodeSelector:
-        node-role.kubernetes.io/infra: ""
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      - effect: NoExecute
-        key: node-role.kubernetes.io/infra
-        value: reserved
+        kubernetes.io/hostname: worker-4
+      resources:
+        requests:
+          memory: "4Gi
       retention: 14d
       enableAdminAPI: true
       walCompression: true
