@@ -19,5 +19,14 @@ spec:
       selector:
         dnsZones:
           - igou.io
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            key: cbull-dns-token
+            name: cbull-dns-token
+          email: bullcs95@gmail.com
+      selector:
+        dnsZones:
+          - cbull.dev
     - http01:
         ingress: {}
