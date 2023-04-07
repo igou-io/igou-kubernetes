@@ -1,8 +1,15 @@
-loki-stack:
-  loki:
-    persistence:
-      enabled: false
-  promtail:
-    tolerations:
-      - effect: NoSchedule
-        operator: Exists
+test:
+  enabled: false
+monitoring:
+  dashboards:
+    enabled: false
+  serviceMonitor:
+    enabled: false
+  metricsInstance:
+    enabled: true
+persistence:
+  enabled: false
+promtail:
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
