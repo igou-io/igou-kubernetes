@@ -1,4 +1,8 @@
 loki:
+  minio:
+    enabled: true
+    persistence:
+      enabled: false 
   test:
     enabled: false
   monitoring:
