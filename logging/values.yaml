@@ -1,7 +1,6 @@
 loki:
   minio:
     enabled: true
-    drivesPerNode: 2
     persistence:
       enabled: true
       existingClaim: minio
