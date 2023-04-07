@@ -1,6 +1,7 @@
 loki:
   minio:
     enabled: true
+    drivesPerNode: 1
     persistence:
       enabled: false 
   test:
