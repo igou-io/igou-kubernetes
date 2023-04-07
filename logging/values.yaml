@@ -1,14 +1,15 @@
-test:
-  enabled: false
-monitoring:
-  dashboards:
+loki:
+  test:
     enabled: false
-  serviceMonitor:
+  monitoring:
+    dashboards:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+    metricsInstance:
+      enabled: false
+  persistence:
     enabled: false
-  metricsInstance:
-    enabled: false
-persistence:
-  enabled: false
 promtail:
   tolerations:
     - effect: NoSchedule
