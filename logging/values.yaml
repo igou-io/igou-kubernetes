@@ -8,9 +8,9 @@ loki:
   test:
     enabled: false
   read:
-    replicas: 1
+    replicas: 2
   write:
-    replicas: 1
+    replicas: 2
   monitoring:
     lokiCanary:
       enabled: false
