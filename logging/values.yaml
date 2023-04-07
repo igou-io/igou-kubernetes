@@ -3,7 +3,8 @@ loki:
     enabled: true
     drivesPerNode: 2
     persistence:
-      enabled: false 
+      enabled: true
+      existingClaim: minio
   test:
     enabled: false
   read:
