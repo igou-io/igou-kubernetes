@@ -3,8 +3,6 @@ loki:
     enabled: true
     persistence:
       enabled: true
-      size: 100Gi
-      existingClaim: minio
   test:
     enabled: false
   read:
