@@ -5,6 +5,10 @@ loki:
       enabled: false 
   test:
     enabled: false
+  read:
+    replicas: 1
+  write:
+    replicas: 1
   monitoring:
     dashboards:
       enabled: false
