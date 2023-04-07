@@ -1,20 +1,21 @@
-loki:
-  minio:
-    enabled: true
+loki-stack:
+  loki:
+    minio:
+      enabled: true
+      persistence:
+        enabled: false 
+    test:
+      enabled: false
+    monitoring:
+      dashboards:
+        enabled: false
+      serviceMonitor:
+        enabled: false
+      metricsInstance:
+        enabled: false
     persistence:
-      enabled: false 
-  test:
-    enabled: false
-  monitoring:
-    dashboards:
       enabled: false
-    serviceMonitor:
-      enabled: false
-    metricsInstance:
-      enabled: false
-  persistence:
-    enabled: false
-promtail:
-  tolerations:
-    - effect: NoSchedule
-      operator: Exists
+  promtail:
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
