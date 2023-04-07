@@ -10,6 +10,8 @@ loki:
   write:
     replicas: 1
   monitoring:
+    lokiCanary:
+      enabled: false
     dashboards:
       enabled: false
     serviceMonitor:
