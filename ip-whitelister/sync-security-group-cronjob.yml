@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-security-group
+spec:
+  schedule: "*/15 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: sync-security-group-script
+            configMap:
+              name: sync-security-group-script
+          - name: aws-credentials
+            secret:
+              secretName: aws-credentials
+          - name: ip-addresses
+            configMap:
+              name: ip-addresses
+          - name: security-group-settings
+            configMap:
+              name: security-group-settings
+          containers:
+          - name: sync-security-group
+            image: amazon/aws-cli:latest
+            command: ["/bin/sh"]
+            args: ["-c", "source /scripts/sync-security-group.sh"]
+            resources:
+              requests:
+                cpu: "50m"
+                memory: "64Mi"
+            volumeMounts:
+            - name: sync-security-group-script
+              mountPath: /scripts
+            - name: aws-credentials
+              mountPath: /secrets
+            - name: ip-addresses
+              mountPath: /config
+            - name: security-group-settings
+              mountPath: /settings
+          restartPolicy: OnFailure
