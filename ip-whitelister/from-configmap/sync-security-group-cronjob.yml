@@ -19,30 +19,33 @@ spec:
                 requests:
                   cpu: "50m"
                   memory: "50Mi"
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: aws-credentials
+                      key: aws_access_key_id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: aws-credentials
+                      key: aws_secret_access_key
               volumeMounts:
-                - name: ip-addresses
-                  mountPath: /config/allowed-ips
-                  subPath: ip-addresses.txt
+                - name: config
+                  mountPath: /config
                 - name: settings
-                  mountPath: /settings/port
-                  subPath: port
-                - name: settings
-                  mountPath: /settings/protocol
-                  subPath: protocol
-                - name: settings
-                  mountPath: /settings/group-id
-                  subPath: group-id
-                - name: settings
-                  mountPath: /settings/aws-region
-                  subPath: aws-region
+                  mountPath: /settings
                 - name: scripts
                   mountPath: /scripts
                 - name: aws-credentials
                   mountPath: /root/.aws
           volumes:
-            - name: ip-addresses
+            - name: config
               configMap:
-                name: ip-addresses
+                name: allowed-ips
+                items:
+                  - key: ip-addresses.txt
+                    path: ip-addresses.txt
             - name: settings
               configMap:
                 name: security-group-settings

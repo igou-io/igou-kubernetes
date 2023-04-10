@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Load IP addresses from the ConfigMap
 echo "Loading IP addresses from ConfigMap..."
-IP_ADDRESSES="$(cat /config/allowed-ips)"
+IP_ADDRESSES="$(cat /config/ip-addresses.txt)"
 
 # Load security group settings from ConfigMap
 echo "Loading security group settings from ConfigMap..."
@@ -15,21 +15,6 @@ AWS_REGION="$(cat /settings/aws-region)"
 
 # Set AWS region
 export AWS_DEFAULT_REGION="${AWS_REGION}"
-
-# Validate the IP addresses before getting the existing IPs in the security group
-echo "Validating IP addresses..."
-INVALID_IPS=false
-while read -r IP; do
-    if ! echo "${IP}" | grep -qE '^(\d{1,3}\.){3}\d{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$'; then
-        echo "Invalid IP address or CIDR: ${IP}"
-        INVALID_IPS=true
-    fi
-done <<< "${IP_ADDRESSES}"
-
-if [ "${INVALID_IPS}" = true ]; then
-    echo "Aborting due to invalid IP addresses."
-    exit 1
-fi
 
 # Get the list of existing IP addresses in the security group
 echo "Getting existing IP addresses in the security group..."
@@ -47,13 +32,14 @@ for EXISTING_IP in ${EXISTING_IPS}; do
             --group-id "${SECURITY_GROUP_ID}" \
             --protocol "${PROTOCOL}" \
             --port "${PORT}" \
-            --cidr "${EXISTING_IP}"
+            --cidr "${EXISTING_IP}" || true
     fi
 done
 
 # Authorize IP addresses from the ConfigMap that are not already in the security group
 echo "Authorizing new IP addresses from the ConfigMap..."
-while read -r IP; do
+IFS=$'\n' # Set internal field separator to newline
+for IP in ${IP_ADDRESSES}; do
     if ! echo "${EXISTING_IPS}" | grep -qE "^${IP}\$"; then
         echo "Authorizing IP address: ${IP}"
         aws ec2 authorize-security-group-ingress \
@@ -62,6 +48,7 @@ while read -r IP; do
             --port "${PORT}" \
             --cidr "${IP}"
     fi
-done <<< "${IP_ADDRESSES}"
+done
+unset IFS
 
 echo "Security group synchronization complete."
