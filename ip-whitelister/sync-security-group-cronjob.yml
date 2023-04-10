@@ -4,42 +4,52 @@ metadata:
   name: sync-security-group
 spec:
   schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
-  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
         spec:
-          volumes:
-          - name: sync-security-group-script
-            configMap:
-              name: sync-security-group-script
-          - name: aws-credentials
-            secret:
-              secretName: aws-credentials
-          - name: ip-addresses
-            configMap:
-              name: ip-addresses
-          - name: security-group-settings
-            configMap:
-              name: security-group-settings
           containers:
-          - name: sync-security-group
-            image: amazon/aws-cli:latest
-            command: ["/bin/sh"]
-            args: ["-c", "source /scripts/sync-security-group.sh"]
-            resources:
-              requests:
-                cpu: "50m"
-                memory: "64Mi"
-            volumeMounts:
-            - name: sync-security-group-script
-              mountPath: /scripts
-            - name: aws-credentials
-              mountPath: /secrets
+            - name: sync-security-group
+              image: amazon/aws-cli:latest
+              command: ["sh", "/scripts/sync-security-group.sh"]
+              resources:
+                requests:
+                  cpu: "50m"
+                  memory: "50Mi"
+              volumeMounts:
+                - name: ip-addresses
+                  mountPath: /config/allowed-ips
+                  subPath: ip-addresses.txt
+                - name: settings
+                  mountPath: /settings/port
+                  subPath: port
+                - name: settings
+                  mountPath: /settings/protocol
+                  subPath: protocol
+                - name: settings
+                  mountPath: /settings/group-id
+                  subPath: group-id
+                - name: settings
+                  mountPath: /settings/aws-region
+                  subPath: aws-region
+                - name: scripts
+                  mountPath: /scripts
+                - name: aws-credentials
+                  mountPath: /root/.aws
+          volumes:
             - name: ip-addresses
-              mountPath: /config
-            - name: security-group-settings
-              mountPath: /settings
+              configMap:
+                name: ip-addresses
+            - name: settings
+              configMap:
+                name: security-group-settings
+            - name: scripts
+              configMap:
+                name: sync-security-group-script
+            - name: aws-credentials
+              secret:
+                secretName: aws-credentials
           restartPolicy: OnFailure
