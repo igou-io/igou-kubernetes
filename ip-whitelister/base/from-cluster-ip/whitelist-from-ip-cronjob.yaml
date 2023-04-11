@@ -1,0 +1,73 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: whitelist-from-ip
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: whitelist-from-ip
+            image: amazon/aws-cli:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Get the current public IP
+              CURRENT_IP=$(curl -s http://checkip.amazonaws.com/)
+              echo "Current IP: $CURRENT_IP"
+
+              # Check if the current IP is already in the security group
+              EXISTS=$(aws ec2 describe-security-groups --group-ids $GROUP_ID --region $AWS_REGION --query "SecurityGroups[].IpPermissions[].IpRanges[?CidrIp=='$CURRENT_IP/32']" --output text)
+
+              if [ -z "$EXISTS" ]; then
+                echo "Adding current IP to the security group"
+                aws ec2 authorize-security-group-ingress --group-id $GROUP_ID --protocol $PROTOCOL --port $PORT --cidr $CURRENT_IP/32 --region $AWS_REGION
+              else
+                echo "Current IP is already in the security group"
+              fi
+
+              # Remove old IPs that are not the current public IP
+              OLD_IPS=$(aws ec2 describe-security-groups --group-ids $GROUP_ID --region $AWS_REGION --query "SecurityGroups[].IpPermissions[?FromPort==\`$PORT\` && ToPort==\`$PORT\` && IpProtocol==\`$PROTOCOL\`].IpRanges[?CidrIp!='$CURRENT_IP/32'].CidrIp" --output text)
+
+              for OLD_IP in $OLD_IPS; do
+                echo "Removing old IP: $OLD_IP"
+                aws ec2 revoke-security-group-ingress --group-id $GROUP_ID --protocol $PROTOCOL --port $PORT --cidr $OLD_IP --region $AWS_REGION
+              done
+            env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: security-group-settings
+                  key: port
+            - name: PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: security-group-settings
+                  key: protocol
+            - name: GROUP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: security-group-settings
+                  key: group-id
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: security-group-settings
+                  key: aws-region
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_secret_access_key
+          restartPolicy: OnFailure
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
