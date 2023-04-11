@@ -46,7 +46,7 @@ for IP in ${IP_ADDRESSES}; do
             --group-id "${SECURITY_GROUP_ID}" \
             --protocol "${PROTOCOL}" \
             --port "${PORT}" \
-            --cidr "${IP}"
+            --cidr "${IP}" || true
     fi
 done
 unset IFS
