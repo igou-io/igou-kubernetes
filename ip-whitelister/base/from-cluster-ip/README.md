@@ -11,4 +11,19 @@ This Kubernetes CronJob updates an AWS security group's ingress rules to allow t
 
 ## Configuration
 
-1. Update the `configmap.yaml` file with the correct values for `PORT`, `PROTOCOL`, `GROUP_ID`, and `AWS_REGION`. These values represent the port and protocol to open in the security group, the security group ID, and the AWS region where the security group is located.
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - aws-security-group-cronjob.yaml
+  - secret.yaml
+
+configMapGenerator:
+  - name: aws-security-group-config
+    literals:
+      - PORT=<your_port>
+      - PROTOCOL=<your_protocol>
+      - GROUP_ID=<your_security_group_id>
+      - AWS_REGION=<your_aws_region>
+```
