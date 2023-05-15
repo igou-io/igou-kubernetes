@@ -116,3 +116,5 @@ scheduler.json
 requirements.lock
 Chart.lock
 **/Chart.lock
+
+**/.DS_store
