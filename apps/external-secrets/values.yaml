@@ -116,9 +116,7 @@ external-secrets:
     node-role.kubernetes.io/control-plane: "true"
   
   tolerations:
-    - effect: NoSchedule
-      key: node-role.kubernetes.io/control-plane
-      operator: Exists
+    - operator: Exists
 
   
   affinity: {}
@@ -166,9 +164,7 @@ external-secrets:
     nodeSelector:
       node-role.kubernetes.io/control-plane: "true"
     tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
-        operator: Exists
+      - operator: Exists
   
     affinity: {}
   
@@ -260,9 +256,7 @@ external-secrets:
       node-role.kubernetes.io/control-plane: "true"
 
     tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
-        operator: Exists
+      - operator: Exists
   
     affinity: {}
   
@@ -365,9 +359,7 @@ connect:
     podAnnotations: {}
     podLabels: {}
     tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
-        operator: Exists
+      - operator: Exists
   
   operator:
     create: false
@@ -383,9 +375,7 @@ connect:
     podAnnotations: {}
     podLabels: {}
     tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
-        operator: Exists
+      - operator: Exists
     watchNamespace: []
     resources: {}
     token:
