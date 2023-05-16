@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+  labels:
+    app.kubernetes.io/instance: argocd
+  name: argocd
+  namespace: argocd
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: argocd.apps.igou.systems
+    http:
+      paths:
+      - backend:
+          service:
+            name: argocd-server
+            port:
+              name: https
+        path: /
+        pathType: Prefix
