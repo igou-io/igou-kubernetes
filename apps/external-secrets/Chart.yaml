@@ -1,0 +1,10 @@
+name: external-secrets
+apiVersion: v2
+version: 1.0.0
+dependencies:
+  - name: external-secrets
+    repository: https://charts.external-secrets.io
+    version: 0.7.1
+  - name: connect
+    repository: https://1password.github.io/connect-helm-charts
+    version: 1.10.0
