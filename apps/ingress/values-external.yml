@@ -11,10 +11,10 @@ ingress-nginx:
       type: Recreate
     hostNetwork: false
     nodeSelector:
-      node-role.kubernetes.io/ingress-external: ""
+      node-role.kubernetes.io/ingress: "true"
     tolerations:
-    - effect: NoSchedule
-      key: ingress-external
+    - effect: NoExecute
+      key: ingress
       operator: "Equal"
       value: "true"
     replicaCount: 1
