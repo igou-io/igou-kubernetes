@@ -4,9 +4,6 @@ ingress-nginx:
       enabled: false
     hostport:
       enabled: true
-    ingressClassResource:
-      name: external
-    ingressClass: external
     updateStrategy:
       type: Recreate
     hostNetwork: false
