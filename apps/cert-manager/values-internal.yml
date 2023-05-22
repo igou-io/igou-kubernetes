@@ -1,3 +1,4 @@
+env: internal
 cert-manager:
   # Default values for cert-manager.
   # This is a YAML-formatted file.
@@ -168,14 +169,6 @@ cert-manager:
   #     - "1.1.1.1"
   #     - "8.8.8.8"
   
-  nodeSelector:
-    kubernetes.io/os: linux
-  
-  ingressShim:
-    defaultIssuerName: "letsencrypt-prod"
-    defaultIssuerKind: "ClusterIssuer"
-    # defaultIssuerGroup: ""
-  
   prometheus:
     enabled: true
     servicemonitor:
@@ -299,10 +292,6 @@ cert-manager:
       successThreshold: 1
       timeoutSeconds: 1
   
-    nodeSelector:
-      kubernetes.io/os: linux
-      beta.kubernetes.io/arch: arm64
-  
     affinity: {}
   
     tolerations: []
@@ -416,10 +405,6 @@ cert-manager:
       #   cpu: 10m
       #   memory: 32Mi
   
-    nodeSelector:
-      kubernetes.io/os: linux
-      beta.kubernetes.io/arch: arm64
-  
     affinity: {}
   
     tolerations: []
@@ -506,10 +491,6 @@ cert-manager:
       # requests:
       #   cpu: 10m
       #   memory: 32Mi
-  
-    nodeSelector:
-      kubernetes.io/os: linux
-      beta.kubernetes.io/arch: arm64
   
     affinity: {}
   

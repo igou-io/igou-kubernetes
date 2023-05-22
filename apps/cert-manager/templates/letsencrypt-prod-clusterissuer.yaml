@@ -1,3 +1,4 @@
+{{- if eq .Values.env "external" }}
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -29,3 +30,26 @@ spec:
           - cbull.dev
     - http01:
         ingress: {}
+{{- end }}
+{{- if eq .Values.env "internal" }}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: igou.david@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            key: dns-token
+            name: dns-token
+          email: igou.david@gmail.com
+      selector:
+        dnsZones:
+          - igou.systems
+{{- end }}
