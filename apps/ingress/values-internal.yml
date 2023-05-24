@@ -2,6 +2,8 @@ ingress-nginx:
   controller:
     admissionWebhooks:
       enabled: false
+    extraArgs:
+      default-ssl-certificate: "ingress/tls-cert"
     hostport:
       enabled: true
     kind: DaemonSet
