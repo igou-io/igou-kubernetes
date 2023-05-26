@@ -174,3 +174,4 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 200Gi
+            storageClassName: ""
