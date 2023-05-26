@@ -13,18 +13,10 @@ spec:
     template:
       type: kubernetes.io/iscsi-chap
   data:
-    - secretKey: discovery.sendtargets.auth.username
-      remoteRef:
-        key: prometheus-iscsi-chap
-        property: username
     - secretKey: node.session.auth.username
       remoteRef:
         key: prometheus-iscsi-chap
         property: username
-    - secretKey: discovery.sendtargets.auth.password
-      remoteRef:
-        key: prometheus-iscsi-chap
-        property: password
     - secretKey: node.session.auth.password
       remoteRef:
         key: prometheus-iscsi-chap
