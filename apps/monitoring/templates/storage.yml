@@ -6,7 +6,7 @@ metadata:
   name: chap-secret
 spec:
   secretStoreRef:
-    name: secret-store-name
+    name: onepassword
     kind: ClusterSecretStore
   refreshInterval: "1h"
   target:
