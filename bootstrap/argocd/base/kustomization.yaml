@@ -4,5 +4,3 @@ resources:
   - "https://github.com/argoproj/argo-cd.git/manifests/cluster-install/?ref=v2.7.3"
   - igou-kubernetes-repo-secret.yml
 namespace: argocd
-commonAnnotations:
-  env: igoucorp
