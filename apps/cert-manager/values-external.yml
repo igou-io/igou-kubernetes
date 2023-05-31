@@ -300,10 +300,6 @@ cert-manager:
       successThreshold: 1
       timeoutSeconds: 1
   
-    nodeSelector:
-      kubernetes.io/os: linux
-      beta.kubernetes.io/arch: arm64
-  
     affinity: {}
   
     tolerations: []
@@ -417,10 +413,6 @@ cert-manager:
       #   cpu: 10m
       #   memory: 32Mi
   
-    nodeSelector:
-      kubernetes.io/os: linux
-      beta.kubernetes.io/arch: arm64
-  
     affinity: {}
   
     tolerations: []
@@ -507,10 +499,6 @@ cert-manager:
       # requests:
       #   cpu: 10m
       #   memory: 32Mi
-  
-    nodeSelector:
-      kubernetes.io/os: linux
-      beta.kubernetes.io/arch: arm64
   
     affinity: {}
   
