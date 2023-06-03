@@ -1,23 +1,11 @@
 ingress-nginx:
   controller:
-    admissionWebhooks:
-      enabled: false
-    hostport:
-      enabled: true
-    updateStrategy:
-      type: Recreate
-    hostNetwork: false
-    nodeSelector:
-      node-role.kubernetes.io/ingress: "true"
-    tolerations:
-    - effect: NoExecute
-      key: ingress
-      operator: "Equal"
-      value: "true"
-    replicaCount: 1
+    kind: DaemonSet
     service:
-      enabled: false
-    publishService:
+      type: "NodePort"
+      nodePorts:
+        https: 30443
+    admissionWebhooks:
       enabled: false
     metrics:
       enabled: true
