@@ -1,6 +1,10 @@
 ingress-nginx:
   controller:
     kind: DaemonSet
+    service:
+      type: "NodePort"
+       nodePorts:
+         https: 33443
     admissionWebhooks:
       enabled: false
     metrics:
