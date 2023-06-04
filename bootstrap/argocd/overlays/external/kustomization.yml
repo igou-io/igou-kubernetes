@@ -2,5 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: argocd
 resources:
-  - ../../base
-  - argocd-ingress.yml
+- ../../base
+- argocd-dex-externalsecret.yml
+- argocd-ingress.yml
+patches:
+- path: argocd-rbac-cm-configmap.yml
+- path: argocd-cm-configmap.yml

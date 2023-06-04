@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+  name: argocd-cm
+  namespace: argocd
+data:
+  url: https://argocd.igou.io
+  admin.enabled: "false"
+  statusbadge.enabled: "true"
+  dex.config: |
+    connectors:
+      - type: github
+        id: github
+        name: GitHub
+        config:
+          clientID: $argocd-dex:clientid
+          clientSecret: $argocd-dex:clientsecret
+          orgs:
+          - name: igou-io
+            teams:
+            - k8s
+            - admin
