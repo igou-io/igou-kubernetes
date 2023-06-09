@@ -14,6 +14,14 @@ kube-prometheus-stack:
   prometheusOperator:
     tlsProxy:
       enabled: false
+    admissionWebhooks:
+      annotations:
+        argocd.argoproj.io/hook: PreSync
+        argocd.argoproj.io/hook-delete-policy: HookSucceeded
+      patch:
+        annotations:
+          argocd.argoproj.io/hook: PreSync
+          argocd.argoproj.io/hook-delete-policy: HookSucceeded
     createCustomResource: true
   alertmanager:
     alertmanagerSpec:
