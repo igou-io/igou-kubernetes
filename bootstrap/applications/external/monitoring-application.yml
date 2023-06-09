@@ -16,9 +16,7 @@ spec:
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    automated: {}
     syncOptions:
     - CreateNamespace=true
     - ServerSideApply=true
