@@ -3,8 +3,6 @@ kind: Application
 metadata:
   name: monitoring
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-options: Validate=false
 spec:
   destination:
     namespace: monitoring
@@ -24,3 +22,4 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - Validate=false
+    - ServerSideApply=true
