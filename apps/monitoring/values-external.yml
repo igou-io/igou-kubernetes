@@ -200,6 +200,7 @@ kube-prometheus-stack:
       storageSpec: # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/storage.md
         volumeClaimTemplate:
          spec:
+            storageClassName: ""
             selector:
               matchLabels:
                 app.kubernetes.io/name: prometheus
