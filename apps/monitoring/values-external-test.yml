@@ -58,11 +58,6 @@ kube-prometheus-stack:
       - name: 'null'
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
-        nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
-      ingressClassName: nginx
       hosts:
       - "alertmanager.igou.io"
       tls:
@@ -89,11 +84,6 @@ kube-prometheus-stack:
       kubernetes.io/hostname: worker-4
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
-        nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
-      ingressClassName: nginx
       hosts:
       - "grafana.igou.io"
       tls:
@@ -138,6 +128,11 @@ kube-prometheus-stack:
         bsbmp-exporter-basic:
           url: https://raw.githubusercontent.com/David-Igou/bsbmp-exporter/master/grafana/bsbmp-exporter-basic.json
           datasource: Prometheus
+    additionalDataSources:
+    - name: loki
+      type: loki
+      access: proxy
+      url: http://logging-loki.logging.svc.cluster.local:3100
     grafana.ini:
       paths:
         data: /var/lib/grafana/data
@@ -168,11 +163,6 @@ kube-prometheus-stack:
   prometheus:
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
-        nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
-      ingressClassName: nginx
       hosts:
       - "prometheus.igou.io"
       tls:
@@ -199,7 +189,7 @@ kube-prometheus-stack:
       walCompression: true
       storageSpec: # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/storage.md
         volumeClaimTemplate:
-         spec:
+          spec:
             selector:
               matchLabels:
                 app.kubernetes.io/name: prometheus
