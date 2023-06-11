@@ -11,6 +11,7 @@ oauth2-proxy:
       provider = "github"
       github_org = "igou-io"
       github_team = "k8s"
+      scope = "user:email"
     # Custom configuration file: oauth2_proxy.cfg
     # configFile: |-
     #   pass_basic_auth = false
