@@ -116,8 +116,6 @@ stackrox-central-services:
   #  endpointsConfig: "@config/central/endpoints.yaml|config/central/endpoints.yaml.default"
   #
   #
-    nodeSelector:
-      kubernetes.io/hostname: nuc0
   #
   #  jwtSigner:
   #    key: null
@@ -157,16 +155,27 @@ stackrox-central-services:
     resources:
       requests:
         memory: "1Gi"
-        cpu: "1"
+        cpu: ".5"
       limits:
         memory: "4Gi"
         cpu: "1"
+    adminPassword:
+      value: "password"
+
+    db:
+      resources:
+        requests:
+          memory: "3Gi"
+          cpu: ".5"
+
+  #    generate: null
+  #    htpasswd: null
   #
-    persistence:
+  #  persistence:
   #    hostPath: null
-      persistentVolumeClaim:
-        claimName: stackrox-db
-        createClaim: false
+  #   persistentVolumeClaim:
+  #     claimName: stackrox-db
+  #     createClaim: false
   #      storageClass: local-path-immediate
   #      size: 20Gi
   #    none: null
@@ -203,8 +212,6 @@ stackrox-central-services:
   #  # Default number of scanner replicas created upon startup. The actual number might be higher
   #  # or lower if autoscaling is enabled (see below).
     replicas: 1
-    nodeSelector:
-      kubernetes.io/hostname: nuc0
   #
   #  logLevel: INFO
   #
@@ -220,10 +227,7 @@ stackrox-central-services:
     resources:
       requests:
         memory: "500Mi"
-        cpu: "500m"
-      limits:
-        memory: "2500Mi"
-        cpu: "2000m"
+        cpu: ".5"
   #
   #  image:
   #    registry: null
