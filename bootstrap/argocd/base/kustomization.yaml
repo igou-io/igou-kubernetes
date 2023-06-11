@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - "https://github.com/argoproj/argo-cd.git/manifests/cluster-install/?ref=v2.7.3"
   - igou-kubernetes-repo-secret.yml
+  - igou-kubernetes-private-repo-externalsecret.yml
 namespace: argocd
