@@ -8,7 +8,6 @@ oauth2-proxy:
     existingSecret: oauth2-proxy-secret
     configFile: |-
       email_domains = "*"
-      upstreams = [ "file:///dev/null" ]
       provider = "github"
       github_org = "igou-io"
       github_team = "k8s"
