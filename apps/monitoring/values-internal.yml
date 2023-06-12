@@ -159,6 +159,10 @@ kube-prometheus-stack:
       serviceMonitorSelector: {}
       serviceMonitorNamespaceSelector: {}
       serviceMonitorSelectorNilUsesHelmValues: false
+      scrapeConfigNamespaceSelector: {}
+      scrapeConfigSelector:
+        matchLabels:
+          release: monitoring
       podMonitorSelector: {}
       podMonitorNamespaceSelector: {}
       podMonitorSelectorNilUsesHelmValues: false
