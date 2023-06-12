@@ -13,7 +13,7 @@ spec:
       skipCrds: true
       valueFiles:
       - values-external.yml
-    path: apps/dex
+    path: apps/dex/dex
     repoURL: https://github.com/igou-io/igou-kubernetes-private.git
     targetRevision: HEAD
   syncPolicy:
