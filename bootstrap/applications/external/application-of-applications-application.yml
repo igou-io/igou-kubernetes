@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: application-of-applications
   namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: bot_test_channel
 spec:
   destination:
     namespace: argocd
