@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonAnnotations:
+  notifications.argoproj.io/subscribe.on-sync-succeeded.slack: igoucloud-notifications
+resources:
+- application-of-applications-application.yml
+- argo-rollouts-application.yml
+- argocd-application.yml
+- cert-manager-application.yml
+- dex-application.yml
+- ingress-application.yml
+- monitoring-application.yml
+- oauth2-proxy-application.yml
