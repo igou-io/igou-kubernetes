@@ -5,6 +5,7 @@ resources:
 - ../../base
 - argocd-dex-externalsecret.yml
 - argocd-ingress.yml
+- argocd-notifications-secret-externalsecret.yml
 patches:
 - path: argocd-rbac-cm-configmap.yml
 - path: argocd-cm-configmap.yml
