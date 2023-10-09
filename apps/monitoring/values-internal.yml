@@ -9,7 +9,7 @@ kube-prometheus-stack:
   prometheusOperator:
     tlsProxy:
       enabled: false
-    createCustomResource: true
+    createCustomResource: false
   alertmanager:
     alertmanagerSpec:
       secrets:
