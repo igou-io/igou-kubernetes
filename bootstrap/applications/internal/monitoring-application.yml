@@ -12,6 +12,7 @@ spec:
     helm:
       valueFiles:
         - values-internal.yml
+      skipCrds: true
     path: apps/monitoring
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
