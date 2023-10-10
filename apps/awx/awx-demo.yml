@@ -10,3 +10,10 @@ spec:
   hostname: awx.apps.igou.systems
   ingress_class_name: nginx
   postgres_storage_class: awx-postgres
+  ee_images:
+    - name: igou-awx-ee
+      image: quay.io/igou/igou-awx-ee
+    - name: igou-awx-ee-edge
+      image: quay.io/igou/igou-awx-ee-edge
+    - name: igou-awx-ee-minimal
+      image: quay.io/igou/igou-awx-ee-minimal
