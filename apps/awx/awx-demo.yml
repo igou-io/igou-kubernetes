@@ -2,7 +2,11 @@
 apiVersion: awx.ansible.com/v1beta1
 kind: AWX
 metadata:
-  name: awx-demo
+  name: awx
   namespace: awx
 spec:
-  service_type: nodeport
+  service_type: clusterip
+  ingress_type: ingress
+  hostname: awx.apps.igou.systems
+  ingress_class_name: nginx
+  
