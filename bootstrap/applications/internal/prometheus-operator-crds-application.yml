@@ -8,7 +8,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: bootstrap/prometheus-operator-crds
+    path: apps/prometheus-operator-crds
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
   syncPolicy:
