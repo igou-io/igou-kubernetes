@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: prometheus-iscsi-pv
+  name: awx-postgres-pv
   labels:
-    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/name: awx
 spec:
   storageClassName: "awx-postgres"
   capacity:
@@ -19,6 +19,6 @@ spec:
     readOnly: false
     secretRef:
       name: chap-secret
-      namespace: monitoring
+      namespace: awx
     chapAuthDiscovery: true
     chapAuthSession: true

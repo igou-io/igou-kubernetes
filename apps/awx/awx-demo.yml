@@ -9,4 +9,4 @@ spec:
   ingress_type: ingress
   hostname: awx.apps.igou.systems
   ingress_class_name: nginx
-  
+  postgres_storage_class: awx-postgres
