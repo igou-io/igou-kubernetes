@@ -18,3 +18,6 @@ spec:
       image: quay.io/igou/igou-awx-ee-edge
     - name: igou-awx-ee-minimal
       image: quay.io/igou/igou-awx-ee-minimal
+  extra_settings:
+    - setting: ALLOW_METRICS_FOR_ANONYMOUS_USERS
+      value: "True"
