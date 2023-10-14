@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: awx-instance
+  namespace: awx
+spec:
+  endpoints:
+  - interval: 30s
+    path: /api/v2/metrics/
+    port: http
+    scheme: http
+    scrapeTimeout: 25s
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: awx
