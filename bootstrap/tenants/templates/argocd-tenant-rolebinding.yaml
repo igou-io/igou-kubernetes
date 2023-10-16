@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argocd-tenant-rolebinding
+  namespace: argocd-{{ .Values.id }}
+subjects:
+- kind: ServiceAccount
+  name: argocd-server
+  namespace: argocd
+roleRef:
+  kind: ClusterRole
+  name: argocd-tenant
+  apiGroup: rbac.authorization.k8s.io

@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "argocd-{{ .Values.id }}"
+---
 {{- range .Values.additionalNamespaces }}
 apiVersion: v1
 kind: Namespace
