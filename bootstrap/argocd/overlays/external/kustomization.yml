@@ -11,3 +11,4 @@ patches:
 - path: argocd-notifications-cm-configmap.yml
 - path: argocd-rbac-cm-configmap.yml
 - path: argocd-cm-configmap.yml
+- path: argocd-cmd-params-cm-configmap.yml
