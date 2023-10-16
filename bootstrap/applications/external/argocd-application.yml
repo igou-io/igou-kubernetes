@@ -12,9 +12,9 @@ spec:
     path: bootstrap/argocd/overlays/external
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
-  automated:
-    prune: true
-    selfHeal: true
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
