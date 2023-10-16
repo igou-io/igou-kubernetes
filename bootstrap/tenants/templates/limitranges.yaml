@@ -1,0 +1,17 @@
+{{- range .Values.additionalNamespaces }}
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: compute-resources-defaults
+  namespace: {{ .namespace }}
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: "{{ index .computeResourceDefaults "limits.cpu" }}"
+      memory: "{{ index .computeResourceDefaults "limits.memory" }}"
+    defaultRequest:
+      cpu: "{{ index .computeResourceDefaults "requests.cpu" }}"
+      memory: "{{ index .computeResourceDefaults "requests.memory" }}"
+---
+{{- end }}

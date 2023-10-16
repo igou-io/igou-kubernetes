@@ -1,0 +1,15 @@
+{{- range .Values.additionalNamespaces }}
+{{- if .networkPolicy }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-networkpolicy
+  namespace: {{ .namespace }}
+spec:
+  {{- toYaml .networkPolicy | nindent 2 }}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+{{- end }}
+{{- end }}

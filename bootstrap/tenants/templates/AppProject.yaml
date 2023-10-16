@@ -9,11 +9,9 @@ spec:
   destinations:
     - namespace: {{ printf "argocd-%s" .Values.id }}
       server: https://kubernetes.default.svc
-    - namespace: {{ printf "%s*" .Values.id }}
-      server: https://kubernetes.default.svc
-  {{- if .Values.additionnalNamespaces }}
-  {{- range $additionnalNamespace := $.Values.additionnalNamespaces }}
-    - namespace: {{ $additionnalNamespace }}
+  {{- if .Values.additionalNamespaces }}
+  {{- range $additionalNamespace := $.Values.additionalNamespaces }}
+    - namespace: {{ $additionalNamespace.namespace }}
       server: https://kubernetes.default.svc
   {{- end }}
   {{- end }}

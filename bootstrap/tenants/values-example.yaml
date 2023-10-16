@@ -1,9 +1,9 @@
 
-id: igou
+id: csbull
 
 # Defines the source Repos from which an applications can be deployed. It can use globs
 sourceRepos:
-  - https://igouhub.com/repos/*
+  - https://github.com/Christian-Bull/*
 #  - repo2
 
 # Defines the list of Admins. It is a list of Azure AD security group UUIDs
@@ -12,9 +12,9 @@ admins: null
 #  admin-id-1: uuid1
 #  admin-id-2: uuid2
 
-# Defines the additional namespaces on which a team can deploy. It can use globs
+# Defines the additional namespaces on which a team can deploy. It can not use globs
 additionalNamespaces:
-  - namespace: my-app
+  - namespace: slack-notify
     labels:
       foo: bar
     annotations:

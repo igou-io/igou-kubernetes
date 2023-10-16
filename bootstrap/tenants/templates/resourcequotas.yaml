@@ -1,0 +1,33 @@
+{{- range .Values.additionalNamespaces }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: storage-quota
+  namespace: {{ .namespace }}
+spec:
+  hard:
+    {{ toYaml .storageQuota | nindent 4 }}
+---
+{{- end }}
+{{- range .Values.additionalNamespaces }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: objects-quota
+  namespace: {{ .namespace }}
+spec:
+  hard:
+    {{ toYaml .objectQuota | nindent 4 }}
+---
+{{- end }}
+{{- range .Values.additionalNamespaces }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources-quota
+  namespace: {{ .namespace }}
+spec:
+  hard:
+    {{ toYaml .computeResourceQuota | nindent 4 }}
+---
+{{- end }}
