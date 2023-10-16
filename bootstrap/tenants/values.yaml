@@ -1,0 +1,38 @@
+
+id: project-id
+
+# Defines the source Repos from which an applications can be deployed. It can use globs
+sourceRepos: []
+#  - repo1
+#  - repo2
+
+# Defines the list of Admins. It is a list of Azure AD security group UUIDs
+# the key is an arbitrary name
+admins: null
+#  admin-id-1: uuid1
+#  admin-id-2: uuid2
+
+# Defines the additional namespaces on which a team can deploy. It can use globs
+additionnalNamespaces: []
+#  - namespace1
+#  - namespace2
+
+# Defines the list of readonly users with the associated Azure AD security group UUID and application glob (ie: customerone-* for all applications prefixed by customerone in team project)
+# the key is an arbitrary name
+readonly: null
+#  readonly-id-1:
+#    glob: application-glob*
+#    azureAdId: uuid
+#  readonly-id-2:
+#    glob: application-glob*
+#    azureAdId: uuid
+
+# (Default null) Defines the list of edit users with the associated Azure AD security group UUID and application glob (ie: customerone-* for all applications prefixed by customerone in team project)
+# the key is an arbitrary name
+edit: null
+#  readonly-id-1:
+#    glob: application-glob*
+#    azureAdId: uuid
+#  readonly-id-2:
+#    glob: application-glob*
+#    azureAdId: uuid

@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .Values.id  }}
+spec:
+  description: {{ .Values.id | title }} components
+  sourceRepos:
+{{ .Values.sourceRepos | toYaml | indent 4 }}
+  destinations:
+    - namespace: {{ printf "argocd-%s" .Values.id }}
+      server: https://kubernetes.default.svc
+    - namespace: {{ printf "%s*" .Values.id }}
+      server: https://kubernetes.default.svc
+  {{- if .Values.additionnalNamespaces }}
+  {{- range $additionnalNamespace := $.Values.additionnalNamespaces }}
+    - namespace: {{ $additionnalNamespace }}
+      server: https://kubernetes.default.svc
+  {{- end }}
+  {{- end }}
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  sourceNamespaces:
+    - {{ printf "argocd-%s" .Values.id }}
+  roles:
+    - name: admins
+      description:  {{ printf "%s Admin role" .Values.id }}
+      policies:
+        - {{ printf "p, proj:%s:admins, applications, create, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applications, delete, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applications, get, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applications, override, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applications, sync, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applications, update, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applications, action/*, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applicationsets, get, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applicationsets, create, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applicationsets, update, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, applicationsets, delete, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, logs, get, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, exec, create, %s/argocd-%s/*, allow" .Values.id .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, projects, get, %s, allow" .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, repositories, get, %s/*, allow" .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, repositories, create, %s/*, allow" .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, repositories, update, %s/*, allow" .Values.id .Values.id }}
+        - {{ printf "p, proj:%s:admins, repositories, delete, %s/*, allow" .Values.id .Values.id }}
+      groups:
+{{ $.Values.admins | values | toYaml | indent 8 }}
+{{- if $.Values.readonly }}
+{{- range $readonlyName, $readonlyConfig := $.Values.readonly  }}
+    - name: {{ printf "%s-readonly" $readonlyName }}
+      description: {{ printf "%s Readonly role for %s" $.Values.id $readonlyName }}
+      policies:
+        - {{ printf "p, proj:%s:%s-readonly, applications, get, %s/argocd-%s/%s, allow" $.Values.id $readonlyName $.Values.id $.Values.id $readonlyConfig.glob }}
+        - {{ printf "p, proj:%s:%s-readonly, logs, get, %s/argocd-%s/%s, allow" $.Values.id $readonlyName $.Values.id $.Values.id $readonlyConfig.glob }}
+        - {{ printf "p, proj:%s:%s-readonly, repositories, get, %s/*, allow" $.Values.id $readonlyName $.Values.id }}
+      groups:
+        - {{ $readonlyConfig.azureAdId }}
+{{- end }}
+{{- end }}
+{{- if $.Values.edit }}
+{{- range $editName, $editConfig := $.Values.edit  }}
+    - name: {{ printf "%s-edit" $editName }}
+      description: {{ printf "%s Edit role for %s" $.Values.id $editName }}
+      policies:
+        - {{ printf "p, proj:%s:%s-edit, applications, get, %s/argocd-%s/%s, allow" $.Values.id $editName $.Values.id $.Values.id $editConfig.glob }}
+        - {{ printf "p, proj:%s:%s-edit, applications, sync, %s/argocd-%s/%s, allow" $.Values.id $editName $.Values.id $.Values.id $editConfig.glob }}
+        - {{ printf "p, proj:%s:%s-edit, applications, actions/*, %s/argocd-%s/%s, allow" $.Values.id $editName $.Values.id $.Values.id $editConfig.glob }}
+        - {{ printf "p, proj:%s:%s-edit, logs, get, %s/argocd-%s/%s, allow" $.Values.id $editName $.Values.id $.Values.id $editConfig.glob }}
+        - {{ printf "p, proj:%s:%s-edit, exec, create, %s/argocd-%s/%s, allow" $.Values.id $editName $.Values.id $.Values.id $editConfig.glob }}
+        - {{ printf "p, proj:%s:%s-edit, repositories, get, %s/*, allow" $.Values.id $editName $.Values.id }}
+      groups:
+        - {{ $editConfig.azureAdId }}
+{{- end }}
+{{- end }}
