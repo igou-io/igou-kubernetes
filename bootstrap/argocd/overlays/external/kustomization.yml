@@ -6,6 +6,7 @@ resources:
 - argocd-dex-externalsecret.yml
 - argocd-ingress.yml
 - argocd-notifications-secret-externalsecret.yml
+- argocd-tenant-clusterrole.yml
 patches:
 - path: https://raw.githubusercontent.com/argoproj/argo-cd/master/notifications_catalog/install.yaml
 - path: argocd-notifications-cm-configmap.yml
