@@ -8,7 +8,8 @@ sourceRepos:
 
 # Defines the list of Admins. It is a list of Azure AD security group UUIDs
 # the key is an arbitrary name
-admins: null
+admins:
+  admins: igou-io:igou
 #  admin-id-1: uuid1
 #  admin-id-2: uuid2
 
