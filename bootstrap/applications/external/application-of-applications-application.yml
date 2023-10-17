@@ -4,7 +4,7 @@ metadata:
   name: application-of-applications
   namespace: argocd
   annotations:
-    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: bot_test_channel
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: igoucloud-notifications
 spec:
   destination:
     namespace: argocd
