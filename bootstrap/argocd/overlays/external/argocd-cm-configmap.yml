@@ -7,7 +7,7 @@ metadata:
   name: argocd-cm
   namespace: argocd
 data:
-  url: https://argocd.igou.io
+  url: "https://argocd.igou.io"
   application.resourceTrackingMethod: "annotation+label"
   admin.enabled: "false"
   statusbadge.enabled: "true"
