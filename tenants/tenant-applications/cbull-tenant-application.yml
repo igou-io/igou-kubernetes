@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: cbull-tenant
   namespace: argocd
+  labels:
+    kind: tenant
 spec:
   destination:
     server: https://kubernetes.default.svc
@@ -14,3 +16,7 @@ spec:
     path: tenants/tenant-chart
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
