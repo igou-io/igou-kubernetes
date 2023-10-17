@@ -3,8 +3,6 @@ kind: Application
 metadata:
   name: dex
   namespace: argocd
-  annotations:
-    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: igoucloud-notifications
 spec:
   destination:
     namespace: dex
