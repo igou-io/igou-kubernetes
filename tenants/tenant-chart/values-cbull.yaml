@@ -44,7 +44,7 @@ additionalNamespaces:
                 kubernetes.io/metadata.name: ingress
             podSelector:
               matchLabels:
-                app.kubernetes.io/name: ingress
+                app.kubernetes.io/name: ingress-nginx
       egress:
       - to:
         - namespaceSelector:
