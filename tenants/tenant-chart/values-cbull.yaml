@@ -8,6 +8,7 @@ sourceRepos:
   - https://github.com/Christian-Bull/catfacts
   - https://github.com/Christian-Bull/cbull-dev
   - https://github.com/Christian-Bull/cbull-dev-infra
+  - https://github.com/Christian-Bull/slack-twitch-slash
 
 admins: 
   admin: igou-io:cbull
