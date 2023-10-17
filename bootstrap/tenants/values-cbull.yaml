@@ -1,0 +1,52 @@
+
+id: cbull
+
+# Defines the source Repos from which an applications can be deployed. It can use globs
+sourceRepos:
+  - https://github.com/Christian-Bull/cbull-dev-apps
+  - https://github.com/Christian-Bull/slack-notify-go
+  - https://github.com/Christian-Bull/catfacts
+  - https://github.com/Christian-Bull/cbull-dev
+
+# Defines the additional namespaces on which a team can deploy. It can use globs
+additionalNamespaces:
+  - namespace: cbull
+    labels:
+      project: cbull
+    storageQuota:
+      persistentvolumeclaims: "5"
+      requests.storage: "10Gi"
+    objectQuota:
+      pods: "20"
+      services: "10"
+      configmaps: "100"
+      secrets: "100"
+      services.loadbalancers: "0"
+      services.nodeports: "0"
+    computeResourceQuota:
+      requests.cpu: "1"
+      requests.memory: 1Gi
+      limits.cpu: "2"
+      limits.memory: 2Gi
+    computeResourceDefaults:
+      requests.cpu: 100m
+      requests.memory: 250Mi
+      limits.cpu: 500m
+      limits.memory: 500Mi
+    networkPolicy:
+      ingress:
+        - from:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: ingress
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/name: ingress
+      egress:
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
