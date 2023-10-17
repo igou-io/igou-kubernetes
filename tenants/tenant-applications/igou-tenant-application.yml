@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: igou-tenant
   namespace: argocd
-  label:
+  labels:
     kind: tenant
 spec:
   destination:
