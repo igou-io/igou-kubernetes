@@ -4,7 +4,6 @@ metadata:
   name: argocd-rbac-cm
   namespace: argocd
 data:
-  policy.default: role:readonly
   policy.csv: |
     p, role:admin, applications, *, */*, allow
     p, role:org-admin, applications, *, */*, allow
