@@ -23,4 +23,4 @@ spec:
     - CreateNamespace=true
     ManagedNamespaceMetadata:
       labels:
-        external.secrets.io/enabled: true
+        external.secrets.io/enabled: "true"

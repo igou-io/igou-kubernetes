@@ -18,7 +18,7 @@ spec:
   syncPolicy:
     managedNamespaceMetadata:
       labels:
-        external.secrets.io/enabled: true
+        external.secrets.io/enabled: "true"
     automated:
       prune: true
       selfHeal: true
