@@ -22,5 +22,5 @@ data:
           orgs:
           - name: igou-io
             teams:
-            - k8s
             - admin
+            - cbull
