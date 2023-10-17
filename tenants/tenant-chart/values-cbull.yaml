@@ -30,14 +30,14 @@ additionalNamespaces:
       services.nodeports: "0"
     computeResourceQuota:
       requests.cpu: "2"
-      requests.memory: 2Gi
-      limits.cpu: "4"
-      limits.memory: 4Gi
+      requests.memory: 1Gi
+      limits.cpu: "2"
+      limits.memory: 2Gi
     computeResourceDefaults:
       requests.cpu: 100m
-      requests.memory: 250Mi
-      limits.cpu: 500m
-      limits.memory: 500Mi
+      requests.memory: 100Mi
+      limits.cpu: 200m
+      limits.memory: 200Mi
     networkPolicy:
       ingress:
         - from:
