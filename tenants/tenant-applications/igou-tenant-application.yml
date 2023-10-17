@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: igou-tenant
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    helm:
+      valueFiles:
+      - values-igou.yaml
+    path: tenants/tenant-chart
+    repoURL: https://github.com/igou-io/igou-kubernetes.git
+    targetRevision: HEAD

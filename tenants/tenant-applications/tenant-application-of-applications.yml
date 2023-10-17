@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application-of-applications
+  namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: bot_test_channel
+  labels:
+    kind: tenant
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: tenants/tenant-applications
+    repoURL: https://github.com/igou-io/igou-kubernetes.git
+    targetRevision: HEAD
+    metaData:
+      labels:
+        kind: "tenant"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
