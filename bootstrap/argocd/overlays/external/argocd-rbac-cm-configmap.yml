@@ -15,3 +15,4 @@ data:
     p, role:org-admin, repositories, delete, *, allow
     g, igou-io:admin, role:admin
     g, igou-io:admin, role:org-admin
+    g, igou-io:read, role:readonly
