@@ -10,7 +10,7 @@ sourceRepos:
 
 # Defines the additional namespaces on which a team can deploy. It can use globs
 additionalNamespaces:
-  - namespace: cbull-*
+  - namespace: cbull
     labels:
       project: cbull
     storageQuota:
