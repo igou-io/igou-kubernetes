@@ -5,3 +5,5 @@ metadata:
 data:
   service.slack: |
     token: $slack-token
+  context: |
+    argocdUrl: https://argocd.igou.io
