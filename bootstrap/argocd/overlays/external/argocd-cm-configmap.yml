@@ -9,7 +9,7 @@ metadata:
 data:
   url: https://argocd.igou.io
   application.resourceTrackingMethod: "annotation+label"
-  admin.enabled: "true"
+  admin.enabled: "false"
   statusbadge.enabled: "true"
   dex.config: |
     connectors:
@@ -22,5 +22,7 @@ data:
           orgs:
           - name: igou-io
             teams:
+            - admin
+            - read
             - igou
             - cbull
