@@ -8,6 +8,9 @@ sourceRepos:
   - https://github.com/Christian-Bull/catfacts
   - https://github.com/Christian-Bull/cbull-dev
 
+admins: 
+  admin: igou-io:cbull
+
 # Defines the additional namespaces on which a team can deploy. It can use globs
 additionalNamespaces:
   - namespace: cbull
