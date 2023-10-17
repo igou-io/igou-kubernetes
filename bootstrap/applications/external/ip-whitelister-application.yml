@@ -1,19 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dex
+  name: ip-whitelister
   namespace: argocd
 spec:
   destination:
-    namespace: dex
+    namespace: ip-whitelister
     server: https://kubernetes.default.svc
   project: default
   source:
-    helm:
-      skipCrds: true
-      valueFiles:
-      - values-external.yml
-    path: apps/dex/dex
+    path: apps/ip-whitelister/overlays/all-overlays
     repoURL: https://github.com/igou-io/igou-kubernetes-private.git
     targetRevision: HEAD
   syncPolicy:

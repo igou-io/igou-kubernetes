@@ -16,6 +16,9 @@ spec:
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
   syncPolicy:
+    ManagedNamespaceMetadata:
+      labels:
+        external.secrets.io/enabled: true
     automated:
       prune: true
       selfHeal: true
