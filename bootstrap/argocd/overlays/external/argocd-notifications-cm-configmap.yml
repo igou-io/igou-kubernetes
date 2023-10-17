@@ -7,3 +7,11 @@ data:
     token: $slack-token
   context: |
     argocdUrl: https://argocd.igou.io
+  defaultTriggers: |
+    - on-health-degraded
+    - on-deleted
+    - on-created
+    - on-deployed
+    - on-sync-status-unknown
+    - on-sync-succeeded
+    - on-sync-status-unknown
