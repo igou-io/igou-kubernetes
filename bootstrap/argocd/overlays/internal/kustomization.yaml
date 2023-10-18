@@ -4,3 +4,9 @@ namespace: argocd
 resources:
   - ../../base
   - argocd-ingress.yml
+  - argocd-notifications-secret-externalsecret.yml
+
+patches:
+- path: https://raw.githubusercontent.com/argoproj/argo-cd/master/notifications_catalog/install.yaml
+- path: argocd-notifications-cm-configmap.yml
+- path: argocd-cm-configmap.yml
