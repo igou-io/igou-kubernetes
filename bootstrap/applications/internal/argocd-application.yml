@@ -18,3 +18,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        external.secrets.io/enabled: "true"
