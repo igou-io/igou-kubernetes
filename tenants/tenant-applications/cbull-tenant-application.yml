@@ -16,7 +16,3 @@ spec:
     path: tenants/tenant-chart
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
