@@ -3,13 +3,7 @@ id: cbull
 
 # Defines the source Repos from which an applications can be deployed. It can use globs
 sourceRepos:
-  - https://github.com/Christian-Bull/cbull-dev-apps
-  - https://github.com/Christian-Bull/slack-notify-go
-  - https://github.com/Christian-Bull/catfacts
-  - https://github.com/Christian-Bull/cbull-dev
-  - https://github.com/Christian-Bull/cbull-dev-infra
-  - https://github.com/Christian-Bull/slack-twitch-slash
-  - https://github.com/Christian-Bull/slack-reactbot
+  - https://github.com/Christian-Bull/*
 
 admins: 
   admin: igou-io:cbull
