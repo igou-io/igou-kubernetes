@@ -3,5 +3,5 @@ apiVersion: v2
 version: 1.0.0
 dependencies:
   - name: gpu-operator
-    version: 23.6.1
+    version: v23.9.0
     repository: https://helm.ngc.nvidia.com/nvidia
