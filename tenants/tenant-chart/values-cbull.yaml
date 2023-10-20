@@ -9,6 +9,7 @@ sourceRepos:
   - https://github.com/Christian-Bull/cbull-dev
   - https://github.com/Christian-Bull/cbull-dev-infra
   - https://github.com/Christian-Bull/slack-twitch-slash
+  - https://github.com/Christian-Bull/slack-reactbot
 
 admins: 
   admin: igou-io:cbull
