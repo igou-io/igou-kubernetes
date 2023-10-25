@@ -18,7 +18,6 @@ spec:
   ignoreDifferences:
   - group: cert-manager.io
     kind: Certificate
-    version: v1
     jsonPointers:
     - /spec/duration
   syncPolicy:
