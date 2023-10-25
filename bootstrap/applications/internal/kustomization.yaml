@@ -10,5 +10,6 @@ resources:
 - external-secrets-application.yml
 - gpu-operator-application.yml
 - ingress-application.yml
+- vpn-application.yml
 - monitoring-application.yml
 - prometheus-operator-crds-application.yml
