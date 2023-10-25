@@ -15,6 +15,12 @@ spec:
     path: apps/vpn
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
+  ignoreDifferences:
+  - group: cert-manager.io
+    kind: Certificate
+    version: v1
+    jsonPointers:
+    - /spec/duration
   syncPolicy:
 #    automated:
 #      prune: true
