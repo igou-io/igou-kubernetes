@@ -13,7 +13,7 @@ pod-gateway:
         image:
           # TODO: Replace with ghcr.io/qdm12/gluetun when a versioned tag is available
           repository: docker.io/qmcgaw/gluetun
-          tag: v3.35.0
+          tag: v3.36.0
       env:
         - name: VPN_SERVICE_PROVIDER
           value: mullvad
