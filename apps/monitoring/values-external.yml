@@ -191,6 +191,9 @@ kube-prometheus-stack:
       ruleSelector: {}
       ruleNamespaceSelector: {}
       ruleSelectorNilUsesHelmValues: false
+      scrapeConfigSelector: {}
+      scrapeConfigNamespaceSelector: {}
+      scrapeConfigSelectorNilUsesHelmValues: false
       serviceMonitorSelector: {}
       serviceMonitorNamespaceSelector: {}
       serviceMonitorSelectorNilUsesHelmValues: false
