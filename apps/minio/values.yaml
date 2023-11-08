@@ -2,12 +2,56 @@ minio:
   mode: standalone
   deploymentUpdate:
     type: Recreate
+  buckets:
+    - name: loki
+      policy: none
+      purge: false
+    - name: thanos
+      policy: none
+      purge: false
   users:
-    - accessKey: foofoofoofoo
-      secretKey: barbarbarbarbarbarbarbar
-      policy: readonly
-  rootUser: admin
-  rootPassword: password1234
+    - accessKey: loki
+      existingSecret: minio-users
+      existingSecretKey: loki-user-secret-key
+      policy: loki-rw
+    - accessKey: thanos
+      existingSecret: minio-users
+      existingSecretKey: thanos-user-secret-key
+      policy: thanos-rw
+  svcaccts:
+    - accessKey: loki-svcacct
+      existingSecret: minio-users
+      existingSecretKey: loki-svcacct-secret-key
+      user: loki
+    - accessKey: thanos-svcacct
+      existingSecret: minio-users
+      existingSecretKey: thanos-svcacct-secret-key
+      user: thanos
+  policies:
+    - name: loki-rw
+      statements:
+        - effect: Allow  # this is the default
+          resources:
+            - 'arn:aws:s3:::loki'
+          actions:
+            - "s3:ListBucket"
+            - "s3:AbortMultipartUpload"
+            - "s3:GetObject"
+            - "s3:DeleteObject"
+            - "s3:PutObject"
+            - "s3:ListMultipartUploadParts"
+    - name: thanos-rw
+      statements:
+        - effect: Allow  # this is the default
+          resources:
+            - 'arn:aws:s3:::thanos'
+          actions:
+            - "s3:AbortMultipartUpload"
+            - "s3:GetObject"
+            - "s3:DeleteObject"
+            - "s3:PutObject"
+            - "s3:ListMultipartUploadParts"
+  existingSecret: minio-root
   persistence:
     enabled: true
     storageClass: "minio"
