@@ -11,5 +11,6 @@ resources:
 - gpu-operator-application.yml
 - ingress-application.yml
 - vpn-application.yml
+- minio-application.yml
 - monitoring-application.yml
 - prometheus-operator-crds-application.yml
