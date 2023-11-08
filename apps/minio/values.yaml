@@ -1,0 +1,28 @@
+minio:
+  mode: standalone
+  deploymentUpdate:
+    type: Recreate
+  users:
+    - accessKey: foofoofoofoo
+      secretKey: barbarbarbarbarbarbarbar
+      policy: readonly
+  rootUser: admin
+  rootPassword: password1234
+  persistence:
+    enabled: true
+    storageClass: "minio"
+    volumeName: "minio-iscsi-pv"
+    size: 1000Gi
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - minio.apps.igou.systems
+  consoleIngress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - minio-console.apps.igou.systems
+  metrics:
+    serviceMonitor:
+      enabled: true
