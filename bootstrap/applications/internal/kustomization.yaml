@@ -12,5 +12,6 @@ resources:
 - ingress-application.yml
 - vpn-application.yml
 - minio-application.yml
+- logging-application.yml
 - monitoring-application.yml
 - prometheus-operator-crds-application.yml
