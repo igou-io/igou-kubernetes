@@ -31,4 +31,4 @@ promtail:
     logLevel: info
     serverPort: 3101
     clients:
-      - url: http://loki-write.logging:3100/loki/api/v1/push
+      - url: http://logging-loki.logging:3100/loki/api/v1/push
