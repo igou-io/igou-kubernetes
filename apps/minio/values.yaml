@@ -33,6 +33,7 @@ minio:
         - effect: Allow  # this is the default
           resources:
             - 'arn:aws:s3:::loki'
+            - 'arn:aws:s3:::loki/*'
           actions:
             - "s3:ListBucket"
             - "s3:AbortMultipartUpload"
@@ -45,6 +46,7 @@ minio:
         - effect: Allow  # this is the default
           resources:
             - 'arn:aws:s3:::thanos'
+            - 'arn:aws:s3:::thanos/*'
           actions:
             - "s3:AbortMultipartUpload"
             - "s3:GetObject"
