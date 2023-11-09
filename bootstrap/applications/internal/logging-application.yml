@@ -18,6 +18,7 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
     managedNamespaceMetadata:
       labels:
         external.secrets.io/enabled: "true"
