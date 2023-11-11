@@ -1,3 +1,4 @@
+{{- if eq .Values.env "internal" }}
 ---
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
@@ -47,3 +48,24 @@ spec:
     chapAuthDiscovery: true
     chapAuthSession: true
 ...
+{{- end }}
+{{- if eq .Values.env "external" }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-pv
+  labels:
+    app.kubernetes.io/name: minio
+spec:
+  storageClassName: "minio"
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  iscsi:
+     targetPortal: 10.10.1.5:3260
+     iqn: iqn.2023-04.systems.igou.dmz:minio
+     lun: 0
+     fsType: 'ext4'
+{{- end }}

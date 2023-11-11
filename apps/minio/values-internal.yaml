@@ -1,3 +1,4 @@
+env: internal
 minio:
   mode: standalone
   deploymentUpdate:
