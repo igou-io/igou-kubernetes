@@ -55,7 +55,7 @@ minio:
   persistence:
     enabled: true
     storageClass: "minio"
-    volumeName: "minio-iscsi-pv"
+    volumeName: "minio-pv"
     size: 500Gi
   ingress:
     enabled: false
