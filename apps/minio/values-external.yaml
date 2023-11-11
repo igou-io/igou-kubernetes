@@ -65,7 +65,18 @@ minio:
   ingress:
     enabled: false
   consoleIngress:
-    enabled: false
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/auth-signin: 'https://oauth.igou.io/oauth2/start'
+      nginx.ingress.kubernetes.io/auth-url: 'https://oauth.igou.io/oauth2/auth'
+    ingressClassName: nginx
+    hosts:
+    - "minio-console.igou.io"
+    tls:
+    - hosts:
+      - "minio-console.igou.io"
+      secretName: minio-console-acme-certificate
   metrics:
     serviceMonitor:
       enabled: true
