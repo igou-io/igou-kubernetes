@@ -1,7 +1,7 @@
 env: external
 minio:
   nodeSelector:
-    node-role.kubernetes.io/worker: true
+    node-role.kubernetes.io/worker: "true"
   resources:
     requests:
       memory: 2Gi
