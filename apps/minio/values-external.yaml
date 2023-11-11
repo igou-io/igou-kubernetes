@@ -1,5 +1,8 @@
 env: external
 minio:
+  resources:
+    requests:
+      memory: 2Gi
   mode: standalone
   deploymentUpdate:
     type: Recreate
