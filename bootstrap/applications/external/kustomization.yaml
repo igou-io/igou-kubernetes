@@ -10,6 +10,7 @@ resources:
 - dex-application.yml
 - external-secrets-application.yml
 - ingress-application.yml
+- minio-application.yml
 - ip-whitelister-application.yml
 - monitoring-application.yml
 - oauth2-proxy-application.yml
