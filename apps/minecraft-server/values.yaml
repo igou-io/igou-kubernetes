@@ -439,7 +439,7 @@ minecraft:
     pruneBackupsDays: 7
   
     # Set to a negative value to retry indefinitely
-    rconRetries: 5
+    rconRetries: -1
     rconRetryInterval: 10s
   
     # is a comma-separated list of glob(3) patterns to exclude from backups. By default excludes all jar files (plugins, server files),
@@ -459,7 +459,7 @@ minecraft:
     zstdParameters: "-3 --long=25 --single-thread"
     # the name of the remote you've configured in your rclone.conf
     rcloneRemote: minio
-    rcloneDestDir:
+    rcloneDestDir: minecraft
     rcloneCompressMethod: gzip
   
     # see https://rclone.org/ for details
