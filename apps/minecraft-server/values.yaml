@@ -311,18 +311,17 @@ minecraft:
   
     rcon:
       # If you enable this, make SURE to change your password below.
-      enabled: false
+      enabled: true
       # By default, the container will generate a random password at startup
       # to ensure internal RCON tooling, including a backup container,
       # can be used, but the password is secure.
       withGeneratedPassword: false
       port: 25575
-      password: "CHANGEME!"
-      existingSecret:
+      existingSecret: minecraft-secrets
       secretKey: rcon-password
-      serviceType: ClusterIP
+      serviceType: NodePort
       ## Set the external port if the rcon serviceType is NodePort
-      nodePort:
+      nodePort: 30655
       clusterIP:
       loadBalancerIP:
       # loadBalancerSourceRanges: []
@@ -431,7 +430,7 @@ minecraft:
     # ***set to 0 or smaller, script will run once and exit.  DO NOT SET TO 0 or smaller, this will cause K8s to kill your pod!***
     # backupInterval="1.5d" -> backup every one and a half days (36 hours)
     # backupInterval="2h 30m" -> backup every two and a half hours
-    backupInterval: 24h
+    backupInterval: 6h
   
     # option lets you pause backups if no players are online.
     pauseIfNoPlayers: "false"
@@ -459,7 +458,7 @@ minecraft:
     # (the default of 25 means 2^25 bytes = 32 MB).
     zstdParameters: "-3 --long=25 --single-thread"
     # the name of the remote you've configured in your rclone.conf
-    rcloneRemote:
+    rcloneRemote: minio
     rcloneDestDir:
     rcloneCompressMethod: gzip
   
@@ -476,7 +475,7 @@ minecraft:
     # bucket_acl = private
   
     # if you prefer to create a secret from file (e.g. kubectl create secret generic my-rclone-config --from-file=~/.config/rclone/rclone.conf)
-    # rcloneConfigExistingSecret: my-rclone-config
+    rcloneConfigExistingSecret: minecraft-secrets
   
     resticRepository:
     # variable to define a space separated list of additional restic tags. see https://hub.docker.com/r/itzg/mc-backup
@@ -507,8 +506,8 @@ minecraft:
   
     resources:
       requests:
-        memory: 12288Mi
-        cpu: 4000m
+        memory: 512Mi
+        cpu: 5000m
   
     persistence:
       annotations: {}
