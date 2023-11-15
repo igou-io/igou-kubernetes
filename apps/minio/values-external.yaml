@@ -12,6 +12,9 @@ minio:
     - name: loki
       policy: none
       purge: false
+    - name: minecraft
+      policy: none
+      purge: false
   users:
     - accessKey: loki
       existingSecret: minio-users
@@ -21,6 +24,10 @@ minio:
       existingSecret: minio-users
       existingSecretKey: thanos-user-secret-key
       policy: thanos-rw
+    - accessKey: minecraft
+      existingSecret: minio-users
+      existingSecretKey: minecraft-user-secret-key
+      policy: minecraft-rw
   svcaccts:
     - accessKey: loki-svcacct
       existingSecret: minio-users
@@ -30,6 +37,10 @@ minio:
       existingSecret: minio-users
       existingSecretKey: thanos-svcacct-secret-key
       user: thanos
+    - accessKey: minecraft-svcacct
+      existingSecret: minio-users
+      existingSecretKey: minecraft-svcacct-secret-key
+      user: minecraft
   policies:
     - name: loki-rw
       statements:
@@ -50,6 +61,18 @@ minio:
           resources:
             - 'arn:aws:s3:::thanos'
             - 'arn:aws:s3:::thanos/*'
+          actions:
+            - "s3:AbortMultipartUpload"
+            - "s3:GetObject"
+            - "s3:DeleteObject"
+            - "s3:PutObject"
+            - "s3:ListMultipartUploadParts"
+    - name: minecraft-rw
+      statements:
+        - effect: Allow  # this is the default
+          resources:
+            - 'arn:aws:s3:::minecraft'
+            - 'arn:aws:s3:::minecraft/*'
           actions:
             - "s3:AbortMultipartUpload"
             - "s3:GetObject"
