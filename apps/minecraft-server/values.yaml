@@ -447,7 +447,7 @@ minecraft:
     excludes: "*.jar,cache,logs"
   
     # backup methods, see https://github.com/itzg/docker-mc-backup e.g. tar, rclone, restic
-    backupMethod: tar
+    backupMethod: rclone
     # tar and rclone methods
     destDir: /backups
     # is a true/false flag that creates a symbolic link to the latest backup
