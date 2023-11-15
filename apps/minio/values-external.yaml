@@ -81,9 +81,7 @@ minio:
             - "s3:PutObject"
             - "s3:ListMultipartUploadParts"
             - "s3:ListAllMyBuckets"
-            - "s3:ListBucket"
-            - "s3:PutObjectAcl"
-  
+            - "s3:ListBucket"  
   existingSecret: minio-root
   persistence:
     enabled: true
