@@ -75,7 +75,12 @@ minio:
             - 'arn:aws:s3:::minecraft'
             - 'arn:aws:s3:::minecraft/*'
           actions:
-            - "s3:*"  
+            - "s3:GetObject"
+            - "s3:DeleteObject"
+            - "s3:PutObject"
+            - "s3:ListBucket"
+            - "s3:PutBucketPolicy"
+            - "s3:GetBucketPolicy"
   existingSecret: minio-root
   persistence:
     enabled: true
