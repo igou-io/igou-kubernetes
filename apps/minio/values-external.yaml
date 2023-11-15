@@ -15,6 +15,7 @@ minio:
     - name: minecraft
       policy: none
       purge: false
+      versioning: true
   users:
     - accessKey: loki
       existingSecret: minio-users
