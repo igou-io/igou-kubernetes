@@ -80,7 +80,7 @@ srs-stack:
     rtc: 8000
 
   ingress:
-    enabled: true
+    enabled: false
     className: "nginx"
     hosts:
       - host: srs.apps.igou.systems
