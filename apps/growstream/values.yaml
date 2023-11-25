@@ -7,8 +7,6 @@ app-template:
             repository: docker.io/datarhei/restreamer
             tag: latest
             pullPolicy: IfNotPresent
-          #command: ["./bootstrap"]
-
     mediamtx:
       pod:
         hostNetwork: true
@@ -31,16 +29,7 @@ app-template:
         value: farming
 
   persistence:
-    config:
-      type: persistentVolumeClaim
-      size: 1Gi
-      accessMode: ReadWriteOnce
-      retain: true
-      advancedMounts:
-        main:
-          main:
-            - path: /core/config
-    data:
+    restreamer-data:
       type: persistentVolumeClaim
       size: 5Gi
       accessMode: ReadWriteOnce
@@ -49,6 +38,16 @@ app-template:
         main:
           main:
             - path: /core/data
+    restreamer-config:
+      type: persistentVolumeClaim
+      size: 1Gi
+      accessMode: ReadWriteOnce
+      retain: true
+      advancedMounts:
+        main:
+          main:
+            - path: /core/config
+
     run-udev:
       type: hostPath
       hostPath: /run/udev
@@ -60,6 +59,10 @@ app-template:
     dev-shm:
       type: emptyDir
       medium: Memory
+      advancedMounts:
+        mediamtx:
+          main:
+            - path: /dev/shm
   service:
     main:
       enabled: true
