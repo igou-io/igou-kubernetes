@@ -10,6 +10,13 @@ app-template:
     mediamtx:
       pod:
         hostNetwork: true
+        nodeSelector:
+          kubernetes.io/hostname: growtent
+        tolerations:
+        - effect: NoSchedule
+          key: workload
+          operator: Equal
+          value: farming
       containers:
         main:
           image:
@@ -20,26 +27,23 @@ app-template:
             MTX_PATHS_CAM_SOURCE: rpiCamera
           securityContext:
             privileged: true
-      nodeSelector:
-        kubernetes.io/hostname: growtent
-      tolerations:
-      - effect: NoSchedule
-        key: workload
-        operator: Equal
-        value: farming
+
 
   persistence:
     restreamer-data:
+      enabled: true
       type: persistentVolumeClaim
+      storageClass: "local-path"
       size: 5Gi
       accessMode: ReadWriteOnce
-      retain: true
       advancedMounts:
         main:
           main:
             - path: /core/data
     restreamer-config:
+      enabled: true
       type: persistentVolumeClaim
+      storageClass: "local-path"
       size: 1Gi
       accessMode: ReadWriteOnce
       retain: true
