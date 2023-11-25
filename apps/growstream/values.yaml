@@ -21,7 +21,7 @@ app-template:
         main:
           image:
             repository: docker.io/bluenviron/mediamtx
-            tag: lastest-rpi
+            tag: latest-rpi
             pullPolicy: IfNotPresent
           env:
             MTX_PATHS_CAM_SOURCE: rpiCamera
