@@ -1,7 +1,0 @@
-name: srs-stack
-apiVersion: v2
-version: 1.0.0
-dependencies:
-  - name: srs-stack
-    version: 1.0.5
-    repository: http://helm.ossrs.io/stable

@@ -1,0 +1,103 @@
+app-template:
+  controllers:
+    main:
+      containers:
+        main:
+          image:
+            repository: docker.io/datarhei/restreamer
+            tag: latest
+            pullPolicy: IfNotPresent
+          #command: ["./bootstrap"]
+
+    mediamtx:
+      pod:
+        hostNetwork: true
+      containers:
+        main:
+          image:
+            repository: docker.io/bluenviron/mediamtx
+            tag: lastest-rpi
+            pullPolicy: IfNotPresent
+          env:
+            MTX_PATHS_CAM_SOURCE: rpiCamera
+          securityContext:
+            privileged: true
+      nodeSelector:
+        kubernetes.io/hostname: growtent
+      tolerations:
+      - effect: NoSchedule
+        key: workload
+        operator: Equal
+        value: farming
+
+  persistence:
+    config:
+      type: persistentVolumeClaim
+      size: 1Gi
+      accessMode: ReadWriteOnce
+      retain: true
+      advancedMounts:
+        main:
+          main:
+            - path: /core/config
+    data:
+      type: persistentVolumeClaim
+      size: 5Gi
+      accessMode: ReadWriteOnce
+      retain: true
+      advancedMounts:
+        main:
+          main:
+            - path: /core/data
+    run-udev:
+      type: hostPath
+      hostPath: /run/udev
+      hostPathType: Directory
+      advancedMounts:
+        mediamtx:
+          main:
+            - path: /run/udev
+    dev-shm:
+      type: emptyDir
+      medium: Memory
+  service:
+    main:
+      enabled: true
+      type: ClusterIP
+      ports:
+        http:
+          port: 8080
+        https:
+          port: 8081
+        rtmp:
+          port: 1935
+        rtmps:
+          port: 1936
+        srt:
+          port: 6000
+          protocol: UDP
+
+    mediamtx:
+      controller: mediamtx
+      enabled: true
+      type: ClusterIP
+      ports:
+        rtsp:
+          port: 8554
+
+
+  ingress:
+    main:
+      enabled: true
+      className: nginx
+      hosts:
+       - host: "restreamer.apps.igou.systems"
+         paths:
+           - path: /
+             pathType: Prefix
+             service:
+               name: main
+               port: http
+
+
+
