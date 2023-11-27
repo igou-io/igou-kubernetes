@@ -18,6 +18,8 @@ spec:
   ignoreDifferences:
   - group: monitoring.grafana.com
     kind: PodLogs
+    jqPathExpressions:
+      - .spec.relabelings[].action
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
