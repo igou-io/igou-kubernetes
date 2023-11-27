@@ -15,9 +15,13 @@ spec:
     path: apps/logging
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
+  ignoreDifferences:
+  - group: monitoring.grafana.com
+    kind: PodLogs
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
     managedNamespaceMetadata:
       labels:
         external.secrets.io/enabled: "true"
