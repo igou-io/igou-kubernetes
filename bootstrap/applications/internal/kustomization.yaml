@@ -15,3 +15,4 @@ resources:
 - logging-application.yml
 - monitoring-application.yml
 - prometheus-operator-crds-application.yml
+- nfs-subdir-external-provisioner-application.yml
