@@ -1,0 +1,63 @@
+app-template:
+  defaultPodOptions:
+    securityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 65536
+  controllers:
+    main:
+      containers:
+        main:
+          nameOverride: qbittorrent
+          env:
+            UMASK: "022"
+          image:
+            repository: ghcr.io/onedr0p/qbittorrent
+            tag: 4.6.0
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+  service:
+    main:
+      ports:
+        http:
+          port: 8080
+  ingress:
+    main:
+      enabled: true
+      className: nginx
+      hosts:
+        - host: &host qb.apps.igou.systems
+          paths:
+            - path: /
+              service:
+                name: main
+                port: http
+  persistence:
+    media:
+      type: persistentVolumeClaim
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 500Gi
+      storageClass: nfs-client
+      advancedMounts:
+        main:
+          main:
+            - path: /downloads
+    config:
+      type: persistentVolumeClaim
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 1Gi
+      storageClass: nfs-client
+      advancedMounts:
+        main:
+          main:
+            - path: /config
