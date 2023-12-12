@@ -3,7 +3,7 @@ apiVersion: v2
 version: 1.0.0
 dependencies:
   - name: loki
-    version: 5.40.1
+    version: 5.41.1
     repository: https://grafana.github.io/helm-charts
   - name: promtail
     version: 6.15.3
