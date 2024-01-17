@@ -16,7 +16,7 @@ app-template:
             UMASK: "022"
           image:
             repository: ghcr.io/onedr0p/qbittorrent
-            tag: 4.6.2
+            tag: 4.6.3
           resources:
             requests:
               cpu: 100m
