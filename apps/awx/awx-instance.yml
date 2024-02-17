@@ -11,6 +11,7 @@ spec:
   ingress_class_name: nginx
   postgres_storage_class: awx-postgres
   web_replicas: 2
+  image_pull_policy: Always
   ee_images:
     - name: igou-awx-ee
       image: quay.io/igou/igou-awx-ee
