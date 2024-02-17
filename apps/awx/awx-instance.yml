@@ -14,11 +14,11 @@ spec:
   image_pull_policy: Always
   ee_images:
     - name: igou-awx-ee
-      image: quay.io/igou/igou-awx-ee
+      image: quay.io/igou/igou-awx-ee:latest
     - name: igou-awx-ee-edge
-      image: quay.io/igou/igou-awx-ee-edge
+      image: quay.io/igou/igou-awx-ee-edge:latest
     - name: igou-awx-ee-minimal
-      image: quay.io/igou/igou-awx-ee-minimal
+      image: quay.io/igou/igou-awx-ee-minimal:latest
   extra_settings:
     - setting: ALLOW_METRICS_FOR_ANONYMOUS_USERS
       value: "True"
