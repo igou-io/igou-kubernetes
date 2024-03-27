@@ -7,6 +7,7 @@ resources:
   - awx-instance.yml
   - awx-postgres-chap-secret.yml
   - awx-postgres-pv.yml
+  - awx-postgres-15-pv.yml
   - awx-servicemonitor.yml
 
 # Set the image tags to match the git version from above
