@@ -48,7 +48,7 @@ additionalNamespaces:
                 kubernetes.io/metadata.name: ingress
             podSelector:
               matchLabels:
-                app.kubernetes.io/name: ingress
+                app.kubernetes.io/name: ingress-nginx
       egress:
       - to:
         - namespaceSelector:
@@ -57,6 +57,12 @@ additionalNamespaces:
           podSelector:
             matchLabels:
               k8s-app: kube-dns
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
 
 # Defines the list of readonly users with the associated Azure AD security group UUID and application glob (ie: customerone-* for all applications prefixed by customerone in team project)
 # the key is an arbitrary name
