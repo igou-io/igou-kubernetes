@@ -6,6 +6,11 @@
     {
       "updateTypes": ["patch", "minor"],
       "automerge": true
-    }
+    },
+    {
+      "matchPackagePatterns": ["^awx"]
+      "updateTypes": ["patch", "minor"],
+      "automerge": false
+    }    
   ]
 }
