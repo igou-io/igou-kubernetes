@@ -417,7 +417,7 @@ minecraft:
   
   # PLEASE NOTE! rcon must be enabled above!  It does NOT require a nodePort or loadBalancerIP
   mcbackup:
-    enabled: true
+    enabled: false
   
     image:
       repository: itzg/mc-backup
