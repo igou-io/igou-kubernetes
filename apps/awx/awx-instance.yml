@@ -8,6 +8,7 @@ spec:
   service_type: clusterip
   ingress_type: ingress
   hostname: awx.apps.igou.systems
+  no_log: false
   ingress_class_name: nginx
   postgres_storage_class: awx-postgres
   postgres_data_volume_init: true
