@@ -10,6 +10,7 @@ spec:
   hostname: awx.apps.igou.systems
   ingress_class_name: nginx
   postgres_storage_class: awx-postgres
+  postgres_data_volume_init: true
   web_replicas: 2
   image_pull_policy: Always
   ee_images:
