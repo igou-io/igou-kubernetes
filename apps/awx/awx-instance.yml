@@ -24,3 +24,11 @@ spec:
   extra_settings:
     - setting: ALLOW_METRICS_FOR_ANONYMOUS_USERS
       value: "True"
+    - setting: TOWER_URL_BASE
+      value: "https://awx.apps.igou.systems"
+    - setting: ACTIVITY_STREAM_ENABLED_FOR_INVENTORY_SYNC
+      value: "True"
+    - setting: AWX_ROLES_ENABLED
+      value: "False"
+    - setting: AWX_COLLECTIONS_ENABLED
+      value: "False"
