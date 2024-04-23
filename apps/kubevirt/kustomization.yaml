@@ -4,9 +4,3 @@ resources:
   - https://github.com/kubevirt/kubevirt/releases/download/v1.1.0/kubevirt-operator.yaml
   - https://github.com/kubevirt/kubevirt/releases/download/v1.1.0/kubevirt-cr.yaml
 
-
-# Set the image tags to match the git version from above
-
-# Specify a custom namespace in which to install AWX
-
-# namespace: awx

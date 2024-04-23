@@ -13,6 +13,7 @@ resources:
 - vpn-application.yml
 - minio-application.yml
 - logging-application.yml
+- kubevirt-application.yml
 - monitoring-application.yml
 - prometheus-operator-crds-application.yml
 - nfs-subdir-external-provisioner-application.yml
