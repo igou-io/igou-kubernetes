@@ -32,3 +32,6 @@ spec:
       value: "False"
     - setting: AWX_COLLECTIONS_ENABLED
       value: "False"
+  ee_extra_env: |
+    - name: RECEPTOR_KUBE_SUPPORT_RECONNECT
+      value: enabled
