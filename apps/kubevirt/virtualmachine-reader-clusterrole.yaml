@@ -6,3 +6,6 @@ rules:
 - apiGroups: ["kubevirt.io"]
   resources: ["virtualmachineinstances", "virtualmachines"]
   verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["namespaces", "services"]
+  verbs: ["list"]
