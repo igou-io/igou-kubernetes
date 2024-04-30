@@ -11,6 +11,11 @@ spec:
     path: apps/kubevirt
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
+  ignoreDifferences:
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    jqPathExpressions:
+      - .spec
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
