@@ -1,0 +1,40 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  name: testvmi-nocloud
+spec:
+  terminationGracePeriodSeconds: 30
+  domain:
+    resources:
+      requests:
+        memory: 1024M
+    devices:
+      disks:
+      - name: containerdisk
+        disk:
+          bus: virtio
+      - name: emptydisk
+        disk:
+          bus: virtio
+      - disk:
+          bus: virtio
+        name: cloudinitdisk
+  volumes:
+  - name: containerdisk
+    containerDisk:
+      image: tedezed/ubuntu-container-disk:22.0
+  - name: emptydisk
+    emptyDisk:
+      capacity: "30Gi"
+  - name: cloudinitdisk
+    cloudInitNoCloud:
+      userData: |-
+        #cloud-config
+        users:
+          - name: igou
+            gecos: "igou"
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            shell: /bin/bash
+            groups: users,docker,video,input
+            ssh-authorized-keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDumonWRoahxRVNYQT6dt76OkYyRThQ1e0Z/lAAMHcF4ffpZ138fZVWFHipT9f85EOqLkleqLWH6b3yj37+zOOCJ4lGoTSk0oFK92neiWLGV6ayTsvGojdV/cGrSefUP04FqleZirSiwv52FYEVA21vPNweaB70L3m4i7x7+VaHqVvtPh4qT0LnnWa2Yf6Oq6aQU0WUi7Sd388SVczcWVZlJ9L+iibjtir1sm0NUE4Z+sEwHYCOfO2m6YbN809z2GQz1q+DchM0cJhpwBmwH+MIv3wjahM4Khz+XNz4bjousak63BMnZwqROf4jkoQoMrvy3Q/4WZHvivkLTu/Bj51p7TtFPTN1XNHq4kt5qzLE63HsQyhOy9lGdZpLk8cigZe14aQ1NV5WbXm0YSgPIdXTNgpHtXxzUGHjioqEhoMx4q/YBbIHZAFrX8eYorE0nhSzE63HA4cJsjMS56zAs3gk6SaG2Vux04+NwhAOftbQpF8wzwbS0QzdPzw42XKHMVDmQEW/YtPw8XVC15mmHTu6QEYjzBBYU6Noi37PXWOrad2wkq5bInIdlH6VBRuOQ0tw+9VeUlnYUoS9fD8lxcsuGiN3iVaLH8R4kptirEnr0VUBblo3fe1M3YqNiuqXpcB4HJ7sEaKIcyqEetGFRYFmbnvj4iM9BJ5uDb3pgzzmYw== digou@redhat.com

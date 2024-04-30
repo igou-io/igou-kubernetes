@@ -1,0 +1,16 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "ubuntu-lts-22-tedezed"
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: ""
+spec:
+  source:
+    registry:
+      url: "docker://docker.io/tedezed/ubuntu-container-disk:22.0"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: "30Gi"
