@@ -9,3 +9,7 @@ resources:
   - virtualmachine-reader-clusterrolebinding.yaml
   - virtualmachine-reader-serviceaccount.yaml
   - virtualmachine-reader-token-secret.yaml
+  - virtualmachine-deployer-clusterrole.yaml
+  - virtualmachine-deployer-clusterrolebinding.yaml
+  - virtualmachine-deployer-serviceaccount.yaml
+  - virtualmachine-deployer-token-secret.yaml
