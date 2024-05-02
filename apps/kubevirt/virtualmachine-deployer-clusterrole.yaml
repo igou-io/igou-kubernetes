@@ -8,7 +8,7 @@ rules:
   verbs: ["get", "watch", "list", "create", "delete"]
 - apiGroups: ["cdi.kubevirt.io"]
   resources: ["datavolumes"]
-  verbs: ["get", "watch", "list", "create", "delete"]
+  verbs: ["*"]
 - apiGroups: [""]
   resources: ["namespaces", "services"]
   verbs: ["list"]
