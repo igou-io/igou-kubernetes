@@ -5,7 +5,7 @@ metadata:
 rules:
 - apiGroups: ["kubevirt.io"]
   resources: ["virtualmachineinstances", "virtualmachines"]
-  verbs: ["get", "watch", "list", "create", "delete"]
+  verbs: ["*"]
 - apiGroups: ["cdi.kubevirt.io"]
   resources: ["datavolumes"]
   verbs: ["*"]
