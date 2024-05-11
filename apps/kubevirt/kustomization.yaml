@@ -16,3 +16,4 @@ resources:
 
 patches:
 - path: patches/feature-gates-patch.yaml
+- path: patches/cdi-workload-nodeselector-patch.yaml
