@@ -1,0 +1,66 @@
+---
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: jammy-aarch64
+spec:
+  pvc:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: freenas-iscsi-csi
+  source:
+    http:
+      url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-arm64.img"
+---
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: rock5-jammy
+spec:
+  pvc:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: freenas-iscsi-csi
+  source:
+    pvc:
+      name: jammy-aarch64
+      namespace: default
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rock5-jammy
+spec:
+  running: true
+  template:
+    spec:
+      architecture: arm64
+      nodeSelector:
+        kubernetes.io/hostname: rock-5b
+      domain:
+        devices:
+          disks:
+            - name: datavolume
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+        resources:
+          requests:
+            memory: 512M
+      volumes:
+        - name: datavolume
+          dataVolume:
+            name: rock5-jammy
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              users:
