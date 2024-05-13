@@ -12,3 +12,6 @@ rules:
 - apiGroups: [""]
   resources: ["namespaces", "services"]
   verbs: ["list"]
+- apiGroups: ["upload.cdi.kubevirt.io"]
+  resources: ["uploadtokenrequests"]
+  verbs: ["create"]
