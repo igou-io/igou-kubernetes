@@ -35,3 +35,9 @@ spec:
   ee_extra_env: |
     - name: RECEPTOR_KUBE_SUPPORT_RECONNECT
       value: enabled
+  node_selector: |
+    kubernetes.io/arch: amd64
+  web_node_selector: |
+    kubernetes.io/arch: amd64
+  task_node_selector: |
+    kubernetes.io/arch: amd64
