@@ -11,7 +11,7 @@ spec:
   source:
     helm:
       valueFiles:
-        - values-iscsi.yml
+        - values-iscsi.yaml
     path: apps/democratic-csi
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
