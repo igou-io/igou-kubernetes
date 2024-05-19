@@ -7,6 +7,7 @@ resources:
 - argocd-application.yml
 - awx-application.yml
 - cert-manager-application.yml
+- democratic-csi-iscsi-application.yml
 - external-secrets-application.yml
 - gpu-operator-application.yml
 - ingress-application.yml
