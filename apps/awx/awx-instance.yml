@@ -41,3 +41,5 @@ spec:
     kubernetes.io/arch: amd64
   task_node_selector: |
     kubernetes.io/arch: amd64
+  postgres_selector: |
+    kubernetes.io/arch: amd64
