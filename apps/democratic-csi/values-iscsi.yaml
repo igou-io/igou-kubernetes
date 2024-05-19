@@ -1,0 +1,25 @@
+configExternalSecret:
+  name: &configExternalSecret "truenas-csi-nuc7-iscsi"
+democratic-csi:
+  csiDriver:
+    name: "org.democratic-csi.iscsi"
+  storageClasses:
+  - name: freenas-iscsi-csi
+    defaultClass: false
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate
+    allowVolumeExpansion: true
+    parameters:
+      fsType: ext4
+    mountOptions: []
+    secrets:
+      provisioner-secret:
+      controller-publish-secret:
+      node-stage-secret:
+      node-publish-secret:
+      controller-expand-secret:
+  volumeSnapshotClasses: []
+  driver:
+    existingConfigSecret: *configExternalSecret
+    config:
+      driver: freenas-iscsi
