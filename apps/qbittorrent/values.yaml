@@ -26,6 +26,7 @@ app-template:
             runAsGroup: 568
   service:
     main:
+      controller: main
       ports:
         http:
           port: 8080
@@ -39,7 +40,7 @@ app-template:
             - path: /
               service:
                 name: main
-                port: http
+                port: 80
   persistence:
     media:
       type: persistentVolumeClaim
