@@ -39,8 +39,7 @@ app-template:
           paths:
             - path: /
               service:
-                name: main
-                port: 80
+                identifier: main
   persistence:
     media:
       type: persistentVolumeClaim
