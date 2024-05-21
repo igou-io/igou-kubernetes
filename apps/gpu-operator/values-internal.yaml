@@ -130,7 +130,7 @@ gpu-operator:
     usePrecompiled: false
     repository: nvcr.io/nvidia
     image: driver
-    version: "535.104.05"
+    version: "550.54.15"
     imagePullPolicy: IfNotPresent
     imagePullSecrets: []
     startupProbe:
