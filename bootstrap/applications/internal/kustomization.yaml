@@ -10,7 +10,6 @@ resources:
 - democratic-csi-iscsi-application.yml
 - democratic-csi-nfs-application.yml
 - external-secrets-application.yml
-- gpu-operator-application.yml
 - ingress-application.yml
 - vpn-application.yml
 - minio-application.yml
