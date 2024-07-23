@@ -35,7 +35,7 @@ spec:
     - setting: RECEPTOR_RELEASE_WORK
       value: "False"
    - setting: AWX_CLEANUP_PATHS
-      value: "False"
+     value: "False"
   ee_extra_env: |
     - name: RECEPTOR_KUBE_SUPPORT_RECONNECT
       value: enabled
