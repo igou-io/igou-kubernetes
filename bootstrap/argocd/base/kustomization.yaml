@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - "https://github.com/argoproj/argo-cd.git/manifests/cluster-install/?ref=v2.12.1"
+  - "https://github.com/argoproj/argo-cd.git/manifests/cluster-install/?ref=v2.12.2"
   - igou-kubernetes-repo-secret.yml
   - igou-kubernetes-private-repo-externalsecret.yml
 namespace: argocd
