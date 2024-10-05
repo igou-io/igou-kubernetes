@@ -1,7 +1,7 @@
 pod-gateway:
   image:
     repository: ghcr.io/angelnu/pod-gateway
-    tag: v1.10.0
+    tag: v1.11.1
   DNS: 172.16.1.1
   addons:
     netshoot:
