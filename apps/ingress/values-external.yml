@@ -2,6 +2,8 @@ ingress-nginx:
   controller:
     kind: DaemonSet
     service:
+      annotations:
+        tailscale.com/expose: "true"
       type: "NodePort"
       nodePorts:
         https: 30443
