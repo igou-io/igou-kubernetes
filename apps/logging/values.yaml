@@ -1,3 +1,7 @@
+promtail:
+  config:
+    clients:
+      - url: http://logging-loki-gateway/loki/api/v1/push
 loki:
   loki:
     auth_enabled: false
