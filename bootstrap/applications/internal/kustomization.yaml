@@ -5,7 +5,6 @@ commonAnnotations:
 resources:
 - application-of-applications-application.yml
 - argocd-application.yml
-- awx-application.yml
 - cert-manager-application.yml
 - democratic-csi-iscsi-application.yml
 - democratic-csi-nfs-application.yml
