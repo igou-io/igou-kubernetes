@@ -8,4 +8,5 @@ metadata:
 data:
   url: "https://argocd.apps.igou.systems"
   application.resourceTrackingMethod: "annotation+label"
+  kustomize.buildOptions: --enable-helm
   statusbadge.enabled: "true"
