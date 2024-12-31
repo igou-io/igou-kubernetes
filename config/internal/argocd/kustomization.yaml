@@ -6,6 +6,7 @@ resources:
   - igou-kubernetes-repo-secret.yml
   - argocd-ingress.yml
   - argocd-notifications-secret-externalsecret.yml
+  - cluster-applicationset.yml
 patches:
 - path: https://raw.githubusercontent.com/argoproj/argo-cd/master/notifications_catalog/install.yaml
 - path: argocd-notifications-cm-configmap.yml
