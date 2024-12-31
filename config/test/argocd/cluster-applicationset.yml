@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
+spec:
+  generators:
+    - git:
+        directories:
+          - path: config/internal/*
+          # - exclude: true
+          #   path: config/internal/live/base-config
+        repoURL: 'https://github.com/igou-io/igou-kubernetes.git'
+        revision: HEAD
+  template:
+    metadata:
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      name: '{{ path.basename }}'
+    spec:
+      destination:
+        namespace: default
+        server: 'https://kubernetes.default.svc'
+      project: default
+      source:
+        path: '{{ path }}'
+        repoURL: 'https://github.com/igou-io/igou-kubernetes.git'
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: true

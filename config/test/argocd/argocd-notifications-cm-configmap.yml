@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+data:
+  service.slack: |
+    token: $slack-token
+  context: |
+    argocdUrl: https://argocd.apps.igou.systems
+  defaultTriggers: |
+    - on-health-degraded
+    - on-deleted
+    - on-created
+    - on-deployed
+    - on-sync-status-unknown
+    - on-sync-succeeded
+    - on-sync-status-unknown
