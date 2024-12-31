@@ -4,7 +4,6 @@ namespace: argocd
 resources:
   - https://github.com/argoproj/argo-cd.git/manifests/cluster-install/?ref=v2.13.2
   - igou-kubernetes-repo-secret.yml
-  - argocd-ingress.yml
   - argocd-notifications-secret-externalsecret.yml
   - cluster-applicationset.yml
 patches:
