@@ -20,12 +20,3 @@ spec:
     kind: Certificate
     jsonPointers:
     - /spec/duration
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-    managedNamespaceMetadata:
-      labels:
-        external.secrets.io/enabled: "true"

@@ -11,6 +11,3 @@ spec:
     path: apps/prometheus-operator-crds
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
-  syncPolicy:
-    syncOptions:
-      - ServerSideApply=true

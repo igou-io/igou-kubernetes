@@ -15,12 +15,3 @@ spec:
     path: apps/qbittorrent
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-    managedNamespaceMetadata:
-      labels:
-        routed-gateway: "true"

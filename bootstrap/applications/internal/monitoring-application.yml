@@ -16,12 +16,3 @@ spec:
     path: apps/monitoring
     repoURL: https://github.com/igou-io/igou-kubernetes.git
     targetRevision: HEAD
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-    managedNamespaceMetadata:
-      labels:
-        external.secrets.io/enabled: "true"

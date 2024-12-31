@@ -20,13 +20,3 @@ spec:
     kind: PodLogs
     jqPathExpressions:
       - .spec.relabelings[].action
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-    managedNamespaceMetadata:
-      labels:
-        external.secrets.io/enabled: "true"

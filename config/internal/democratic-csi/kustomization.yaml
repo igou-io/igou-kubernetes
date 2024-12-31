@@ -1,0 +1,64 @@
+namespace: democratic-csi
+resources:
+  - truenas-csi-nuc7-iscsi-externalsecret.yaml
+  - truenas-csi-nuc7-nfs-externalsecret.yaml
+helmCharts:
+- name: democratic-csi
+  includeCRDs: true
+  releaseName: democratic-csi-iscsi
+  version: 0.14.7
+  repo: https://democratic-csi.github.io/charts/
+  valuesInline:
+    csiDriver:
+      name: "org.democratic-csi.iscsi"
+    storageClasses:
+    - name: freenas-iscsi-csi
+      defaultClass: false
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      allowVolumeExpansion: true
+      parameters:
+        fsType: ext4
+      mountOptions: []
+      secrets:
+        provisioner-secret:
+        controller-publish-secret:
+        node-stage-secret:
+        node-publish-secret:
+        controller-expand-secret:
+    volumeSnapshotClasses: []
+    driver:
+      existingConfigSecret: truenas-csi-nuc7-iscsi
+      config:
+        driver: freenas-iscsi
+- name: democratic-csi
+  includeCRDs: true
+  releaseName: democratic-csi-nfs
+  version: 0.14.7
+  repo: https://democratic-csi.github.io/charts/
+  valuesInline:
+    csiDriver:
+      name: "org.democratic-csi.nfs"
+      fsGroupPolicy: File
+    storageClasses:
+      - name: freenas-nfs-csi
+        defaultClass: false
+        reclaimPolicy: Delete
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          fsType: nfs
+        mountOptions:
+          - noatime
+          - nfsvers=4
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
+    volumeSnapshotClasses: []
+    driver:
+      existingConfigSecret: truenas-csi-nuc7-nfs
+      config:
+        driver: freenas-nfs
