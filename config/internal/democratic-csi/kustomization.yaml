@@ -2,6 +2,7 @@ namespace: democratic-csi
 resources:
   - truenas-csi-nuc7-iscsi-externalsecret.yaml
   - truenas-csi-nuc7-nfs-externalsecret.yaml
+  - democratic-csi-namespace.yaml
 helmCharts:
 - name: democratic-csi
   includeCRDs: true
