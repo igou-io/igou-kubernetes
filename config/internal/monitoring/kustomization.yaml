@@ -4,6 +4,7 @@ namespace: monitoring
 resources:
   - storage.yml
   - slackurl-externalsecret.yaml
+  - monitoring-namespace.yaml
 helmCharts:
 - name: kube-prometheus-stack
   includeCRDs: false
