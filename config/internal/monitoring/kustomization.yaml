@@ -12,6 +12,7 @@ helmCharts:
   version: 61.9.0
   repo: https://prometheus-community.github.io/helm-charts
   valuesInline:
+    namespaceOverride: "monitoring"
     defaultRules:
       rules:
         kubeApiserverAvailability: true
