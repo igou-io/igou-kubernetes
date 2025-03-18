@@ -1,0 +1,86 @@
+namespace: minio
+resources:
+  - minio-root-externalsecret.yaml
+  - minio-users-externalsecret.yaml
+  - storage.yml
+  - minio-namespace.yaml
+helmCharts:
+- name: minio
+  includeCRDs: true
+  releaseName: minio
+  version: 5.4.0
+  repo: https://charts.min.io/
+  valuesInline:
+    mode: standalone
+    deploymentUpdate:
+      type: Recreate
+    buckets:
+      - name: loki
+        policy: none
+        purge: false
+      - name: thanos
+        policy: none
+        purge: false
+    users:
+      - accessKey: loki
+        existingSecret: minio-users
+        existingSecretKey: loki-user-secret-key
+        policy: loki-rw
+      - accessKey: thanos
+        existingSecret: minio-users
+        existingSecretKey: thanos-user-secret-key
+        policy: thanos-rw
+    svcaccts:
+      - accessKey: loki-svcacct
+        existingSecret: minio-users
+        existingSecretKey: loki-svcacct-secret-key
+        user: loki
+      - accessKey: thanos-svcacct
+        existingSecret: minio-users
+        existingSecretKey: thanos-svcacct-secret-key
+        user: thanos
+    policies:
+      - name: loki-rw
+        statements:
+          - effect: Allow  # this is the default
+            resources:
+              - 'arn:aws:s3:::loki'
+              - 'arn:aws:s3:::loki/*'
+            actions:
+              - "s3:ListBucket"
+              - "s3:AbortMultipartUpload"
+              - "s3:GetObject"
+              - "s3:DeleteObject"
+              - "s3:PutObject"
+              - "s3:ListMultipartUploadParts"
+      - name: thanos-rw
+        statements:
+          - effect: Allow  # this is the default
+            resources:
+              - 'arn:aws:s3:::thanos'
+              - 'arn:aws:s3:::thanos/*'
+            actions:
+              - "s3:AbortMultipartUpload"
+              - "s3:GetObject"
+              - "s3:DeleteObject"
+              - "s3:PutObject"
+              - "s3:ListMultipartUploadParts"
+    existingSecret: minio-root
+    persistence:
+      enabled: true
+      storageClass: "minio"
+      volumeName: "minio-iscsi-pv"
+      size: 1000Gi
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - minio.apps.igou.systems
+    consoleIngress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - minio-console.apps.igou.systems
+    metrics:
+      serviceMonitor:
+        enabled: true
