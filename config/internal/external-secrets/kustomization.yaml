@@ -9,7 +9,7 @@ helmCharts:
   repo: https://charts.external-secrets.io
   valuesInline:
     replicaCount: 1
-
+    namespaceOverride: external-secrets
     image:
       repository: ghcr.io/external-secrets/external-secrets
       pullPolicy: IfNotPresent
