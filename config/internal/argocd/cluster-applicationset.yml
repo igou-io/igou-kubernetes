@@ -10,6 +10,7 @@ spec:
     - git:
         directories:
           - path: config/internal/*
+          - path: config/internal/**
           # - exclude: true
           #   path: config/internal/live/base-config
         repoURL: 'https://github.com/igou-io/igou-kubernetes.git'
