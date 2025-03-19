@@ -1,0 +1,65 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+# resources:
+#   - storage.yml
+#   - slackurl-externalsecret.yaml
+#   - monitoring-namespace.yaml
+helmCharts:
+- name: app-template
+  releaseName: mktxp-exporter
+  version: 3.7.1
+  repo: https://bjw-s.github.io/helm-charts
+  valuesInline:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+    controllers:
+      mktxp-exporter:
+        replicas: 1
+        containers:
+          app:
+            image:
+              repository: ghcr.io/akpw/mktxp
+              tag: 1.2.10
+              pullPolicy: IfNotPresent
+            resources:
+              limits:
+                memory: 128Mi
+              requests:
+                cpu: 10m
+                memory: 32Mi
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+    service:
+      app:
+        controller: mktxp-exporter
+        ports:
+          metrics:
+            port: 49090
+            protocol: HTTP
+    serviceMonitor:
+      app:
+        serviceName: mktxp-exporter
+        endpoints:
+          - port: metrics
+    persistence:
+      config:
+        type: secret
+        name: mktxp-exporter-config
+        defaultMode: 0400
+        globalMounts:
+          - path: /mktxp
