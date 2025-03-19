@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: igou-wildcard
+  namespace: ingress
+spec:
+  secretName: igou-wildcard
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: "*.apps.igou.systems"
+  dnsNames:
+    - "*.apps.igou.systems"
