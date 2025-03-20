@@ -15,16 +15,14 @@ helmCharts:
         enabled: false
       extraArgs:
         default-ssl-certificate: "ingress/igou-wildcard"
-      hostport:
-        enabled: true
       kind: DaemonSet
       hostNetwork: false
       nodeSelector:
         node-role.kubernetes.io/worker: "true"
       service:
-        enabled: false
+        enabled: true
       publishService:
-        enabled: false
+        enabled: true
       metrics:
         enabled: true
         serviceMonitor:
