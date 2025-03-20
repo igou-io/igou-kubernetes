@@ -8,7 +8,7 @@ namespace: monitoring
 helmCharts:
 - name: app-template
   releaseName: mktxp-exporter
-  version: 3.7.1
+  version: 3.7.3
   repo: https://bjw-s.github.io/helm-charts
   valuesInline:
     defaultPodOptions:
