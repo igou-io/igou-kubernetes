@@ -1,4 +1,6 @@
 resources:
+  - default-ipaddresspool.yaml
+  - default-l2advertisement.yaml
   - metallb-system-namespace.yaml
 helmCharts:
 - name: metallb
