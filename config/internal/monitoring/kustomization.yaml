@@ -129,6 +129,9 @@ helmCharts:
           nginx-dashboard:
             url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
             datasource: Prometheus
+          mktxp-dashboard:
+            gnetid: 13679
+            datasource: Prometheus
       grafana.ini:
         paths:
           data: /var/lib/grafana/data
