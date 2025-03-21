@@ -132,7 +132,9 @@ helmCharts:
           mktxp-dashboard:
             gnetId: 13679
             revision: 22
-            datasource: Prometheus
+            datasource:
+              - name: DS_PROMETHEUS
+                value: Prometheus
       grafana.ini:
         paths:
           data: /var/lib/grafana/data
