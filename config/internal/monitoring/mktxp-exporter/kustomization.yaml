@@ -1,13 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: monitoring
-# resources:
-#   - storage.yml
-#   - slackurl-externalsecret.yaml
-#   - monitoring-namespace.yaml
 helmCharts:
 - name: app-template
   releaseName: mktxp-exporter
+  namespace: monitoring
   version: 3.7.3
   repo: https://bjw-s.github.io/helm-charts
   valuesInline:
@@ -63,3 +60,131 @@ helmCharts:
         defaultMode: 0400
         globalMounts:
           - path: /mktxp
+    rawResources:
+      config:
+        enabled: true
+        apiVersion: external-secrets.io/v1beta1
+        kind: ExternalSecret
+        spec:
+          spec:
+            secretStoreRef:
+              kind: ClusterSecretStore
+              name: onepassword
+            target:
+              name: mktxp-exporter-config
+              template:
+                engineVersion: v2
+                data:
+                  # multiline string
+                  _mktxp.conf: |-
+                    ## Copyright (c) 2020 Arseniy Kuznetsov
+                    ##
+                    ## This program is free software; you can redistribute it and/or
+                    ## modify it under the terms of the GNU General Public License
+                    ## as published by the Free Software Foundation; either version 2
+                    ## of the License, or (at your option) any later version.
+                    ##
+                    ## This program is distributed in the hope that it will be useful,
+                    ## but WITHOUT ANY WARRANTY; without even the implied warranty of
+                    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+
+                    [MKTXP]
+                        listen = '0.0.0.0:49090'         # Space separated list of socket addresses to listen to, both IPV4 and IPV6
+                        socket_timeout = 5
+
+                        initial_delay_on_failure = 120
+                        max_delay_on_failure = 900
+                        delay_inc_div = 5
+
+                        bandwidth = False                # Turns metrics bandwidth metrics collection on / off
+                        bandwidth_test_interval = 600    # Interval for collecting bandwidth metrics
+                        minimal_collect_interval = 5     # Minimal metric collection interval
+
+                        verbose_mode = True              # Set it on for troubleshooting
+
+                        fetch_routers_in_parallel = False   # Fetch metrics from multiple routers in parallel / sequentially
+                        max_worker_threads = 5              # Max number of worker threads that can fetch routers (parallel fetch only)
+                        max_scrape_duration = 30            # Max duration of individual routers' metrics collection (parallel fetch only)
+                        total_max_scrape_duration = 90      # Max overall duration of all metrics collection (parallel fetch only)
+
+                        compact_default_conf_values = False  # Compact mktxp.conf, so only specific values are kept on the individual routers' level
+                  mktxp.conf: |-
+                    [RB5009]
+                      hostname = "{{ `{{ .rb5009_ip }}` }}"
+
+                    [CRS328]
+                      hostname = "{{ `{{ .crs328_ip }}` }}"
+
+                    [default]
+                      username = "{{ `{{ .username }}` }}"
+                      password = "{{ `{{ .password }}` }}"
+
+                      enabled = True                  # turns metrics collection for this RouterOS device on / off
+                      hostname = localhost            # RouterOS IP address
+                      port = "{{ `{{ .port }}` }}"    # RouterOS IP Port
+
+                      use_ssl = True                  # enables connection via API-SSL servis
+                      no_ssl_certificate = False      # enables API_SSL connect without router SSL certificate
+                      ssl_certificate_verify = False  # turns SSL certificate verification on / off
+                      plaintext_login = True          # for legacy RouterOS versions below 6.43 use False
+
+                      health = True                   # System Health metrics
+                      installed_packages = True       # Installed packages
+                      dhcp = True                     # DHCP general metrics
+                      dhcp_lease = True               # DHCP lease metrics
+
+                      connections = True              # IP connections metrics
+                      connection_stats = False        # Open IP connections metrics
+
+                      interface = True                # Interfaces traffic metrics
+
+                      route = True                    # IPv4 Routes metrics
+                      pool = True                     # IPv4 Pool metrics
+                      firewall = True                 # IPv4 Firewall rules traffic metrics
+                      neighbor = True                 # IPv4 Reachable Neighbors
+                      dns = False                     # DNS stats
+
+                      ipv6_route = False              # IPv6 Routes metrics
+                      ipv6_pool = False               # IPv6 Pool metrics
+                      ipv6_firewall = False           # IPv6 Firewall rules traffic metrics
+                      ipv6_neighbor = False           # IPv6 Reachable Neighbors
+
+                      poe = True                      # POE metrics
+                      monitor = True                  # Interface monitor metrics
+                      netwatch = True                 # Netwatch metrics
+                      public_ip = True                # Public IP metrics
+                      wireless = True                 # WLAN general metrics
+                      wireless_clients = True         # WLAN clients metrics
+                      capsman = True                  # CAPsMAN general metrics
+                      capsman_clients = True          # CAPsMAN clients metrics
+
+                      eoip = False                    # EoIP status metrics
+                      gre = False                     # GRE status metrics
+                      ipip = False                    # IPIP status metrics
+                      lte = False                     # LTE signal and status metrics (requires additional 'test' permission policy on RouterOS v6)
+                      ipsec = False                   # IPSec active peer metrics
+                      switch_port = False             # Switch Port metrics
+
+                      kid_control_assigned = False    # Allow Kid Control metrics for connected devices with assigned users
+                      kid_control_dynamic = False     # Allow Kid Control metrics for all connected devices, including those without assigned user
+
+                      user = True                     # Active Users metrics
+                      queue = True                    # Queues metrics
+
+                      bfd = False                     # BFD sessions metrics
+                      bgp = True                      # BGP sessions metrics
+                      routing_stats = False           # Routing process stats
+                      certificate = False             # Certificates metrics
+
+                      remote_dhcp_entry = None        # An MKTXP entry to provide for remote DHCP info / resolution
+                      remote_capsman_entry = None     # An MKTXP entry to provide for remote capsman info
+
+                      use_comments_over_names = True  # when available, forces using comments over the interfaces names
+                      check_for_updates = True        # check for available ROS updates
+            dataFrom:
+            - extract:
+                key: mktxp-exporter
+                conversionStrategy: Default
+                decodingStrategy: None
+                metadataPolicy: None
