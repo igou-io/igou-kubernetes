@@ -116,6 +116,9 @@ helmCharts:
                     [CRS328]
                       hostname = "{{ `{{ .crs328_ip }}` }}"
 
+                    [CRS317]
+                      hostname = "{{ `{{ .crs317_ip }}` }}"
+
                     [default]
                       username = "{{ `{{ .username }}` }}"
                       password = "{{ `{{ .password }}` }}"
