@@ -64,4 +64,4 @@ pod-gateway:
       label: routed-gateway
     image:
       repository: ghcr.io/angelnu/gateway-admision-controller
-      tag: v3.11.0
+      tag: v3.12.0
