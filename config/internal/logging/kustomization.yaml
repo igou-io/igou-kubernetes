@@ -93,7 +93,11 @@ helmCharts:
       sources:
         vector_metrics_source:
           type: internal_metrics
-        vector:
+        vector_kubernetes_source:
+          address: 0.0.0.0:6000
+          type: vector
+          version: "2"
+        vector_journal_source:
           address: 0.0.0.0:6000
           type: vector
           version: "2"
@@ -106,7 +110,8 @@ helmCharts:
         loki:
           type: loki
           inputs:
-            - vector
+            - vector_kubernetes_source
+            - vector_journal_source
           endpoint: http://logging-loki-gateway:3100
           encoding:
             codec: logfmt
@@ -115,13 +120,55 @@ helmCharts:
               {{`{{ source_type }}`}}
     podMonitor:
       enabled: true
-
-# - name: vector
-#   namespace: logging
-#   includeCRDs: false
-#   releaseName: vector-agent
-#   version: 0.41.0
-#   repo: https://helm.vector.dev
-#   valuesInline:
-#     role: Agent
-
+- name: vector
+  namespace: logging
+  includeCRDs: false
+  releaseName: vector-agent
+  version: 0.41.0
+  repo: https://helm.vector.dev
+  valuesInline:
+    role: Agent
+    containerPorts:
+      - name: prom-exporter
+        containerPort: 9090
+        protocol: TCP
+    tolerations:
+      - operator: Exists
+    customConfig:
+      data_dir: /vector-data-dir
+      expire_metrics_secs: 60
+      sources:
+        journal_logs:
+          type: journald
+          journal_directory: /var/log/journal
+        kubernetes_logs:
+          type: kubernetes_logs
+        # host_metrics:
+        #   type: host_metrics
+        #   collectors:
+        #     - cpu
+        #     - memory
+        #     - network
+        #     - load
+        #   namespace: host
+        #   scrape_interval_secs: 15
+        vector_metrics:
+          type: internal_metrics
+      sinks:
+        loki_journal_sink:
+          type: vector
+          inputs:
+            - journal_logs
+          address: vector-aggregator:6000
+          version: "2"
+        loki_kubernetes_sink:
+          type: vector
+          inputs:
+            - kubernetes_logs
+          address: vector-aggregator:6010
+          version: "2"
+        vector_metrics_sink:
+          type: prometheus_exporter
+          inputs:
+            - vector_metrics_source
+          address: 0.0.0.0:9090
