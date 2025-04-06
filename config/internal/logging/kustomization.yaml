@@ -95,15 +95,15 @@ helmCharts:
           address: 0.0.0.0:6000
           type: vector
           version: "2"
+      sinks:
+        loki:
+          type: loki
+          inputs:
+            - vector
+          endpoint: http://logging-loki-gateway:3100
     podMonitor:
       enabled: true
-      # sinks: todo loki
-      #   files:
-      #     type: file
-      #     inputs: [sort]
-      #     encoding:
-      #       codec: raw_message
-      #     path: /var/log/k8s/{{ "{{" }} .folder {{ "}}" }}/{{ "{{" }} .filename {{ "}}" }}-%Y%m%d.log
+
 # - name: vector
 #   namespace: logging
 #   includeCRDs: false
