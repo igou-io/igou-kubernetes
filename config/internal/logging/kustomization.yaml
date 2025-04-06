@@ -54,7 +54,6 @@ helmCharts:
       replicas: 0
     write:
       replicas: 0
-
     ingester:
       replicas: 0
     querier:
@@ -73,13 +72,44 @@ helmCharts:
       replicas: 0
     bloomGateway:
       replicas: 0
-- name: promtail
+- name: vector
   namespace: logging
   includeCRDs: false
-  releaseName: logging
-  version: 6.16.6
-  repo: https://grafana.github.io/helm-charts
+  releaseName: vector-aggregator
+  version: 0.41.0
+  repo: https://helm.vector.dev
   valuesInline:
-    config:
-      clients:
-        - url: http://logging-loki-gateway/loki/api/v1/push
+    role: Stateless-Aggregator
+    # containerPorts:
+    #   - name: api
+    #     containerPort: 8686
+    #     protocol: TCP
+    #   - name: prom-exporter
+    #     containerPort: 9090
+    #     protocol: TCP
+    customConfig:
+      data_dir: /vector-data-dir
+      expire_metrics_secs: 60
+      sources:
+        vector:
+          address: 0.0.0.0:6000
+          type: vector
+          version: "2"
+    podMonitor:
+      enabled: true
+      # sinks: todo loki
+      #   files:
+      #     type: file
+      #     inputs: [sort]
+      #     encoding:
+      #       codec: raw_message
+      #     path: /var/log/k8s/{{ "{{" }} .folder {{ "}}" }}/{{ "{{" }} .filename {{ "}}" }}-%Y%m%d.log
+# - name: vector
+#   namespace: logging
+#   includeCRDs: false
+#   releaseName: vector-agent
+#   version: 0.41.0
+#   repo: https://helm.vector.dev
+#   valuesInline:
+#     role: Agent
+
