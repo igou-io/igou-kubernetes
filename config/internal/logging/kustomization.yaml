@@ -103,6 +103,9 @@ helmCharts:
           endpoint: http://logging-loki-gateway:3100
           encoding:
             codec: logfmt
+          labels:
+            source: >-
+              {{`{{ source_type }}`}}
     podMonitor:
       enabled: true
 
