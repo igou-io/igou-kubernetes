@@ -80,13 +80,13 @@ helmCharts:
   repo: https://helm.vector.dev
   valuesInline:
     role: Stateless-Aggregator
-    # containerPorts:
-    #   - name: api
-    #     containerPort: 8686
-    #     protocol: TCP
-    #   - name: prom-exporter
-    #     containerPort: 9090
-    #     protocol: TCP
+    containerPorts:
+      - name: api
+        containerPort: 8686
+        protocol: TCP
+      - name: prom-exporter
+        containerPort: 9090
+        protocol: TCP
     customConfig:
       data_dir: /vector-data-dir
       expire_metrics_secs: 60
