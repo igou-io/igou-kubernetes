@@ -94,7 +94,7 @@ helmCharts:
         vector_metrics_source:
           type: internal_metrics
         vector_kubernetes_source:
-          address: 0.0.0.0:6000
+          address: 0.0.0.0:6010
           type: vector
           version: "2"
         vector_journal_source:
@@ -119,6 +119,8 @@ helmCharts:
             source: >-
               {{`{{ source_type }}`}}
     podMonitor:
+      enabled: true
+    service:
       enabled: true
 - name: vector
   namespace: logging
