@@ -101,6 +101,8 @@ helmCharts:
           inputs:
             - vector
           endpoint: http://logging-loki-gateway:3100
+          encoding:
+            codec: logfmt
     podMonitor:
       enabled: true
 
