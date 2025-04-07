@@ -144,6 +144,8 @@ helmCharts:
           labels:
             source: >-
               {{`{{ source_type }}`}}
+            namespace: >-
+              {{`{{ namespace }}`}}
     podMonitor:
       enabled: true
     service:
