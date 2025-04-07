@@ -166,7 +166,7 @@ helmCharts:
               {{`{{ pod }}`}}
             service_name: >-
               {{`{{ service_name }}`}}
-        loki_syslog_sink:
+        loki_routeros_sink:
           type: loki
           inputs:
             - routeros_logs
@@ -174,11 +174,13 @@ helmCharts:
           encoding:
             codec: logfmt
           labels:
-            source: "syslog"
-            # source: >-
-            #   {{`{{ source_type }}`}}
-            # service_name: >-
-            #   {{`{{ service_name }}`}}
+            source: >-
+              {{`{{ source_type }}`}}
+            service_name: "routeros"
+            device: >-
+              {{`{{ deviceProduct }}`}}
+            host: >-
+              {{`{{ dvchost }}`}}
     podMonitor:
       enabled: true
     service:
