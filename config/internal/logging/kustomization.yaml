@@ -116,7 +116,7 @@ helmCharts:
         vector_syslog_source:
           type: syslog
           address: "0.0.0.0:9000"
-          mode: tcp
+          mode: udp
         # vector_journal_source:
         #   address: 0.0.0.0:6000
         #   type: vector
