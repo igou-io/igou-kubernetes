@@ -134,13 +134,13 @@ helmCharts:
             .namespace = .kubernetes.pod_namespace
             .source_type = "k8s_internal"
             .service_name = .kubernetes.pod_labels."app.kubernetes.io/name"
-        syslog_logs:
-          type: remap
-          inputs:
-            - vector_syslog_source
-          source: |
-            .message = .message
-            .source_type = "syslog"
+        # syslog_logs:
+        #   type: remap
+        #   inputs:
+        #     - vector_syslog_source
+        #   source: |
+        #     .message = .message
+        #     .source_type = "syslog"
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
@@ -166,13 +166,14 @@ helmCharts:
         loki_syslog_sink:
           type: loki
           inputs:
-            - syslog_logs
+            - vector_syslog_source
           endpoint: http://logging-loki-gateway:80
           encoding:
             codec: logfmt
           labels:
-            source: >-
-              {{`{{ source_type }}`}}
+            source: "syslog"
+            # source: >-
+            #   {{`{{ source_type }}`}}
             # service_name: >-
             #   {{`{{ service_name }}`}}
     podMonitor:
