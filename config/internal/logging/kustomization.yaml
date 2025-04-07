@@ -154,7 +154,7 @@ helmCharts:
         #     - load
         #   namespace: host
         #   scrape_interval_secs: 15
-        vector_metrics:
+        vector_metrics_source:
           type: internal_metrics
       sinks:
         loki_journal_sink:
