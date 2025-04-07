@@ -113,6 +113,10 @@ helmCharts:
           address: 0.0.0.0:6010
           type: vector
           version: "2"
+        vector_syslog_source:
+          type: syslog
+          address: "0.0.0.0:9000"
+          mode: tcp
         # vector_journal_source:
         #   address: 0.0.0.0:6000
         #   type: vector
@@ -129,17 +133,23 @@ helmCharts:
             .namespace = .kubernetes.pod_namespace
             .source_type = "k8s_internal"
             .service_name = .kubernetes.pod_labels."app.kubernetes.io/name"
+        syslog_logs:
+          type: remap
+          inputs:
+            - vector_syslog_source
+          source: |
+            .message = .message
+            .source_type = "syslog"
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
           inputs:
             - vector_metrics_source
           address: 0.0.0.0:9090
-        loki: # This will likely become a k8s only sink?
+        loki_kubernetes_sink:
           type: loki
           inputs:
             - kubernetes_container_logs
-            # - vector_journal_source
           endpoint: http://logging-loki-gateway:80
           encoding:
             codec: logfmt
@@ -152,10 +162,24 @@ helmCharts:
               {{`{{ pod }}`}}
             service_name: >-
               {{`{{ service_name }}`}}
+        loki_syslog_sink:
+          type: loki
+          inputs:
+            - syslog_logs
+          endpoint: http://logging-loki-gateway:80
+          encoding:
+            codec: logfmt
+          labels:
+            source: >-
+              {{`{{ source_type }}`}}
+            # service_name: >-
+            #   {{`{{ service_name }}`}}
     podMonitor:
       enabled: true
     service:
       enabled: true
+      type: LoadBalancer
+      loadBalancerIP: 10.10.9.16
 - name: vector
   namespace: logging
   includeCRDs: false
