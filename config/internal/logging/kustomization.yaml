@@ -44,8 +44,8 @@ helmCharts:
         split_queries_by_interval: 15m
         query_timeout: 300s
         volume_enabled: true
-        ingestion_rate_mb: 20
-        ingestion_burst_size_mb: 30
+        ingestion_rate_mb: 100
+        ingestion_burst_size_mb: 200
     deploymentMode: SingleBinary
     singleBinary:
       replicas: 1
