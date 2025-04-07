@@ -134,7 +134,7 @@ helmCharts:
           inputs:
             - vector_metrics_source
           address: 0.0.0.0:9090
-        loki:
+        loki: # This will likely become a k8s only sink?
           type: loki
           inputs:
             - kubernetes_container_logs
@@ -149,6 +149,8 @@ helmCharts:
               {{`{{ namespace }}`}}
             pod: >-
               {{`{{ pod }}`}}
+            service_name: >-
+              {{`{{ kubernetes.pod_labels.app.kubernetes.io/name }}`}}
     podMonitor:
       enabled: true
     service:
