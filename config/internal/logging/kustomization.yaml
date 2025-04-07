@@ -127,7 +127,7 @@ helmCharts:
             .container = .kubernetes.container_name
             .pod = .kubernetes.pod_name
             .namespace = .kubernetes.pod_namespace
-            .source_type = k8s_internal
+            .source_type = "k8s_internal"
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
