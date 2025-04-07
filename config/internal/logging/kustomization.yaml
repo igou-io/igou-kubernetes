@@ -136,7 +136,7 @@ helmCharts:
         loki:
           type: loki
           inputs:
-            - vector_kubernetes_source
+            - kubernetes_container_logs
             # - vector_journal_source
           endpoint: http://logging-loki-gateway:80
           encoding:
