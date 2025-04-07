@@ -128,6 +128,7 @@ helmCharts:
             .pod = .kubernetes.pod_name
             .namespace = .kubernetes.pod_namespace
             .source_type = "k8s_internal"
+            .service_name = .kubernetes.pod_labels.app.kubernetes.io/name
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
@@ -150,7 +151,7 @@ helmCharts:
             pod: >-
               {{`{{ pod }}`}}
             service_name: >-
-              {{`{{ kubernetes.pod_labels.app.kubernetes.io/name }}`}}
+              {{`{{ service_name }}`}}
     podMonitor:
       enabled: true
     service:
