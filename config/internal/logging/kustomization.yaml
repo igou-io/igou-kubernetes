@@ -72,6 +72,10 @@ helmCharts:
       replicas: 0
     bloomGateway:
       replicas: 0
+    test:
+      enabled: false
+    lokiCanary:
+      enabled: false
 - name: vector
   namespace: logging
   includeCRDs: false
@@ -156,6 +160,16 @@ helmCharts:
         #   scrape_interval_secs: 15
         vector_metrics_source:
           type: internal_metrics
+      transforms:
+        kubernetes_container_logs:
+          type: remap
+          inputs:
+            - kubernetes_logs
+          source: |
+            .message = .message
+            .container = .kubernetes.container_name
+            .pod = .kubernetes.pod_name
+            .namespace = .kubernetes.pod_namespace
       sinks:
         # loki_journal_sink:
         #   type: vector
