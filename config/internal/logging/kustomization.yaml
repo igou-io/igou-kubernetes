@@ -96,7 +96,7 @@ helmCharts:
   repo: https://helm.vector.dev
   valuesInline:
     role: Stateless-Aggregator
-    logLevel: debug
+    logLevel: info
     containerPorts:
       - name: api
         containerPort: 8686
@@ -114,7 +114,7 @@ helmCharts:
           address: 0.0.0.0:6010
           type: vector
           version: "2"
-        vector_syslog_source:
+        vector_routeros_socket_source:
           type: socket
           address: "0.0.0.0:9000"
           mode: udp
@@ -134,13 +134,16 @@ helmCharts:
             .namespace = .kubernetes.pod_namespace
             .source_type = "k8s_internal"
             .service_name = .kubernetes.pod_labels."app.kubernetes.io/name"
-        # syslog_logs:
-        #   type: remap
-        #   inputs:
-        #     - vector_syslog_source
-        #   source: |
-        #     .message = .message
-        #     .source_type = "syslog"
+        routeros_logs:
+          type: remap
+          inputs:
+            - vector_routeros_socket_source
+          source: |
+            . |= parse_cef!(.message)
+            .source_type = "RouterOS"
+            .topics = del(.name)
+            del(.port)
+            del(.host)
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
@@ -166,7 +169,7 @@ helmCharts:
         loki_syslog_sink:
           type: loki
           inputs:
-            - vector_syslog_source
+            - routeros_logs
           endpoint: http://logging-loki-gateway:80
           encoding:
             codec: logfmt
