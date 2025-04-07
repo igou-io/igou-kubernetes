@@ -97,10 +97,10 @@ helmCharts:
           address: 0.0.0.0:6010
           type: vector
           version: "2"
-        vector_journal_source:
-          address: 0.0.0.0:6000
-          type: vector
-          version: "2"
+        # vector_journal_source:
+        #   address: 0.0.0.0:6000
+        #   type: vector
+        #   version: "2"
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
@@ -111,8 +111,8 @@ helmCharts:
           type: loki
           inputs:
             - vector_kubernetes_source
-            - vector_journal_source
-          endpoint: http://logging-loki-gateway:3100
+            # - vector_journal_source
+          endpoint: http://logging-loki-gateway:80
           encoding:
             codec: logfmt
           labels:
@@ -140,9 +140,9 @@ helmCharts:
       data_dir: /vector-data-dir
       expire_metrics_secs: 60
       sources:
-        journal_logs:
-          type: journald
-          journal_directory: /var/log/journal
+        # journal_logs:
+        #   type: journald
+        #   journal_directory: /var/log/journal
         kubernetes_logs:
           type: kubernetes_logs
         # host_metrics:
@@ -157,12 +157,12 @@ helmCharts:
         vector_metrics_source:
           type: internal_metrics
       sinks:
-        loki_journal_sink:
-          type: vector
-          inputs:
-            - journal_logs
-          address: vector-aggregator:6000
-          version: "2"
+        # loki_journal_sink:
+        #   type: vector
+        #   inputs:
+        #     - journal_logs
+        #   address: vector-aggregator:6000
+        #   version: "2"
         loki_kubernetes_sink:
           type: vector
           inputs:
