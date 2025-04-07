@@ -144,6 +144,7 @@ helmCharts:
             .topics = del(.name)
             del(.port)
             del(.host)
+            .message = del(.msg)
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
