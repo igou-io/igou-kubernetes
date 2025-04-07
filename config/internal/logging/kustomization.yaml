@@ -171,6 +171,7 @@ helmCharts:
         #   journal_directory: /var/log/journal
         kubernetes_logs:
           type: kubernetes_logs
+          node_annotation_fields: ""
         # host_metrics:
         #   type: host_metrics
         #   collectors:
