@@ -115,7 +115,7 @@ helmCharts:
           type: vector
           version: "2"
         vector_syslog_source:
-          type: syslog
+          type: socket
           address: "0.0.0.0:9000"
           mode: udp
         # vector_journal_source:
