@@ -96,6 +96,7 @@ helmCharts:
   repo: https://helm.vector.dev
   valuesInline:
     role: Stateless-Aggregator
+    logLevel: debug
     containerPorts:
       - name: api
         containerPort: 8686
