@@ -206,11 +206,11 @@ helmCharts:
       type: LoadBalancer
       loadBalancerIP: 10.10.9.16
     extraVolumes:
-      - name: syslog.igou.systems-tls
+      - name: syslog-tls
         secret:
           secretName: syslog.igou.systems-tls
     extraVolumeMounts:
-      - name: syslog.igou.systems-tls
+      - name: syslog-tls
         mountPath: /tls
 - name: vector
   namespace: logging
