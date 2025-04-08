@@ -153,6 +153,11 @@ helmCharts:
             del(.port)
             del(.host)
             .message = del(.msg)
+        syslog_logs:
+          type: remap
+          inputs:
+            - vector_syslog_tls_source
+          source: . |= parse_syslog!(.message)
       sinks:
         vector_metrics_sink:
           type: prometheus_exporter
@@ -193,12 +198,13 @@ helmCharts:
         loki_syslog_sink:
           type: loki
           inputs:
-            - vector_syslog_tls_source
+            - syslog_logs
           endpoint: http://logging-loki-gateway:80
           encoding:
             codec: logfmt
           labels:
             source: "syslog-tls"
+            service_name: "syslog"
     podMonitor:
       enabled: true
     service:
