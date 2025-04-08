@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: syslog.igou.systems-tls
+  namespace: logging
+spec:
+  secretName: syslog.igou.systems-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: syslog.igou.systems
+  dnsNames:
+    - syslog.igou.systems

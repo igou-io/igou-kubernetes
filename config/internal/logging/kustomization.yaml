@@ -114,6 +114,14 @@ helmCharts:
           address: 0.0.0.0:6010
           type: vector
           version: "2"
+        vector_syslog_tls_source: #syslog.igou.systems
+          type: syslog
+          address: "0.0.0.0:6514"
+          mode: tcp
+          tls:
+            crt_file: /tls/tls.crt
+            enabled: true
+            key_file: /tls/tls.key
         vector_routeros_socket_source:
           type: socket
           address: "0.0.0.0:9000"
@@ -182,12 +190,28 @@ helmCharts:
               {{`{{ deviceProduct }}`}}
             host: >-
               {{`{{ dvchost }}`}}
+        loki_syslog_sink:
+          type: loki
+          inputs:
+            - vector_syslog_tls_source
+          endpoint: http://logging-loki-gateway:80
+          encoding:
+            codec: logfmt
+          labels:
+            source: "syslog-tls"
     podMonitor:
       enabled: true
     service:
       enabled: true
       type: LoadBalancer
       loadBalancerIP: 10.10.9.16
+    extraVolumes:
+      - name: syslog.igou.systems-tls
+        secret:
+          secretName: syslog.igou.systems-tls
+    extraVolumeMounts:
+      - name: syslog.igou.systems-tls
+        mountPath: /tls
 - name: vector
   namespace: logging
   includeCRDs: false
