@@ -5,7 +5,7 @@ helmCharts:
 - name: external-secrets
   includeCRDs: true
   releaseName: external-secrets
-  version: 0.15.1
+  version: 0.16.0
   repo: https://charts.external-secrets.io
   valuesInline:
     replicaCount: 1
