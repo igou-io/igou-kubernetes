@@ -1,0 +1,73 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: democratic-csi
+resources:
+  - democratic-csi-iscsi-ssd-externalsecret.yml
+  - democratic-csi-nfs-externalsecret.yml
+helmCharts:
+- name: democratic-csi
+  namespace: democratic-csi
+  includeCRDs: false
+  releaseName: democratic-csi-iscsi-ssd-config
+  version: 0.15.0
+  repo: https://democratic-csi.github.io/charts/
+  valuesInline:
+    csiDriver:
+      name: "org.democratic-csi.iscsi"
+    storageClasses:
+    - name: freenas-iscsi-ssd-csi
+      defaultClass: false
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      allowVolumeExpansion: true
+      parameters:
+        fsType: ext4
+      mountOptions: []
+      secrets:
+        provisioner-secret:
+        controller-publish-secret:
+        node-stage-secret:
+        node-publish-secret:
+        controller-expand-secret:
+    volumeSnapshotClasses: []
+    driver:
+      existingConfigSecret: "democratic-csi-iscsi-ssd-config"
+      config:
+        driver: freenas-iscsi
+- name: democratic-csi
+  namespace: democratic-csi
+  includeCRDs: false
+  releaseName: democratic-csi-nfs-ssd-config
+  version: 0.15.0
+  repo: https://democratic-csi.github.io/charts/
+  valuesInline:
+    controller:
+      driver:
+        enabled: true
+        image:
+          registry: docker.io/democraticcsi/democratic-csi
+          tag: next
+    csiDriver:
+      name: "org.democratic-csi.nfs"
+    storageClasses:
+    - name: freenas-nfs-ssd-csi
+      defaultClass: false
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      allowVolumeExpansion: true
+      parameters:
+        fsType: nfs
+      mountOptions:
+        - noatime
+        - nfsvers=4
+      secrets:
+        provisioner-secret:
+        controller-publish-secret:
+        node-stage-secret:
+        node-publish-secret:
+        controller-expand-secret:
+    volumeSnapshotClasses: []
+    driver:
+      existingConfigSecret: "democratic-csi-nfs-ssd-config"
+      config:
+        driver: freenas-nfs
