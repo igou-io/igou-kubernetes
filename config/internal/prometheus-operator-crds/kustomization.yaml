@@ -2,5 +2,5 @@ helmCharts:
 - name: prometheus-operator-crds
   includeCRDs: true
   releaseName: prometheus-operator-crds
-  version: 19.1.0
+  version: 21.0.0
   repo: https://prometheus-community.github.io/helm-charts
