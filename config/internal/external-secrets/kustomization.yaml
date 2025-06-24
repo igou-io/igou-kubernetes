@@ -331,7 +331,7 @@ helmCharts:
 - name: connect
   includeCRDs: true
   releaseName: connect
-  version: 1.17.0
+  version: 1.17.1
   repo: https://1password.github.io/connect-helm-charts
   valuesInline:
     connect:
