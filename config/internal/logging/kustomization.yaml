@@ -8,7 +8,7 @@ helmCharts:
   namespace: logging
   includeCRDs: false
   releaseName: logging
-  version: 6.31.0
+  version: 6.32.0
   repo: https://grafana.github.io/helm-charts
   valuesInline:
     loki:
