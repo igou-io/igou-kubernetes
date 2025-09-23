@@ -92,7 +92,7 @@ helmCharts:
   namespace: logging
   includeCRDs: false
   releaseName: vector-aggregator
-  version: 0.45.0
+  version: 0.46.0
   repo: https://helm.vector.dev
   valuesInline:
     role: Stateless-Aggregator
@@ -225,7 +225,7 @@ helmCharts:
   namespace: logging
   includeCRDs: false
   releaseName: vector-agent
-  version: 0.45.0
+  version: 0.46.0
   repo: https://helm.vector.dev
   valuesInline:
     role: Agent
