@@ -171,7 +171,7 @@ helmCharts:
         # If not set and create is true, a name is generated using the fullname template.
         name: ""
       nodeSelector:
-        node-role.kubernetes.io/control-plane: "true"
+        node-role.kubernetes.io/control-plane: ""
       tolerations:
         - operator: Exists
 
@@ -262,7 +262,7 @@ helmCharts:
         # If not set and create is true, a name is generated using the fullname template.
         name: ""
       nodeSelector:
-        node-role.kubernetes.io/control-plane: "true"
+        node-role.kubernetes.io/control-plane: ""
 
       tolerations:
         - operator: Exists
