@@ -1,16 +1,13 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "github>igou-io/igou-devenv//renovate-base.json"
   ],
   "packageRules": [
     {
-      "updateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-    {
-      "matchPackagePatterns": ["awx"],
-      "updateTypes": ["patch", "minor"],
+      "description": "Hold AWX updates for manual review",
+      "matchPackageNames": ["/awx/"],
       "automerge": false
-    }    
+    }
   ]
 }
