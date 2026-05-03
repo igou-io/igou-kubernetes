@@ -1,7 +1,7 @@
 pod-gateway:
   image:
     repository: ghcr.io/angelnu/pod-gateway
-    tag: v1.13.0
+    tag: v1.13.0@sha256:a5b032e15f7570493977b330a5a86dcffebb807d35685ad803e47afb62d105f2
   DNS: 172.16.1.1
   addons:
     netshoot:
@@ -13,7 +13,7 @@ pod-gateway:
         image:
           # TODO: Replace with ghcr.io/qdm12/gluetun when a versioned tag is available
           repository: docker.io/qmcgaw/gluetun
-          tag: v3.41.1
+          tag: v3.41.1@sha256:1a5bf4b4820a879cdf8d93d7ef0d2d963af56670c9ebff8981860b6804ebc8ab
       env:
         - name: VPN_SERVICE_PROVIDER
           value: mullvad
@@ -64,4 +64,4 @@ pod-gateway:
       label: routed-gateway
     image:
       repository: ghcr.io/angelnu/gateway-admision-controller
-      tag: v3.12.0
+      tag: v3.12.0@sha256:6f6ab596afd5fef0ca4648eadfb21cd37ba86fa5afa8b85edcc072976a61fbed
