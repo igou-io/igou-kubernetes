@@ -5,7 +5,7 @@ app-template:
         main:
           image:
             repository: docker.io/datarhei/restreamer
-            tag: latest
+            tag: latest@sha256:813acc9d41d2953b1e7fbb5b281f9a1f68d07fef4e1b30e34472b12d3db9426a
             pullPolicy: IfNotPresent
     mediamtx:
       pod:
@@ -21,7 +21,7 @@ app-template:
         main:
           image:
             repository: docker.io/bluenviron/mediamtx
-            tag: latest-rpi
+            tag: latest-rpi@sha256:1c2c3b5cce954e6096674c6477ea47cef08ad8978dcc0fea15be39fcde173037
             pullPolicy: IfNotPresent
           env:
             MTX_PATHS_CAM_SOURCE: rpiCamera
