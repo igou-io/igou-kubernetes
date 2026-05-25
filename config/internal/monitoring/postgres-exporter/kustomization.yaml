@@ -8,7 +8,7 @@ helmCharts:
   namespace: monitoring
   includeCRDs: false
   releaseName: monitoring
-  version: 7.5.2
+  version: 8.0.0
   repo: https://prometheus-community.github.io/helm-charts
   valuesInline:
     serviceMonitor:
