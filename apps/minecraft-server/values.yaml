@@ -2,7 +2,7 @@ minecraft:
   # ref: https://hub.docker.com/r/itzg/minecraft-server/
   image:
     repository: itzg/minecraft-server
-    tag: latest
+    tag: latest@sha256:f29173ca0edfee411bd9e08820aa1bfc508787d7fd02876cfa4c96a3a2a7a77c
     pullPolicy: IfNotPresent
     pullSecret: ""
   
@@ -421,7 +421,7 @@ minecraft:
   
     image:
       repository: itzg/mc-backup
-      tag: latest
+      tag: latest@sha256:2e10554d83a28f97db323a904052eb342770a54c0dfb35da40159bd1712d54f8
       pullPolicy: IfNotPresent
   
     #  wait 2 minutes before starting
