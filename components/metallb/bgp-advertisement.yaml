@@ -10,5 +10,6 @@ metadata:
 spec:
   ipAddressPools:
     - trusted-lan
+    - trusted-lan-gateway
     - iot
     - guest-dmz

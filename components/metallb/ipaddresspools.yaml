@@ -12,8 +12,24 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   addresses:
-    - 10.10.150.0/24
+    # .1 is reserved for the cluster gateway (DNS *.rk8s.igou.systems);
+    # exclude it and the network/broadcast addresses from auto-assignment.
+    - 10.10.150.2-10.10.150.254
   autoAssign: true
+---
+# Pinned pool for the gateway VIP: request it with
+# metallb.io/loadBalancerIPs: 10.10.150.1 (or spec.loadBalancerIP).
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: trusted-lan-gateway
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    - 10.10.150.1/32
+  autoAssign: false
 ---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
@@ -24,7 +40,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   addresses:
-    - 10.10.151.0/24
+    - 10.10.151.1-10.10.151.254
   autoAssign: false
 ---
 apiVersion: metallb.io/v1beta1
@@ -36,5 +52,5 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   addresses:
-    - 10.10.152.0/24
+    - 10.10.152.1-10.10.152.254
   autoAssign: false
