@@ -1,0 +1,40 @@
+# Three BGP-advertised tiers; rb5009 enforces per-tier client isolation in
+# its forward chain (see igou-inventory #32). 10.10.150.1 is reserved by
+# convention for the cluster ingress/gateway — *.rk8s.igou.systems and the
+# rk8s.igou.systems apex resolve to it (igou-inventory #41); pin it with
+# metallb.io/loadBalancerIPs on the gateway's LoadBalancer service.
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: trusted-lan
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    - 10.10.150.0/24
+  autoAssign: true
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: iot
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    - 10.10.151.0/24
+  autoAssign: false
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: guest-dmz
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    - 10.10.152.0/24
+  autoAssign: false

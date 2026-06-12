@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: metallb-system
+resources:
+  - metallb-namespace.yaml
+  # BGP config CRs ship in the same sync as the chart's CRDs —
+  # SkipDryRunOnMissingResource on each lets the first sync converge.
+  - bgp-peer.yaml
+  - ipaddresspools.yaml
+  - bgp-advertisement.yaml
+helmCharts:
+- name: metallb
+  includeCRDs: true
+  releaseName: metallb
+  namespace: metallb-system
+  version: 0.16.1
+  repo: https://metallb.github.io/metallb

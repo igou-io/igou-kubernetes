@@ -1,0 +1,15 @@
+# rb5009 BGP listener (igou-inventory host_vars/rb5009.igou.systems.yml):
+# /routing/bgp/connection "metallb-listener" — AS 64512, router-id 10.10.9.1,
+# passive (connect: false), accepts peers from 10.10.9.0/24 remote-AS 64513.
+# Its metallb-in filter only accepts /32 routes inside the three tier pools.
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: rb5009
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  myASN: 64513
+  peerASN: 64512
+  peerAddress: 10.10.9.1

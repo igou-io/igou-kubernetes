@@ -55,6 +55,15 @@ applications:
     source:
       path: components/cert-manager
 
+  metallb:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '5'
+    destination:
+      namespace: metallb-system
+    source:
+      path: components/metallb
+
   nginx-gateway-fabric:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
