@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: virtualmachine-deployer
+subjects:
+- kind: ServiceAccount
+  name: virtualmachine-deployer
+  namespace: kubevirt
+roleRef:
+  kind: ClusterRole
+  name: virtualmachine-deployer
+  apiGroup: rbac.authorization.k8s.io

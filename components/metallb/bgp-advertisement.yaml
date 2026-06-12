@@ -1,0 +1,14 @@
+# /32 per service IP (default) — rb5009's metallb-in filter rejects
+# anything that isn't a /32 inside the tier pools.
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: tiers
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ipAddressPools:
+    - trusted-lan
+    - iot
+    - guest-dmz

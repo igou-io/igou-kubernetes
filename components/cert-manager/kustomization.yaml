@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cert-manager
+resources:
+  - cert-manager-namespace.yaml
+helmCharts:
+- name: cert-manager
+  includeCRDs: true
+  releaseName: cert-manager
+  namespace: cert-manager
+  version: v1.20.2
+  repo: https://charts.jetstack.io
+  valuesInline:
+    crds:
+      enabled: true
+      keep: true
+
+    # Public resolvers so DNS01 self-checks don't get poisoned by
+    # split-horizon answers from the lab resolver.
+    dns01RecursiveNameservers: "1.1.1.1:53,9.9.9.9:53"
+    dns01RecursiveNameserversOnly: true
+
+    config:
+      apiVersion: controller.config.cert-manager.io/v1alpha1
+      kind: ControllerConfiguration
+      enableGatewayAPI: true
+
+    prometheus:
+      enabled: false

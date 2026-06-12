@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tailscale
+resources:
+  - tailscale-namespace.yaml
+  - operator-oauth-externalsecret.yaml
+helmCharts:
+- name: tailscale-operator
+  includeCRDs: true
+  releaseName: tailscale
+  namespace: tailscale
+  version: 1.98.4
+  repo: https://pkgs.tailscale.com/helmcharts
+  valuesInline:
+    # OAuth credentials come from the operator-oauth ExternalSecret, not
+    # chart values.
+    oauth: {}
+
+    installCRDs: true
+
+    operatorConfig:
+      defaultTags:
+        - "tag:k8s-operator"
+      hostname: "tailscale-operator"
+      logging: "info"
+
+    proxyConfig:
+      defaultTags: "tag:k8s"
+      firewallMode: auto
+
+    apiServerProxyConfig:
+      mode: "false"
