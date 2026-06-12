@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: democratic-csi
+resources:
+  - democratic-csi-namespace.yaml
+# Storage is intentionally unconfigured for now: no StorageClasses are
+# defined and the driver config secrets referenced below do not exist yet.
+# The controller/node pods will sit in ContainerCreating until the
+# democratic-csi-*-config secrets are provisioned (1Password via ESO) and
+# StorageClasses are added per pool.
+helmCharts:
+# ---- NFS ----
+- name: democratic-csi
+  namespace: democratic-csi
+  includeCRDs: false
+  releaseName: democratic-csi-nfs
+  version: 0.15.1
+  repo: https://democratic-csi.github.io/charts/
+  valuesInline:
+    csiDriver:
+      name: "org.democratic-csi.nfs"
+    controller:
+      driver:
+        enabled: true
+    node:
+      driver:
+        enabled: true
+        localtimeHostPath: null
+    storageClasses: []
+    volumeSnapshotClasses: []
+    driver:
+      existingConfigSecret: "democratic-csi-nfs-config"
+      config:
+        driver: freenas-nfs
+# ---- iSCSI ----
+- name: democratic-csi
+  namespace: democratic-csi
+  includeCRDs: false
+  releaseName: democratic-csi-iscsi
+  version: 0.15.1
+  repo: https://democratic-csi.github.io/charts/
+  valuesInline:
+    csiDriver:
+      name: "org.democratic-csi.iscsi"
+    controller:
+      driver:
+        enabled: true
+      hostNetwork: true
+    node:
+      driver:
+        enabled: true
+        localtimeHostPath: null
+    storageClasses: []
+    volumeSnapshotClasses: []
+    driver:
+      existingConfigSecret: "democratic-csi-iscsi-config"
+      config:
+        driver: freenas-iscsi

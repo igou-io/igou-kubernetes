@@ -1,0 +1,55 @@
+applications:
+
+  app-of-apps:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '0'
+    destination:
+      namespace: argocd
+    source:
+      path: clusters/internal
+
+  democratic-csi:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '7'
+    destination:
+      namespace: democratic-csi
+    source:
+      path: components/democratic-csi
+
+  kube-prometheus-stack:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '10'
+    destination:
+      namespace: monitoring
+    source:
+      path: components/kube-prometheus-stack
+
+  loki:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '11'
+    destination:
+      namespace: loki
+    source:
+      path: components/loki
+
+  tailscale-operator:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '12'
+    destination:
+      namespace: tailscale
+    source:
+      path: components/tailscale-operator
+
+  kubevirt:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '50'
+    destination:
+      namespace: kubevirt
+    source:
+      path: components/kubevirt

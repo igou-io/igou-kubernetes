@@ -1,0 +1,65 @@
+projects:
+
+  cluster-config:
+    description: Project for overall cluster configuration
+    namespace: argocd
+    sourceRepos:
+    - "{{ .Values.default.app.source.repoURL }}"
+    destinations: |
+      - namespace: '*'
+        server: https://kubernetes.default.svc
+    extraFields: |
+      clusterResourceWhitelist:
+      - group: '*'
+        kind: '*'
+
+  cluster-apps:
+    description: Project for user-facing applications and workloads
+    namespace: argocd
+    sourceRepos:
+    - "{{ .Values.default.app.source.repoURL }}"
+    destinations: |
+      - namespace: '*'
+        server: https://kubernetes.default.svc
+    extraFields: |
+      clusterResourceWhitelist:
+      - group: '*'
+        kind: '*'
+
+applications:
+
+  argocd:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '0'
+    destination:
+      namespace: argocd
+    source:
+      path: components/argocd
+
+  external-secrets-operator:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '0'
+    destination:
+      namespace: external-secrets
+    source:
+      path: components/external-secrets-operator
+
+  cert-manager:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '5'
+    destination:
+      namespace: cert-manager
+    source:
+      path: components/cert-manager
+
+  nginx-gateway-fabric:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '6'
+    destination:
+      namespace: nginx-gateway
+    source:
+      path: components/nginx-gateway-fabric

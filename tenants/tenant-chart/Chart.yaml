@@ -1,7 +1,0 @@
-apiVersion: v2
-name: argocd-team-configuration
-description: A chart to deploy team configuration
-
-type: application
-
-version: 1.0.0

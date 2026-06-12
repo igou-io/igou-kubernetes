@@ -1,13 +1,28 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>igou-io/igou-devenv//renovate-base.json"
+    "github>igou-io/igou-devenv//renovate-base.json",
+    ":configMigration"
   ],
+  "helm-values": {
+    "managerFilePatterns": ["/\\.yaml$/"]
+  },
+  "kubernetes": {
+    "managerFilePatterns": ["/\\.yaml$/"]
+  },
   "packageRules": [
     {
-      "description": "Hold AWX updates for manual review",
-      "matchPackageNames": ["/awx/"],
+      "description": "Docker major updates require manual merge",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
       "automerge": false
+    },
+    {
+      "description": "Disable digest pinning for OCI helm charts managed by kustomize",
+      "matchManagers": ["kustomize"],
+      "matchDatasources": ["docker"],
+      "matchDepTypes": ["HelmChart"],
+      "pinDigests": false
     }
   ]
 }

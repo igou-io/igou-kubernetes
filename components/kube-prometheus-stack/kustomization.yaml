@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+resources:
+  - monitoring-namespace.yaml
+helmCharts:
+- name: kube-prometheus-stack
+  includeCRDs: true
+  releaseName: kube-prometheus-stack
+  namespace: monitoring
+  version: 86.2.2
+  repo: https://prometheus-community.github.io/helm-charts
+  valuesInline:
+    fullnameOverride: kube-prometheus-stack
+
+    prometheus:
+      prometheusSpec:
+        # Pick up all ServiceMonitors/PodMonitors/Rules cluster-wide, not
+        # just the ones with the chart's release label.
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        retention: 30d
+
+    grafana:
+      enabled: true
+      defaultDashboardsTimezone: America/New_York
+
+    # k3s runs these control-plane components in-process; there are no
+    # separate pods/endpoints to scrape.
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    kubeEtcd:
+      enabled: false

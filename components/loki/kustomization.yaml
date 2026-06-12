@@ -1,0 +1,59 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: loki
+resources:
+  - loki-namespace.yaml
+helmCharts:
+- name: loki
+  includeCRDs: true
+  releaseName: loki
+  namespace: loki
+  version: 7.0.0
+  repo: https://grafana.github.io/helm-charts
+  valuesInline:
+    deploymentMode: SingleBinary
+
+    loki:
+      auth_enabled: false
+      commonConfig:
+        replication_factor: 1
+      storage:
+        type: filesystem
+      schemaConfig:
+        configs:
+          - from: "2024-04-01"
+            store: tsdb
+            object_store: filesystem
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+
+    singleBinary:
+      replicas: 1
+      persistence:
+        enabled: true
+        size: 20Gi
+
+    # Zero out the scalable-mode targets; SingleBinary handles everything.
+    read:
+      replicas: 0
+    write:
+      replicas: 0
+    backend:
+      replicas: 0
+
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+
+    gateway:
+      enabled: true
+      replicas: 1
+
+    lokiCanary:
+      enabled: false
+
+    test:
+      enabled: false
