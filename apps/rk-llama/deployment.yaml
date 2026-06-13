@@ -1,0 +1,103 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rk-llama-server
+  namespace: rk-llama
+  labels:
+    app.kubernetes.io/name: rk-llama-server
+spec:
+  # The RK3588 NPU kernel-panics if two independent processes touch it
+  # concurrently (per upstream README), so never surge a second pod.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rk-llama-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rk-llama-server
+    spec:
+      # Pinned to the one board running the Armbian vendor kernel
+      # (6.1.115-vendor-rk35xx), which provides the rknpu driver
+      # (v0.9.8) that librknnrt requires. The other boards run
+      # mainline/edge kernels whose `rocket` driver cannot serve
+      # the vendor RKNN runtime.
+      nodeSelector:
+        kubernetes.io/hostname: rock-5b-01.igou.systems
+      containers:
+        - name: llama-server
+          # Built from the Containerfile in this directory; binaries
+          # compiled natively on a board from
+          # github.com/invisiofficial/rk-llama.cpp @ rknpu2 (81eff6a).
+          # Imported into k3s containerd on the node via
+          # `k3s ctr images import` (no registry), hence Never.
+          image: localhost/rk-llama-server:rknpu2-81eff6a
+          imagePullPolicy: Never
+          args:
+            # Ministral-3-3B after two failed candidates: Gemma-4-E4B
+            # (gemma3n/gemma4-E family generates degenerate output on
+            # this fork — upstream issue #6) and LFM2-8B-A1B (special
+            # tokens only). Both of those GGUFs remain on the node for
+            # retesting when upstream fixes land. Ministral3 3B is
+            # all-green in the fork's own benchmark table and verified
+            # coherent here on the W8A8 NPU pipeline.
+            - "-m"
+            - "/models/Ministral-3-3B-Instruct-2512-Q8_0.gguf"
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "8080"
+            - "-c"
+            - "4096"
+          env:
+            # Q8_0 maps to the W8A8_STANDARD pipeline by default —
+            # the exact config upstream benchmarked for this model.
+            - name: RKNPU_DEVICE
+              value: "RK3588"
+          securityContext:
+            # librknnrt needs raw access to the rknpu DRM render node
+            # and DMA heaps; privileged keeps this simple on a
+            # single-user homelab cluster.
+            privileged: true
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: dev-dri
+              mountPath: /dev/dri
+          resources:
+            requests:
+              cpu: "2"
+              memory: 5Gi
+            limits:
+              memory: 8Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            # Model load + NPU requantization takes minutes.
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 900
+            periodSeconds: 30
+            failureThreshold: 10
+      volumes:
+        - name: models
+          hostPath:
+            path: /var/lib/rk-llama/models
+            type: Directory
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
