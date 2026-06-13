@@ -3,8 +3,8 @@ kind: Kustomization
 resources:
 - https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/kubevirt-operator.yaml
 - https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/kubevirt-cr.yaml
-- https://github.com/kubevirt/containerized-data-importer/releases/download/v1.59.0/cdi-cr.yaml
-- https://github.com/kubevirt/containerized-data-importer/releases/download/v1.59.0/cdi-operator.yaml
+- https://github.com/kubevirt/containerized-data-importer/releases/download/v1.65.0/cdi-cr.yaml
+- https://github.com/kubevirt/containerized-data-importer/releases/download/v1.65.0/cdi-operator.yaml
 - virtualmachine-reader-clusterrole.yaml
 - virtualmachine-reader-clusterrolebinding.yaml
 - virtualmachine-reader-serviceaccount.yaml
@@ -16,4 +16,3 @@ resources:
 
 patches:
 - path: patches/feature-gates-patch.yaml
-- path: patches/cdi-workload-nodeselector-patch.yaml
