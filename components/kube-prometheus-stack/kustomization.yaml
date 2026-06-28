@@ -8,7 +8,7 @@ helmCharts:
   includeCRDs: true
   releaseName: kube-prometheus-stack
   namespace: monitoring
-  version: 86.2.2
+  version: 86.2.3
   repo: https://prometheus-community.github.io/helm-charts
   valuesInline:
     fullnameOverride: kube-prometheus-stack
