@@ -16,7 +16,7 @@ applications:
     destination:
       namespace: democratic-csi
     source:
-      path: components/democratic-csi
+      path: clusters/internal/democratic-csi
 
   kube-prometheus-stack:
     annotations:

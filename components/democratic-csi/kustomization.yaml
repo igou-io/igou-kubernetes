@@ -3,11 +3,14 @@ kind: Kustomization
 namespace: democratic-csi
 resources:
   - democratic-csi-namespace.yaml
-# Storage is intentionally unconfigured for now: no StorageClasses are
-# defined and the driver config secrets referenced below do not exist yet.
-# The controller/node pods will sit in ContainerCreating until the
-# democratic-csi-*-config secrets are provisioned (1Password via ESO) and
-# StorageClasses are added per pool.
+# Driver config secrets (democratic-csi-{nfs,iscsi}-config) are NOT in
+# git — they are rendered by the ExternalSecrets in
+# clusters/internal/democratic-csi/ (1Password via ESO), mirroring
+# igou-openshift's components/ vs clusters/ split. Both drivers are the
+# pure-API freenas-api-* variants authenticating as the dedicated
+# TrueNAS `csi` user — no sshConnection anywhere.
+# volumeSnapshotClasses stay empty until a snapshot controller +
+# snapshot.storage.k8s.io CRDs are deployed on this cluster.
 helmCharts:
 # ---- NFS ----
 - name: democratic-csi
@@ -26,12 +29,28 @@ helmCharts:
       driver:
         enabled: true
         localtimeHostPath: null
-    storageClasses: []
+    storageClasses:
+      - name: freenas-nfs-ssd-csi
+        defaultClass: false
+        reclaimPolicy: Delete
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          fsType: nfs
+        mountOptions:
+          - noatime
+          - nfsvers=4
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
     volumeSnapshotClasses: []
     driver:
       existingConfigSecret: "democratic-csi-nfs-config"
       config:
-        driver: freenas-nfs
+        driver: freenas-api-nfs
 # ---- iSCSI ----
 - name: democratic-csi
   namespace: democratic-csi
@@ -50,9 +69,23 @@ helmCharts:
       driver:
         enabled: true
         localtimeHostPath: null
-    storageClasses: []
+    storageClasses:
+      - name: freenas-iscsi-ssd-csi
+        defaultClass: false
+        reclaimPolicy: Delete
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          fsType: ext4
+        mountOptions: []
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
     volumeSnapshotClasses: []
     driver:
       existingConfigSecret: "democratic-csi-iscsi-config"
       config:
-        driver: freenas-iscsi
+        driver: freenas-api-iscsi
