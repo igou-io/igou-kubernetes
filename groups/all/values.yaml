@@ -57,7 +57,14 @@ applications:
 
   metallb:
     annotations:
-      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      # ServerSideDiff=false: MetalLB's ipaddresspool validating webhook
+      # rejects the server-side-diff dry-run whenever a pool-boundary change
+      # transiently overlaps the live pools (e.g. moving the gateway VIP into
+      # a range the old pool still spans), wedging the app at ComparisonError.
+      # Client-side diff skips the dry-run; the sync then applies in name
+      # order (trusted-lan narrows before trusted-lan-gateway moves), which
+      # the webhook accepts.
+      argocd.argoproj.io/compare-options: IgnoreExtraneous,ServerSideDiff=false
       argocd.argoproj.io/sync-wave: '5'
     destination:
       namespace: metallb-system
