@@ -33,6 +33,7 @@ helmCharts:
       replicas: 1
       persistence:
         enabled: true
+        storageClass: freenas-iscsi-ssd-csi
         size: 20Gi
 
     # Zero out the scalable-mode targets; SingleBinary handles everything.
