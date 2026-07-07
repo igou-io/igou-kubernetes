@@ -22,10 +22,34 @@ helmCharts:
         ruleSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         retention: 30d
+        # Durable TSDB on TrueNAS (democratic-csi iSCSI); without this the
+        # 30d retention above only ever holds until the pod restarts.
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: freenas-iscsi-ssd-csi
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
 
+    alertmanager:
+      alertmanagerSpec:
+        # Persist silences + notification dedup state across restarts.
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: freenas-iscsi-ssd-csi
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 2Gi
+
+    # Grafana ships disabled here; a dedicated Grafana operator will own it.
     grafana:
-      enabled: true
-      defaultDashboardsTimezone: America/New_York
+      enabled: false
 
     # k3s runs these control-plane components in-process; there are no
     # separate pods/endpoints to scrape.
