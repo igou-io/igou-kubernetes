@@ -3,7 +3,8 @@ kind: Kustomization
 namespace: external-secrets
 resources:
   - external-secrets-namespace.yaml
-  - onepassword-sdk-ocp-pull-clustersecretstore.yaml
+  - onepassword-lab-rk8s-clustersecretstore.yaml
+  - onepassword-lab-external-api-keys-clustersecretstore.yaml
 helmCharts:
 - name: external-secrets
   includeCRDs: true
