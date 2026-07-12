@@ -1,0 +1,12 @@
+# Control-plane metrics (xDS translation, watch queues, etc.) on the
+# envoy-gateway Service's metrics port (19001).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: envoy-gateway
+spec:
+  selector:
+    matchLabels:
+      control-plane: envoy-gateway
+  endpoints:
+    - port: metrics

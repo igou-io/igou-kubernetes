@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: rk8s
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: envoy
+  # HTTP only for now: no ClusterIssuer exists on rk8s yet. When one
+  # lands, add a 443 HTTPS listener with tls.certificateRefs and let
+  # cert-manager's Gateway API integration (already enabled in the
+  # cert-manager component) issue the wildcard cert.
+  listeners:
+    - name: http-wildcard
+      protocol: HTTP
+      port: 80
+      hostname: "*.rk8s.igou.systems"
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: http-apex
+      protocol: HTTP
+      port: 80
+      hostname: rk8s.igou.systems
+      allowedRoutes:
+        namespaces:
+          from: All

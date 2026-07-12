@@ -1,0 +1,29 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: rk8s-proxy-config
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 2
+        container:
+          # Sized for the arm64 SBC fleet; bump if the gateway ever
+          # fronts something hungrier than homelab HTTP traffic.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+      envoyService:
+        # 10.10.150.129 is the rk8s ingress VIP by convention:
+        # *.rk8s.igou.systems and the apex resolve to it, and the
+        # trusted-lan-gateway MetalLB pool reserves it (autoAssign off).
+        annotations:
+          metallb.io/loadBalancerIPs: 10.10.150.129
+        # Local keeps client source IPs and, with MetalLB BGP mode,
+        # announces the VIP only from nodes running a proxy pod.
+        externalTrafficPolicy: Local

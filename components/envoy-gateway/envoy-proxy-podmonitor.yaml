@@ -1,0 +1,16 @@
+# Data-plane metrics. Envoy Gateway generates the proxy Deployments at
+# runtime (they are not in git), so scrape the pods by the labels the
+# infra manager stamps on them. Envoy serves Prometheus metrics on
+# 19001 /stats/prometheus by default.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: envoy-proxy-fleet
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: envoy
+      app.kubernetes.io/managed-by: envoy-gateway
+  podMetricsEndpoints:
+    - targetPort: 19001
+      path: /stats/prometheus

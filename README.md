@@ -28,6 +28,7 @@ Helm chart via kustomize's `helmCharts` field, plus any raw manifests
 | external-secrets-operator | charts.external-secrets.io | 0 |
 | cert-manager | charts.jetstack.io | 5 |
 | nginx-gateway-fabric | ghcr.io/nginx/charts (OCI) | 6 |
+| envoy-gateway | docker.io/envoyproxy (OCI) | 6 |
 | democratic-csi | democratic-csi.github.io/charts | 7 |
 | kube-prometheus-stack | prometheus-community.github.io/helm-charts | 10 |
 | loki | grafana.github.io/helm-charts | 11 |
@@ -41,6 +42,9 @@ Not yet configured (intentionally):
 - **external-secrets** has no ClusterSecretStore; the `onepassword` store and
   its backend still need to be wired up. Until then anything that consumes an
   ExternalSecret (tailscale-operator oauth, private repo creds) stays degraded.
+- **envoy-gateway** serves HTTP only; TLS waits on a cluster issuer
+  (see [docs/envoy-gateway.md](docs/envoy-gateway.md)). The Gateway API CRDs
+  remain owned by the nginx-gateway-fabric app.
 
 ## Bootstrap
 

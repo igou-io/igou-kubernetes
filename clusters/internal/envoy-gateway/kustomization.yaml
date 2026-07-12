@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: envoy-gateway-system
+resources:
+  - ../../../components/envoy-gateway
+  - gatewayclass.yaml
+  - envoyproxy.yaml
+  - gateway.yaml
+# The GatewayClass/EnvoyProxy/Gateway CRs sync in the same operation as
+# the CRDs that define them; skip the dry-run so the first sync doesn't
+# fail on not-yet-registered kinds (same pattern as democratic-csi).
+commonAnnotations:
+  argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

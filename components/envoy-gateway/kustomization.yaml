@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: envoy-gateway-system
+resources:
+  - envoy-gateway-namespace.yaml
+  - envoy-gateway-servicemonitor.yaml
+  - envoy-proxy-podmonitor.yaml
+helmCharts:
+# Envoy Gateway's own CRDs (gateway.envoyproxy.io) only. The Gateway API
+# CRDs (gateway.networking.k8s.io) are deliberately NOT installed here:
+# the nginx-gateway-fabric app already owns the standard-channel v1.5.1
+# bundle, and with FailOnSharedResource=true a second owner would fail
+# every sync. See docs/envoy-gateway.md for the CRD ownership plan.
+- name: gateway-crds-helm
+  releaseName: envoy-gateway-crds
+  namespace: envoy-gateway-system
+  version: 1.8.2
+  repo: oci://docker.io/envoyproxy
+  valuesInline:
+    crds:
+      gatewayAPI:
+        enabled: false
+      envoyGateway:
+        enabled: true
+# Control plane. crds.enabled=false keeps this chart from re-installing
+# both CRD sets (its crds subchart bundles the *experimental* Gateway API
+# channel on top of the Envoy Gateway CRDs). The certgen Job carries
+# helm.sh/hook pre-install annotations that Argo CD runs as a PreSync
+# hook; upstream annotates it for exactly this flow.
+- name: gateway-helm
+  releaseName: envoy-gateway
+  namespace: envoy-gateway-system
+  version: 1.8.2
+  repo: oci://docker.io/envoyproxy
+  valuesInline:
+    crds:
+      enabled: false
+    # Topology-aware routing webhook is useless on a single-zone homelab
+    # cluster; disabling it removes a mutating webhook failure mode.
+    topologyInjector:
+      enabled: false
