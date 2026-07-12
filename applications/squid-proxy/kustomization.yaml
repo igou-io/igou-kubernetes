@@ -1,0 +1,123 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: squid-proxy
+resources:
+  - squid-proxy-namespace.yaml
+configMapGenerator:
+  - name: squid-proxy-config
+    files:
+      - squid.conf
+generatorOptions:
+  disableNameSuffixHash: true
+helmCharts:
+  - name: app-template
+    namespace: squid-proxy
+    version: 4.6.2
+    releaseName: squid-proxy
+    repo: oci://ghcr.io/bjw-s-labs/helm
+    valuesFile: values-dummy.yaml
+    valuesInline:
+      controllers:
+        squid-proxy:
+          type: deployment
+          replicas: 1
+          strategy: RollingUpdate
+          pod:
+            securityContext:
+              seccompProfile:
+                type: RuntimeDefault
+              # emptyDir spool (/var/spool/squid) must be writable by the
+              # non-root runAsUser below. On OCP the restricted SCC handled
+              # volume ownership via fsGroup automatically; k3s has no SCC, so
+              # set fsGroup explicitly — kubelet chowns the emptyDir to this
+              # group so squid can write its pid file / coredumps there.
+              fsGroup: 13
+          containers:
+            app:
+              image:
+                repository: docker.io/ubuntu/squid
+                # OCP pinned 6.9-24.04_beta (now gone upstream); 6.6-24.04_beta
+                # is the closest surviving equivalent (squid 6.x on ubuntu
+                # 24.04). Multi-arch: manifest list includes linux/arm64/v8.
+                tag: "6.6-24.04_beta@sha256:6a097f68bae708cedbabd6188d68c7e2e7a38cedd05a176e1cc0ba29e3bbe029"
+                pullPolicy: IfNotPresent
+              # Run squid directly (foreground, no init script) so the image's
+              # root-only entrypoint setup steps are skipped and squid runs as
+              # the arbitrary non-root UID assigned below.
+              command:
+                - /usr/sbin/squid
+              args:
+                - -N
+                - -f
+                - /etc/squid/squid.conf
+              env: {}
+              probes:
+                liveness:
+                  enabled: true
+                  type: TCP
+                  spec:
+                    initialDelaySeconds: 10
+                    periodSeconds: 15
+                readiness:
+                  enabled: true
+                  type: TCP
+                  spec:
+                    initialDelaySeconds: 10
+                    periodSeconds: 15
+                startup:
+                  enabled: true
+                  type: TCP
+                  spec:
+                    failureThreshold: 30
+                    periodSeconds: 5
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 128Mi
+                # squid's default in-memory cache (cache_mem) is 256MB and
+                # there is no disk cache (cache_dir null), so hot objects live
+                # in RAM up to that cap. Give headroom above 256MB + squid's
+                # fixed pools to avoid OOMKill under sustained proxy load. OCP
+                # ran with no limits; squid.conf is kept faithful (cache_mem
+                # left at its default rather than clamped in-config).
+                limits:
+                  memory: 384Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                # The ubuntu/squid image ships no USER directive (runs as root
+                # by default). OCP's restricted SCC assigned a non-root UID
+                # dynamically; k3s has no SCC, so with only runAsNonRoot the
+                # kubelet would refuse to start (image would run as root). Pin
+                # squid's own proxy account (UID/GID 13 in the Debian/Ubuntu
+                # base) to satisfy runAsNonRoot; fsGroup 13 above makes the
+                # spool emptyDir writable.
+                runAsUser: 13
+                runAsGroup: 13
+                capabilities:
+                  drop:
+                    - ALL
+      persistence:
+        squid-config:
+          type: configMap
+          name: squid-proxy-config
+          globalMounts:
+            - path: /etc/squid/squid.conf
+              subPath: squid.conf
+              readOnly: true
+        spool:
+          type: emptyDir
+          globalMounts:
+            - path: /var/spool/squid
+      service:
+        app:
+          controller: squid-proxy
+          ports:
+            proxy:
+              port: 3128
+              targetPort: 3128
+              protocol: TCP
+      serviceAccount:
+        squid-proxy:
+          enabled: true

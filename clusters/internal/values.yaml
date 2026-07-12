@@ -113,3 +113,12 @@ applications:
       namespace: searxng
     source:
       path: applications/searxng
+
+  squid-proxy:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: squid-proxy
+    source:
+      path: applications/squid-proxy
