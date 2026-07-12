@@ -15,6 +15,12 @@ helmCharts:
 
     prometheus:
       prometheusSpec:
+        # Stamped onto every series this Prometheus exposes, including over
+        # /federate. Lets the OCP UWM federation scrape attribute pulled-in
+        # series to this source cluster (cross-cluster federation, see the
+        # gateway component + igou-openshift UWM additionalScrapeConfig).
+        externalLabels:
+          cluster: rk8s
         # Pick up all ServiceMonitors/PodMonitors/Rules cluster-wide, not
         # just the ones with the chart's release label.
         serviceMonitorSelectorNilUsesHelmValues: false

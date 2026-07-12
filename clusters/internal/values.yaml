@@ -36,6 +36,19 @@ applications:
     source:
       path: components/loki
 
+  gateway:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      # After cert-manager/metallb/NGF (wave 5-6) and kube-prometheus-stack
+      # (wave 10, which owns the monitoring namespace + prometheus Service
+      # this app's HTTPRoute and namespace label depend on). ArgoCD retries
+      # cover any residual ordering gaps.
+      argocd.argoproj.io/sync-wave: '15'
+    destination:
+      namespace: nginx-gateway
+    source:
+      path: components/gateway
+
   tailscale-operator:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
