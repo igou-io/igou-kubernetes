@@ -95,3 +95,12 @@ applications:
       namespace: kubevirt
     source:
       path: components/kubevirt
+
+  gotify:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: gotify
+    source:
+      path: applications/gotify
