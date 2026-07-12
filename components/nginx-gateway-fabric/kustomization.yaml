@@ -4,7 +4,7 @@ namespace: nginx-gateway
 resources:
   - nginx-gateway-namespace.yaml
   # Gateway API CRDs at the exact version this NGF release is built against
-  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.6.5
+  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.6.6
 helmCharts:
 - name: nginx-gateway-fabric
   includeCRDs: true
