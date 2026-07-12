@@ -105,6 +105,15 @@ applications:
     source:
       path: applications/gitea
 
+  forgejo:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: forgejo
+    source:
+      path: applications/forgejo
+
   gotify:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous

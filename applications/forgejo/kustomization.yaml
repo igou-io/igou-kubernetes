@@ -1,0 +1,144 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: forgejo
+# Ported from igou-openshift/applications/forgejo. Forgejo is LIVE PRODUCTION on
+# OCP (real repos ~28Gi + a CNPG PG18 database that was disaster-recovered from
+# Barman on 2026-07-03). This rk8s port is a FRESH EMPTY instance for base
+# verification only. rk8s (k3s/arm64) adaptations:
+#   - route.enabled true -> false: dropped the OpenShift Route
+#     (forgejo.apps.ocp.igou.systems). No ingress in this effort. Services stay
+#     ClusterIP (forgejo-http 3000, forgejo-ssh 22). git-over-ssh would need a
+#     MetalLB LoadBalancer for TCP 22 (recorded gap).
+#   - ROOT_URL / SSH_DOMAIN retargeted to the in-cluster Service DNS (the OCP
+#     values pointed at the public Route host).
+#   - persistence storageClass freenas-nvmeof-ssd-csi -> local-path; repos PVC
+#     shrunk 100Gi -> 10Gi (OCP real 100Gi, ~28Gi used).
+#   - CNPG forgejo-pg -> local-path 2Gi, PG18 pinned to match the live OCP DB
+#     major so a future restore is possible (see forgejo-pg-cluster.yaml).
+#   - DROPPED the barman/S3 backup objects: forgejo-pg-objectstore.yaml,
+#     forgejo-pg-scheduledbackup.yaml, cnpg-s3-credentials-externalsecret.yaml,
+#     and the Cluster's barman-cloud plugin block. No S3 target on rk8s and the
+#     barman plugin is not installed — recorded as a gap.
+#   - DROPPED the OCP SCC RBAC (use-scc-nonroot-v2-role.yaml +
+#     forgejo-nonroot-v2-rolebinding.yaml): no SCC/SELinux on k3s. The forgejo
+#     image is the ROOTLESS variant (USER 1000 baked in) and the chart default
+#     podSecurityContext.fsGroup is 1000, so no runAsUser injection is needed
+#     (unlike the USER-less gotify/searxng/squid images).
+#   - image pinned explicitly (code.forgejo.org/forgejo/forgejo:15.0.1-rootless,
+#     arm64-verified multi-arch index) — matches the chart appVersion + the live
+#     OCP image.
+#   - ExternalSecret store retargeted to onepassword-lab-rk8s (see
+#     forgejo-secrets-externalsecret.yaml).
+# The forgejo chart templates {{ .Release.Namespace }} on every object, so no
+# add-namespace patch is needed.
+resources:
+  - forgejo-namespace.yaml
+  - forgejo-pg-cluster.yaml
+  - forgejo-pg-podmonitor.yaml
+  - forgejo-secrets-externalsecret.yaml
+helmCharts:
+  - name: forgejo
+    namespace: forgejo
+    version: 17.0.1
+    releaseName: forgejo
+    repo: oci://code.forgejo.org/forgejo-helm
+    valuesInline:
+      image:
+        # arm64-verified: code.forgejo.org/forgejo/forgejo:15.0.1-rootless is a
+        # multi-arch OCI index (linux/amd64 + linux/arm64 + arm/v6). Rootless
+        # variant runs as UID 1000 (satisfies non-root without an SCC). Matches
+        # chart appVersion 15.0.1 and the live OCP image.
+        registry: code.forgejo.org
+        repository: forgejo/forgejo
+        tag: "15.0.1"
+        digest: sha256:4f4d168b4e792d0f73e5f4da0548f3b54b9c9d03fb85f277c97eb985cb9a290a
+        rootless: true
+
+      service:
+        http:
+          type: ClusterIP
+          port: 3000
+        ssh:
+          type: ClusterIP
+          port: 22
+
+      ingress:
+        enabled: false
+
+      route:
+        enabled: false
+
+      persistence:
+        enabled: true
+        create: true
+        storageClass: local-path
+        size: 10Gi
+        claimName: forgejo-shared-storage
+
+      replicaCount: 1
+
+      # forgejo's process footprint is ~300Mi; the rest of what shows up as
+      # "memory" is reclaimable git page cache. A limit makes the kernel reclaim
+      # that cache instead of letting it grow unbounded. git's own heap is capped
+      # via gitea.config.[git.config] pack.* below.
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+
+      serviceAccount:
+        create: true
+        name: forgejo
+
+      gitea:
+        admin:
+          existingSecret: forgejo-secrets
+          passwordMode: initialOnlyRequireReset
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+        config:
+          database:
+            DB_TYPE: postgres
+            SCHEMA: public
+          server:
+            # rk8s adaptation: in-cluster Service DNS instead of the OCP Route
+            # host (no ingress in this effort).
+            ROOT_URL: http://forgejo-http.forgejo.svc.cluster.local:3000/
+            SSH_DOMAIN: forgejo-ssh.forgejo.svc.cluster.local
+          webhook:
+            ALLOWED_HOST_LIST: private
+          # Cap git's own memory so gc/repack/upload-pack stay well under the
+          # cgroup memory limit above.
+          "git.config":
+            pack.windowMemory: 128m
+            pack.deltaCacheSize: 128m
+            pack.threads: 2
+        additionalConfigFromEnvs:
+          - name: GITEA__database__HOST
+            valueFrom:
+              secretKeyRef:
+                name: forgejo-pg-app
+                key: host
+          - name: GITEA__database__NAME
+            valueFrom:
+              secretKeyRef:
+                name: forgejo-pg-app
+                key: dbname
+          - name: GITEA__database__USER
+            valueFrom:
+              secretKeyRef:
+                name: forgejo-pg-app
+                key: username
+          - name: GITEA__database__PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: forgejo-pg-app
+                key: password
+
+      test:
+        enabled: false
