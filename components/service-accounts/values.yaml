@@ -1,0 +1,284 @@
+namespace:
+  create: true
+  name: service-accounts
+
+defaults:
+  createServiceAccount: true
+  automountServiceAccountToken: false
+  longLivedToken:
+    enabled: true
+    nameSuffix: "-token"
+
+# ClusterRoles for molecule / KubeVirt automation. Every apiGroup below was
+# verified present on rk8s (kubectl api-resources): kubevirt.io,
+# subresources.kubevirt.io, cdi.kubevirt.io, upload.cdi.kubevirt.io,
+# snapshot.kubevirt.io, clone.kubevirt.io, instancetype.kubevirt.io.
+# route.openshift.io (OCP-only) was dropped from virtualmachine-deployer.
+clusterRoles:
+  - name: molecule-kubernetes
+    rules:
+      - apiGroups:
+          - kubevirt.io
+        resources:
+          - virtualmachines
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - delete
+          - patch
+          - update
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - delete
+          - patch
+          - update
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+
+  - name: virtualmachine-reader
+    rules:
+      - apiGroups:
+          - kubevirt.io
+        resources:
+          - virtualmachineinstances
+          - virtualmachines
+        verbs:
+          - get
+          - watch
+          - list
+      - apiGroups:
+          - ""
+        resources:
+          - namespaces
+          - services
+        verbs:
+          - list
+
+  - name: virtualmachine-deployer
+    rules:
+      - apiGroups:
+          - kubevirt.io
+        resources:
+          - virtualmachineinstances
+          - virtualmachines
+        verbs:
+          - "*"
+      - apiGroups:
+          - cdi.kubevirt.io
+        resources:
+          - datavolumes
+        verbs:
+          - "*"
+      - apiGroups:
+          - ""
+        resources:
+          - namespaces
+          - services
+        verbs:
+          - create
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - upload.cdi.kubevirt.io
+        resources:
+          - uploadtokenrequests
+        verbs:
+          - create
+
+  - name: virtualmachine-ops
+    rules:
+      - apiGroups:
+          - kubevirt.io
+        resources:
+          - virtualmachines
+          - virtualmachineinstances
+          - virtualmachineinstancemigrations
+        verbs:
+          - "*"
+      - apiGroups:
+          - subresources.kubevirt.io
+        resources:
+          - virtualmachines/start
+          - virtualmachines/stop
+          - virtualmachines/restart
+          - virtualmachines/migrate
+          - virtualmachines/addvolume
+          - virtualmachines/removevolume
+          - virtualmachines/expand-spec
+          - virtualmachines/portforward
+          - virtualmachineinstances/console
+          - virtualmachineinstances/vnc
+          - virtualmachineinstances/portforward
+          - virtualmachineinstances/pause
+          - virtualmachineinstances/unpause
+          - virtualmachineinstances/freeze
+          - virtualmachineinstances/unfreeze
+          - virtualmachineinstances/softreboot
+          - virtualmachineinstances/addvolume
+          - virtualmachineinstances/removevolume
+          - virtualmachineinstances/guestosinfo
+          - virtualmachineinstances/filesystemlist
+          - virtualmachineinstances/userlist
+        verbs:
+          - get
+          - update
+      - apiGroups:
+          - cdi.kubevirt.io
+        resources:
+          - datavolumes
+        verbs:
+          - "*"
+      - apiGroups:
+          - cdi.kubevirt.io
+        resources:
+          - datavolumes/source
+        verbs:
+          - create
+      - apiGroups:
+          - upload.cdi.kubevirt.io
+        resources:
+          - uploadtokenrequests
+        verbs:
+          - create
+      - apiGroups:
+          - cdi.kubevirt.io
+        resources:
+          - datasources
+          - dataimportcrons
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - snapshot.kubevirt.io
+        resources:
+          - virtualmachinesnapshots
+          - virtualmachinerestores
+        verbs:
+          - "*"
+      - apiGroups:
+          - snapshot.kubevirt.io
+        resources:
+          - virtualmachinesnapshotcontents
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - clone.kubevirt.io
+        resources:
+          - virtualmachineclones
+        verbs:
+          - "*"
+      - apiGroups:
+          - instancetype.kubevirt.io
+        resources:
+          - virtualmachineinstancetypes
+          - virtualmachineclusterinstancetypes
+          - virtualmachinepreferences
+          - virtualmachineclusterpreferences
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resources:
+          - namespaces
+          - persistentvolumeclaims
+          - pods
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - create
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+          - configmaps
+        verbs:
+          - create
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+
+serviceAccounts:
+  - name: ansible-molecule
+    roleBindings:
+      - namespace: molecule
+        clusterRoles:
+          - molecule-kubernetes
+    pushSecrets:
+      - name: ansible-molecule-token-push
+        refreshInterval: "0"
+        secretStoreRefs:
+          - name: onepassword-lab-rk8s
+            kind: ClusterSecretStore
+        data:
+          - conversionStrategy: None
+            match:
+              secretKey: token
+              remoteRef:
+                remoteKey: rk8s-ansible-molecule
+                property: token
+
+  - name: virtualmachine-reader
+    clusterRoleBindings:
+      - name: virtualmachine-reader
+        clusterRole: virtualmachine-reader
+
+  - name: virtualmachine-deployer
+    clusterRoleBindings:
+      - name: virtualmachine-deployer
+        clusterRole: virtualmachine-deployer
+
+  - name: virtualmachine-ops
+    clusterRoleBindings:
+      - name: virtualmachine-ops
+        clusterRole: virtualmachine-ops
+    pushSecrets:
+      - name: virtualmachine-ops-token
+        refreshInterval: "0"
+        secretStoreRefs:
+          - name: onepassword-lab-rk8s
+            kind: ClusterSecretStore
+        data:
+          - conversionStrategy: None
+            match:
+              secretKey: token
+              remoteRef:
+                remoteKey: rk8s-virtualmachine-ops
+                property: token

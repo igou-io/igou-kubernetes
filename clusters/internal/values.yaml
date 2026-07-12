@@ -18,6 +18,15 @@ applications:
     source:
       path: clusters/internal/democratic-csi
 
+  cloudnative-pg:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '8'
+    destination:
+      namespace: cnpg-system
+    source:
+      path: components/cloudnative-pg
+
   kube-prometheus-stack:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -57,6 +66,26 @@ applications:
       namespace: tailscale
     source:
       path: components/tailscale-operator
+
+  service-accounts:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '13'
+    destination:
+      namespace: service-accounts
+    source:
+      path: components/service-accounts
+
+  molecule:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      # wave 12 (before service-accounts wave 13) so the molecule namespace
+      # exists when the ansible-molecule RoleBinding is applied into it.
+      argocd.argoproj.io/sync-wave: '12'
+    destination:
+      namespace: molecule
+    source:
+      path: components/molecule
 
   kubevirt:
     annotations:
