@@ -1,0 +1,141 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: gitea
+# Ported from igou-openshift/applications/gitea (which was retired on OCP in
+# favour of Forgejo — manifests kept for reference). rk8s (k3s/arm64) adaptations:
+#   - openshift.enabled true -> false: no SCC/SELinux adaptation on k3s. Dropped
+#     the OCP use-scc-nonroot-v2 Role + RoleBinding and the valkey
+#     global.compatibility.openshift.adaptSecurityContext:force block. The
+#     gitea-rootless image ships USER 1000 and the valkey image runs as 1001, so
+#     both satisfy runAsNonRoot without an SCC-assigned UID.
+#   - route.enabled true -> false: no OpenShift Route / no ingress in this effort.
+#     Services stay ClusterIP (http 3000, ssh 22). SSH would need a MetalLB
+#     LoadBalancer for real git-over-ssh (recorded gap).
+#   - persistence + valkey persistence storageClass freenas-nvmeof-ssd-csi ->
+#     local-path; repo PVC shrunk 10Gi -> 5Gi, valkey 2Gi kept (fresh install).
+#   - CNPG gitea-pg storageClass -> local-path (see gitea-pg-cluster.yaml).
+#   - ExternalSecret store retargeted to onepassword-lab-rk8s (see that file).
+#   - Set explicit modest gitea container resources (OCP left them unset).
+# The gitea chart templates {{ .Release.Namespace }} on every object, so no
+# add-namespace patch is needed (unlike the jellyfin-helm chart).
+resources:
+  - gitea-namespace.yaml
+  - gitea-pg-cluster.yaml
+  - gitea-admin-secret-externalsecret.yaml
+helmCharts:
+  - name: gitea
+    namespace: gitea
+    version: 12.6.0
+    releaseName: gitea
+    repo: https://dl.gitea.com/charts/
+    valuesInline:
+      openshift:
+        enabled: false
+
+      test:
+        enabled: false
+
+      image:
+        # arm64-verified: docker.gitea.com/gitea:1.26.1-rootless is a multi-arch
+        # index (linux/amd64 + linux/arm64 + riscv64). Rootless variant runs as
+        # UID 1000 (satisfies runAsNonRoot without an SCC).
+        registry: docker.gitea.com
+        repository: gitea
+        tag: "1.26.1"
+        digest: sha256:4c4256497e2e237ddebdd30986c7ce52cb6f936b3e90c34bb9f4665714599f62
+        rootless: true
+
+      postgresql:
+        enabled: false
+      postgresql-ha:
+        enabled: false
+
+      valkey-cluster:
+        enabled: false
+      valkey:
+        enabled: true
+        architecture: standalone
+        # In-cluster cache only; Service is ClusterIP and the chart applies a
+        # NetworkPolicy that gates ingress to port 6379. Auth disabled so the
+        # gitea side needs no chart-generated password.
+        auth:
+          enabled: false
+        image:
+          # arm64-verified: docker.io/bitnamilegacy/valkey:8.1.3-debian-12-r3 is
+          # a multi-arch index (linux/amd64 + linux/arm64). The chart already
+          # points at bitnamilegacy (post-2025 Bitnami image migration).
+          registry: docker.io
+          repository: bitnamilegacy/valkey
+          tag: 8.1.3-debian-12-r3
+          digest: sha256:4f0191fba7d3ffc38362381fa0ecac3c570dac56621278bcda513b477c8308c4
+        primary:
+          persistence:
+            enabled: true
+            storageClass: local-path
+            size: 2Gi
+          pdb:
+            create: false
+
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 5Gi
+
+      ingress:
+        enabled: false
+      route:
+        enabled: false
+
+      service:
+        http:
+          port: 3000
+        ssh:
+          port: 22
+
+      serviceAccount:
+        create: true
+        name: gitea
+
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 768Mi
+
+      gitea:
+        admin:
+          existingSecret: gitea-admin-secret
+          passwordMode: initialOnlyRequireReset
+        config:
+          database:
+            DB_TYPE: postgres
+            SCHEMA: public
+          server:
+            HTTP_PORT: 3000
+        additionalConfigFromEnvs:
+          - name: GITEA__database__HOST
+            valueFrom:
+              secretKeyRef:
+                name: gitea-pg-app
+                key: host
+          - name: GITEA__database__NAME
+            valueFrom:
+              secretKeyRef:
+                name: gitea-pg-app
+                key: dbname
+          - name: GITEA__database__USER
+            valueFrom:
+              secretKeyRef:
+                name: gitea-pg-app
+                key: username
+          - name: GITEA__database__PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: gitea-pg-app
+                key: password
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
