@@ -123,6 +123,15 @@ applications:
     source:
       path: applications/gitea-mirror
 
+  firecrawl:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: firecrawl
+    source:
+      path: applications/firecrawl
+
   gotify:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
