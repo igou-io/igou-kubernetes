@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-media
+  namespace: jellyfin
+spec:
+  accessModes:
+    - ReadOnlyMany
+  # Empty storageClassName + volumeName binds statically to the NFS PV and
+  # stops the default local-path provisioner from trying to provision it.
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: jellyfin-media-nfs

@@ -1,0 +1,29 @@
+# Media library PV — points at the SAME TrueNAS NFS export as OCP.
+#
+# CAVEAT (rk8s): this export is currently NOT mountable from rk8s nodes. The
+# TrueNAS network ACL on /mnt/cold/media/data/media only authorises
+# 10.10.9.10/32 (the OCP MS-01 node's VLAN9 address); rk8s node IPs are
+# rejected with "access denied by server" (verified via test mount +
+# `showmount -e 10.10.9.213`). This PV/PVC is kept in git as the migration
+# target and binds harmlessly (bind is a claim-match, not a mount), but the
+# jellyfin Deployment does NOT mount it (see kustomization.yaml). To enable a
+# real library on rk8s, add the rk8s VLAN9 node IPs (or 10.10.9.0/24) to this
+# export's Hosts/Networks allow-list on TrueNAS, then re-wire the volume mount.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-media-nfs
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  nfs:
+    server: 10.10.9.213
+    path: /mnt/cold/media/data/media
+    readOnly: true
+  claimRef:
+    namespace: jellyfin
+    name: jellyfin-media

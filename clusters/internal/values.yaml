@@ -105,6 +105,15 @@ applications:
     source:
       path: applications/gotify
 
+  jellyfin:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: jellyfin
+    source:
+      path: applications/jellyfin
+
   searxng:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
