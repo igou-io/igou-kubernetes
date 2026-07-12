@@ -1,0 +1,16 @@
+---
+use_default_settings: true
+
+general:
+  instance_name: SearXNG
+
+search:
+  formats:
+    - html
+    - json
+
+server:
+  # Overridden at runtime by the SEARXNG_SECRET environment variable.
+  secret_key: ultrasecretkey
+  limiter: false
+  image_proxy: true

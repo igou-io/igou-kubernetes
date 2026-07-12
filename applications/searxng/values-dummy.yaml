@@ -1,0 +1,3 @@
+---
+# Intentionally empty — required by kustomize helmCharts to point at a values file.
+# All values are inlined in kustomization.yaml under valuesInline.
