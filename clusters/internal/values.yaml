@@ -114,6 +114,15 @@ applications:
     source:
       path: applications/forgejo
 
+  gitea-mirror:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: gitea-mirror
+    source:
+      path: applications/gitea-mirror
+
   gotify:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
