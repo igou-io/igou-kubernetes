@@ -1,0 +1,27 @@
+---
+# First ClusterIssuer on rk8s. Named to match the ocp cluster's issuer
+# (`cluster-acme`) so the two clusters read the same. Let's Encrypt prod,
+# solving DNS01 via Cloudflare using the `dns-token` Secret above.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cluster-acme
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  acme:
+    email: igou.david@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: acme-private-key
+    solvers:
+      - dns01:
+          cloudflare:
+            email: igou.david@gmail.com
+            apiTokenSecretRef:
+              name: dns-token
+              key: credential
+        selector:
+          dnsZones:
+            - igou.systems
+            - rk8s.igou.systems
