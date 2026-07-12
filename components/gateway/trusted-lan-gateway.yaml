@@ -13,10 +13,10 @@ spec:
   gatewayClassName: nginx
   infrastructure:
     # Copied by NGF onto the generated LoadBalancer Service. The VIP is a
-    # contract with rb5009 (igou-inventory): the rk8s apex and one EXPLICIT
-    # A record per exposed hostname resolve to 10.10.150.129 (no *.rk8s DNS
-    # wildcard — dropped in igou-inventory#132; a new HTTPRoute hostname
-    # needs a matching A record there). The VIP is the reserved
+    # contract with rb5009 (igou-inventory): one EXPLICIT A record per
+    # exposed hostname resolves to 10.10.150.129 (no *.rk8s DNS wildcard or
+    # apex — dropped in igou-inventory#132; a new HTTPRoute hostname needs a
+    # matching A record there). The VIP is the reserved
     # `trusted-lan-gateway` MetalLB pool (components/metallb). Do not change
     # it without updating both repos.
     annotations:

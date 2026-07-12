@@ -1,9 +1,9 @@
 # Three BGP-advertised tiers; rb5009 enforces per-tier client isolation in
 # its forward chain (see igou-inventory #32). 10.10.150.129 is reserved by
-# convention for the cluster ingress/gateway — the rk8s.igou.systems apex
-# plus one explicit A record per exposed hostname resolve to it (no *.rk8s
-# DNS wildcard since igou-inventory#132); pin it with
-# metallb.io/loadBalancerIPs on the gateway's LoadBalancer service.
+# convention for the cluster ingress/gateway — one explicit A record per
+# exposed hostname resolves to it (no *.rk8s DNS wildcard or apex since
+# igou-inventory#132); pin it with metallb.io/loadBalancerIPs on the
+# gateway's LoadBalancer service.
 #
 # CLUSTER SPLIT (2026-07): rb5009's BGP listener carries both rk8s and ocp
 # (both peer as AS 64513), and igou-openshift claims the same three /24s. To
