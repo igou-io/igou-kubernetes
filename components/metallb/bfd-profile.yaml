@@ -1,0 +1,20 @@
+# BFD backing for the rb5009 BGP session: detects a silently dead board in
+# ~1.5s (500ms x3) instead of waiting out the BGP hold timer, during which
+# this cluster's advertised /32s blackhole. Timers are deliberately more
+# conservative than the ocp cluster's (300ms) — a BFD flap on a loaded SBC
+# would tear the BGP session, which is worse than slower detection. The
+# router side (BFD whitelist + use-bfd on the listener) lives in
+# igou-inventory; one-sided BFD is harmless — BGP stays up with BFD down
+# until both ends are configured. Full design:
+# igou-inventory/docs/network-topology.md.
+apiVersion: metallb.io/v1beta1
+kind: BFDProfile
+metadata:
+  name: rb5009
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  receiveInterval: 500
+  transmitInterval: 500
+  detectMultiplier: 3
