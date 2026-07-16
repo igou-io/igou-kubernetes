@@ -27,20 +27,20 @@ Helm chart via kustomize's `helmCharts` field, plus any raw manifests
 | argocd | argoproj.github.io/argo-helm | 0 |
 | external-secrets-operator | charts.external-secrets.io | 0 |
 | cert-manager | charts.jetstack.io | 5 |
+| metallb | metallb.github.io/metallb | 5 |
 | nginx-gateway-fabric | ghcr.io/nginx/charts (OCI) | 6 |
 | democratic-csi | democratic-csi.github.io/charts | 7 |
 | kube-prometheus-stack | prometheus-community.github.io/helm-charts | 10 |
 | loki | grafana.github.io/helm-charts | 11 |
 | tailscale-operator | pkgs.tailscale.com/helmcharts | 12 |
+| gateway | raw Gateway API manifests (NGF Gateway + routes) | 15 |
 | kubevirt | upstream release manifests (kustomize) | 50 |
 
-Not yet configured (intentionally):
-
-- **democratic-csi** ships with no StorageClasses and references driver config
-  secrets (`democratic-csi-{nfs,iscsi}-config`) that don't exist yet.
-- **external-secrets** has no ClusterSecretStore; the `onepassword` store and
-  its backend still need to be wired up. Until then anything that consumes an
-  ExternalSecret (tailscale-operator oauth, private repo creds) stays degraded.
+**metallb** carries the cluster's BGP load-balancer setup (peering with the
+homelab router, this cluster's half of the shared VIP tiers) and **gateway**
+pins the `*.rk8s.igou.systems` ingress VIP — both are contracts with config
+in other repos; see [AGENTS.md](AGENTS.md) §Networking and
+`igou-inventory/docs/network-topology.md` before changing them.
 
 ## Bootstrap
 
