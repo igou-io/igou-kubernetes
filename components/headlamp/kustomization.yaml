@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: headlamp
+resources:
+  - headlamp-namespace.yaml
+  - headlamp-httproute.yaml
+helmCharts:
+- name: headlamp
+  includeCRDs: true
+  releaseName: headlamp
+  namespace: headlamp
+  version: 0.43.0
+  repo: https://kubernetes-sigs.github.io/headlamp/
+  valuesInline:
+    # Token login (Headlamp's default): the chart creates the `headlamp`
+    # ServiceAccount bound to cluster-admin; sessions authenticate with a
+    # short-lived token minted via `kubectl create token headlamp -n
+    # headlamp`. No OIDC provider on this cluster, and
+    # unsafeUseServiceAccountToken stays off so the trusted-lan exposure
+    # still requires a token.
+    config:
+      oidc:
+        # Don't render the (empty) OIDC secret the chart creates by default.
+        secret:
+          create: false
+
+    serviceAccount:
+      create: true
+    clusterRoleBinding:
+      create: true
+      clusterRoleName: cluster-admin
+
+    replicaCount: 1
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        memory: 512Mi

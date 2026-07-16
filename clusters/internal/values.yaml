@@ -58,6 +58,17 @@ applications:
     source:
       path: components/tailscale-operator
 
+  headlamp:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      # After gateway (wave 15): the HTTPRoute here attaches to the
+      # trusted-lan Gateway. ArgoCD retries cover residual ordering gaps.
+      argocd.argoproj.io/sync-wave: '16'
+    destination:
+      namespace: headlamp
+    source:
+      path: components/headlamp
+
   kubevirt:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
