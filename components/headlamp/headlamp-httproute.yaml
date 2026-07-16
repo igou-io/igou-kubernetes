@@ -1,0 +1,33 @@
+---
+# Exposes the Headlamp UI over the trusted-lan Gateway at
+# headlamp.rk8s.igou.systems. TLS terminates at the Gateway; Headlamp itself
+# authenticates every session with a ServiceAccount bearer token (its
+# default in-cluster login), so nothing is reachable without a token.
+# The matching rb5009 A record lives in igou-inventory (no *.rk8s wildcard).
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: headlamp
+  namespace: headlamp
+spec:
+  # group/kind/weight below are API-server defaults, stated explicitly so
+  # ArgoCD's server-side-apply diff doesn't report the route as forever
+  # OutOfSync (same wart as the Gateway certificateRefs).
+  parentRefs:
+    - name: trusted-lan
+      namespace: nginx-gateway
+      group: gateway.networking.k8s.io
+      kind: Gateway
+  hostnames:
+    - headlamp.rk8s.igou.systems
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: headlamp
+          port: 80
+          group: ""
+          kind: Service
+          weight: 1
