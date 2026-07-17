@@ -52,13 +52,18 @@ spec:
   ignoreDifferences:
 {{ toYaml . | indent 2 }}
   {{- end }}
-{{- if (hasKey $val "enableAutoSync" | ternary $val.enableAutoSync $.Values.default.app.enableAutoSync) }}
+  {{- /* syncPolicy renders unconditionally: retry and syncOptions must
+       apply to MANUAL syncs of enableAutoSync:false apps too (without
+       ServerSideApply=true, large CRDs like CNPG's blow the 262KB
+       last-applied annotation limit). Only `automated` is gated. */}}
   syncPolicy:
+{{- if (hasKey $val "enableAutoSync" | ternary $val.enableAutoSync $.Values.default.app.enableAutoSync) }}
     automated:
       selfHeal: true
       {{- if (hasKey $val "autoSyncPrune" | ternary $val.autoSyncPrune $.Values.default.app.autoSyncPrune) }}
       prune: true
       {{- end }}
+{{- end }}
     {{- if or (hasKey $val "syncPolicyRetry") (hasKey $.Values.default.app "syncPolicyRetry") }}
     {{- $syncPolicyRetry := merge (ternary $val.syncPolicyRetry (dict) (hasKey $val "syncPolicyRetry") ) (ternary $.Values.default.app.syncPolicyRetry (dict) (hasKey $.Values.default.app "syncPolicyRetry") )  }}
     retry: {{- toYaml $syncPolicyRetry | nindent 6 }}
@@ -70,7 +75,6 @@ spec:
 {{ toYaml . | indent 6 }}
       {{- end }}
     {{- end}}
-{{- end }}
 {{- if $val.sources }}
   {{- with $val.sources }}
   sources:

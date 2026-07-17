@@ -49,7 +49,12 @@ clusterRoles:
           - get
           - list
 
-  - name: virtualmachine-reader
+  # sa- prefix: components/kubevirt owns the legacy cluster-scoped names
+  # (virtualmachine-reader/-deployer ClusterRole+CRB) and live AAP tokens
+  # still bind through them. These chart-managed successors carry richer
+  # rules under distinct names; the legacy kubevirt set retires in a
+  # follow-up once AAP consumes the 1P-pushed sa-* tokens.
+  - name: sa-virtualmachine-reader
     rules:
       - apiGroups:
           - kubevirt.io
@@ -68,7 +73,7 @@ clusterRoles:
         verbs:
           - list
 
-  - name: virtualmachine-deployer
+  - name: sa-virtualmachine-deployer
     rules:
       - apiGroups:
           - kubevirt.io
@@ -257,13 +262,13 @@ serviceAccounts:
 
   - name: virtualmachine-reader
     clusterRoleBindings:
-      - name: virtualmachine-reader
-        clusterRole: virtualmachine-reader
+      - name: sa-virtualmachine-reader
+        clusterRole: sa-virtualmachine-reader
 
   - name: virtualmachine-deployer
     clusterRoleBindings:
-      - name: virtualmachine-deployer
-        clusterRole: virtualmachine-deployer
+      - name: sa-virtualmachine-deployer
+        clusterRole: sa-virtualmachine-deployer
 
   - name: virtualmachine-ops
     clusterRoleBindings:
