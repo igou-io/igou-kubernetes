@@ -12,4 +12,5 @@ spec:
     - trusted-lan
     - trusted-lan-gateway
     - iot
+    - iot-gateway
     - guest-dmz

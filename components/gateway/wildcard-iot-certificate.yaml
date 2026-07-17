@@ -1,17 +1,17 @@
 ---
-# Wildcard cert for the cluster-wildcard Gateway (every zero-friction
-# *.rk8s.igou.systems route, e.g. headlamp). DNS01 supports wildcards.
-# Lives in the Gateway's namespace (nginx-gateway) so the listener
-# certificateRef needs no ReferenceGrant.
+# Wildcard cert for the iot tier domain (*.iot.igou.systems —
+# whoami.iot and any future intentionally-served iot hostname).
+# DNS01 supports wildcards. Lives in the Gateway's namespace so the
+# listener certificateRef needs no ReferenceGrant.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: wildcard-rk8s-tls
+  name: wildcard-iot-tls
   namespace: nginx-gateway
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
-  secretName: wildcard-rk8s-tls
+  secretName: wildcard-iot-tls
   duration: 2160h0m0s # 90d
   renewBefore: 360h0m0s # 15d
   subject:
@@ -23,7 +23,7 @@ spec:
     encoding: PKCS1
     rotationPolicy: Always
   dnsNames:
-    - "*.rk8s.igou.systems"
+    - "*.iot.igou.systems"
   issuerRef:
     kind: ClusterIssuer
     name: cluster-acme

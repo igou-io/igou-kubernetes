@@ -1,9 +1,14 @@
 # Three BGP-advertised tiers; rb5009 enforces per-tier client isolation in
-# its forward chain (see igou-inventory #32). 10.10.150.129 is reserved by
-# convention for the cluster ingress/gateway — one explicit A record per
-# exposed hostname resolves to it (no *.rk8s DNS wildcard or apex since
-# igou-inventory#132); pin it with metallb.io/loadBalancerIPs on the
-# gateway's LoadBalancer service.
+# its forward chain (see igou-inventory #32). Two exposure classes ride on
+# these pools (full policy: igou-inventory/docs/network-topology.md):
+#   - tier gateways (trusted-lan .150.129, iot .151.129): intentional
+#     serving — one explicit A record per hostname on rb5009, tier-scoped
+#     domains (*.lan / *.iot / *.dmz igou.systems)
+#   - vlan9-wildcard (10.10.9.11, L2 — see below): zero-friction serving on
+#     `*.rk8s.igou.systems` via a single rb5009 wildcard record; an
+#     HTTPRoute merge alone exposes a service to VLAN9/admin
+# Pin gateway VIPs with metallb.io/loadBalancerIPs on the Gateway's
+# LoadBalancer service.
 #
 # CLUSTER SPLIT (2026-07): rb5009's BGP listener carries both rk8s and ocp
 # (both peer as AS 64513), and igou-openshift claims the same three /24s. To
@@ -53,8 +58,23 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   addresses:
-    # High half; low half (.1-.127) belongs to ocp.
-    - 10.10.151.129-10.10.151.254
+    # High half; .129 is the pinned iot gateway VIP (below), so this pool
+    # starts at .130. Low half (.1-.127) belongs to ocp.
+    - 10.10.151.130-10.10.151.254
+  autoAssign: false
+---
+# Pinned pool for the iot tier gateway VIP (components/gateway/iot-gateway
+# .yaml): request it with metallb.io/loadBalancerIPs: 10.10.151.129.
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: iot-gateway
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    - 10.10.151.129/32
   autoAssign: false
 ---
 apiVersion: metallb.io/v1beta1
@@ -68,4 +88,25 @@ spec:
   addresses:
     # High half; ocp holds the low half (.1 jellyfin, .3 dmz gateway).
     - 10.10.152.129-10.10.152.254
+  autoAssign: false
+---
+# THE ONE L2 EXCEPTION on this otherwise BGP-only cluster: the VLAN9
+# cluster-wildcard ingress VIP (components/gateway/cluster-wildcard-gateway
+# .yaml, `*.rk8s.igou.systems`). It cannot ride BGP — rb5009's metallb-in
+# filter only admits /32s inside the tier /24s, and a host route inside the
+# router's own connected subnet is wrong anyway. Announced via ARP on the
+# shared VLAN9 L2 instead (l2-advertisement.yaml), mirroring how ocp's
+# keepalived ingress VIP (10.10.9.10) works. The address sits BELOW the
+# VLAN9 DHCP pool (.20-.240) next to ocp's VIPs (.10/.15) and is a pinned
+# cross-repo contract with rb5009's wildcard DNS record (igou-inventory).
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: vlan9-wildcard
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    - 10.10.9.11/32
   autoAssign: false

@@ -9,6 +9,7 @@ resources:
   - bgp-peer.yaml
   - ipaddresspools.yaml
   - bgp-advertisement.yaml
+  - l2-advertisement.yaml
 helmCharts:
 - name: metallb
   includeCRDs: true
