@@ -14,17 +14,22 @@ spec:
   infrastructure:
     # Copied by NGF onto the generated LoadBalancer Service. The VIP is a
     # contract with rb5009 (igou-inventory): one EXPLICIT A record per
-    # exposed hostname resolves to 10.10.150.129 (no *.rk8s DNS wildcard or
-    # apex — dropped in igou-inventory#132; a new HTTPRoute hostname needs a
-    # matching A record there). The VIP is the reserved
+    # exposed *.lan.igou.systems hostname resolves to 10.10.150.129 — no
+    # tier-domain wildcards (zero-friction wildcard serving lives on the
+    # cluster-wildcard Gateway instead); a new HTTPRoute hostname here needs
+    # a matching A record in igou-inventory. The VIP is the reserved
     # `trusted-lan-gateway` MetalLB pool (components/metallb). Do not change
     # it without updating both repos.
     annotations:
       metallb.universe.tf/address-pool: trusted-lan-gateway
       metallb.universe.tf/loadBalancerIPs: 10.10.150.129
   listeners:
+    # Tier domain *.lan.igou.systems: intentional serving only — every
+    # hostname here needs an explicit rb5009 A record → 10.10.150.129 in
+    # igou-inventory. Zero-friction serving lives on the cluster-wildcard
+    # Gateway (*.rk8s.igou.systems) instead.
     - name: https
-      hostname: "*.rk8s.igou.systems"
+      hostname: "*.lan.igou.systems"
       port: 443
       protocol: HTTPS
       tls:
@@ -33,7 +38,7 @@ spec:
           # kind/group are API-server defaults, stated explicitly so
           # ArgoCD's server-side-apply diff doesn't report the Gateway as
           # forever OutOfSync.
-          - name: wildcard-rk8s-tls
+          - name: wildcard-lan-tls
             kind: Secret
             group: ""
       # Apps opt in by labelling their namespace `gateway-access/trusted-lan:

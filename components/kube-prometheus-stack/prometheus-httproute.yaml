@@ -1,32 +1,32 @@
 ---
-# Exposes ONLY Prometheus /federate over the trusted-lan Gateway, at
-# federate.lan.igou.systems, for the ocp cluster's UWM to scrape. The path
-# prefix is deliberately limited to /federate: TLS terminates at the Gateway
-# but there is no auth in front of it, so we expose the federation endpoint
-# and nothing else of the Prometheus UI/API — trusted LAN + path-limited.
+# Exposes the full Prometheus UI/API over the cluster-wildcard Gateway at
+# prometheus.rk8s.igou.systems (resolved by rb5009's *.rk8s wildcard —
+# no per-hostname DNS needed). Prometheus has NO auth: acceptable only
+# because the wildcard VIP is reachable solely from VLAN9 and admin
+# (rb5009 forward chain). Unlike the path-limited /federate route on the
+# trusted-lan Gateway, this is the whole UI — never move this hostname to
+# a tier gateway without adding auth in front.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: prometheus-federate
+  name: prometheus
   namespace: monitoring
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
 spec:
   # group/kind/weight below are API-server defaults, stated explicitly so
   # ArgoCD's server-side-apply diff doesn't report the route as forever
   # OutOfSync (same wart as the Gateway certificateRefs).
   parentRefs:
-    - name: trusted-lan
+    - name: cluster-wildcard
       namespace: nginx-gateway
       group: gateway.networking.k8s.io
       kind: Gateway
   hostnames:
-    - federate.lan.igou.systems
+    - prometheus.rk8s.igou.systems
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /federate
+            value: /
       backendRefs:
         - name: kube-prometheus-stack-prometheus
           port: 9090

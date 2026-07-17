@@ -1,17 +1,17 @@
 ---
-# Wildcard cert for the cluster-wildcard Gateway (every zero-friction
-# *.rk8s.igou.systems route, e.g. headlamp). DNS01 supports wildcards.
-# Lives in the Gateway's namespace (nginx-gateway) so the listener
-# certificateRef needs no ReferenceGrant.
+# Wildcard cert for the trusted-lan tier domain (*.lan.igou.systems —
+# federate.lan and any future intentionally-served trusted-lan hostname).
+# DNS01 supports wildcards. Lives in the Gateway's namespace so the
+# listener certificateRef needs no ReferenceGrant.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: wildcard-rk8s-tls
+  name: wildcard-lan-tls
   namespace: nginx-gateway
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
-  secretName: wildcard-rk8s-tls
+  secretName: wildcard-lan-tls
   duration: 2160h0m0s # 90d
   renewBefore: 360h0m0s # 15d
   subject:
@@ -23,7 +23,7 @@ spec:
     encoding: PKCS1
     rotationPolicy: Always
   dnsNames:
-    - "*.rk8s.igou.systems"
+    - "*.lan.igou.systems"
   issuerRef:
     kind: ClusterIssuer
     name: cluster-acme

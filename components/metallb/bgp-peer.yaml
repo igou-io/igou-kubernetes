@@ -13,3 +13,5 @@ spec:
   myASN: 64513
   peerASN: 64512
   peerAddress: 10.10.9.1
+  # Fast failure detection via BFD (bfd-profile.yaml).
+  bfdProfile: rb5009

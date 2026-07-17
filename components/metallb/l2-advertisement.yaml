@@ -1,0 +1,14 @@
+---
+# L2 (ARP) announcement for the vlan9-wildcard pool ONLY — every other pool
+# is BGP-advertised (bgp-advertisement.yaml). See the pool comment in
+# ipaddresspools.yaml for why this exception exists.
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: vlan9-wildcard
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ipAddressPools:
+    - vlan9-wildcard

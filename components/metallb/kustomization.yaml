@@ -5,9 +5,11 @@ resources:
   - metallb-namespace.yaml
   # BGP config CRs ship in the same sync as the chart's CRDs —
   # SkipDryRunOnMissingResource on each lets the first sync converge.
+  - bfd-profile.yaml
   - bgp-peer.yaml
   - ipaddresspools.yaml
   - bgp-advertisement.yaml
+  - l2-advertisement.yaml
 helmCharts:
 - name: metallb
   includeCRDs: true
