@@ -1,0 +1,5 @@
+apiVersion: v2
+name: service-account-access
+description: Manage service accounts, RBAC, token push secrets, and secret stores
+type: application
+version: 0.1.0

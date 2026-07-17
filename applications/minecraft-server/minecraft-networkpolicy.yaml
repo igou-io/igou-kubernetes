@@ -1,0 +1,31 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: minecraft
+spec:
+  podSelector: {}
+  egress:
+    # DNS: on OCP this pointed at the openshift-dns namespace; on k3s CoreDNS
+    # lives in kube-system on port 53.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Public internet (PaperMC jar download + Mojang auth/session), but NOT the
+    # private RFC1918 lab network — preserves the OCP egress-containment intent.
+    # The OCP minio/S3 egress rules are dropped: mcbackup is disabled here.
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+  policyTypes:
+    - Egress

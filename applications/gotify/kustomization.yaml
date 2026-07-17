@@ -1,0 +1,96 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: gotify
+# Gotify itself runs on the public VPS (gotify.igou.io); rk8s does not host the
+# server, its PVC, or admin secret. Only the in-cluster
+# alertmanager-gotify-bridge is deployed here, posting alerts to the VPS over
+# the internet (see GOTIFY_ENDPOINT below). Its GOTIFY_TOKEN is the VPS
+# alertmanager app token, delivered via the gotify-bridge-token ExternalSecret.
+resources:
+  - gotify-namespace.yaml
+  - gotify-bridge-token-externalsecret.yaml
+helmCharts:
+  - name: app-template
+    namespace: gotify
+    version: 4.6.2
+    releaseName: alertmanager-gotify-bridge
+    repo: oci://ghcr.io/bjw-s-labs/helm
+    valuesFile: values-dummy.yaml
+    valuesInline:
+      controllers:
+        alertmanager-gotify-bridge:
+          type: deployment
+          replicas: 1
+          strategy: RollingUpdate
+          pod:
+            securityContext:
+              seccompProfile:
+                type: RuntimeDefault
+          containers:
+            app:
+              image:
+                repository: ghcr.io/druggeri/alertmanager_gotify_bridge
+                tag: "2.3.2@sha256:242441023c6a7956fc7bcdd30350a8fed38f791e703d670aa286fc0465f88b41"
+                pullPolicy: IfNotPresent
+              env:
+                GOTIFY_ENDPOINT: https://gotify.igou.io/message
+                BIND_ADDRESS: 0.0.0.0
+                PORT: "8080"
+                # Read the Gotify message body from the `summary` annotation
+                # rather than the default `description`. Many platform alerts
+                # (OutdatedVirtualMachineInstanceWorkloads, KubeJobFailed,
+                # ClusterNotUpgradeable, CDIStorageProfiles*, …) ship summary
+                # only; the bridge returns HTTP 400 when its message
+                # annotation is absent, regardless of DISPATCH_ERRORS, which
+                # causes AlertmanagerFailedToSendAlerts to fire.
+                MESSAGE_ANNOTATION: summary
+                # Still attempt to dispatch a debug message on any other
+                # missing/templating issue (priority annotation, etc.) — the
+                # bridge will also return 400, but Gotify still gets the
+                # error notification for visibility.
+                DISPATCH_ERRORS: "true"
+                # Render notifications in Markdown with FIR/RES status,
+                # start time, and (when present) a generator URL.
+                EXTENDED_DETAILS: "true"
+                GOTIFY_TOKEN:
+                  valueFrom:
+                    secretKeyRef:
+                      name: gotify-bridge-token
+                      key: token
+              probes:
+                liveness:
+                  enabled: true
+                  type: TCP
+                readiness:
+                  enabled: true
+                  type: TCP
+                startup:
+                  enabled: true
+                  type: TCP
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                # The upstream image ships no USER; on OCP the restricted SCC
+                # assigned a non-root UID dynamically. k3s has no SCC, so pin an
+                # explicit non-root UID/GID to satisfy runAsNonRoot.
+                runAsUser: 65534
+                runAsGroup: 65534
+                capabilities:
+                  drop:
+                    - ALL
+      service:
+        app:
+          controller: alertmanager-gotify-bridge
+          ports:
+            http:
+              port: 8080
+              targetPort: 8080
+      serviceAccount:
+        alertmanager-gotify-bridge:
+          enabled: true

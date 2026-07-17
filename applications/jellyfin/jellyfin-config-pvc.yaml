@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-config
+  namespace: jellyfin
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # local-path (default, WaitForFirstConsumer): jellyfin's /config (library
+  # DB + metadata) is small and latency-sensitive. On OCP this was
+  # freenas-nvmeof-ssd-csi (NVMe-oF); on rk8s local-path keeps the DB on the
+  # scheduling node's local SSD. For shared/relocatable config, swap to
+  # freenas-iscsi-ssd-csi (democratic-csi iSCSI) — RWO, survives node moves,
+  # but capped ~118MB/s over 1GbE.
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi

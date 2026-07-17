@@ -1,0 +1,14 @@
+namespace:
+  create: true
+  name: service-accounts
+
+defaults:
+  createServiceAccount: true
+  automountServiceAccountToken: false
+  longLivedToken:
+    enabled: true
+    nameSuffix: "-token"
+
+clusterRoles: []
+
+serviceAccounts: []

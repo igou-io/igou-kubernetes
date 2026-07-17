@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cnpg-system
+resources:
+  - cloudnative-pg-namespace.yaml
+helmCharts:
+- name: cloudnative-pg
+  includeCRDs: true
+  releaseName: cloudnative-pg
+  namespace: cnpg-system
+  version: 0.29.0
+  repo: https://cloudnative-pg.github.io/charts
+  valuesInline:
+    # Operator image ghcr.io/cloudnative-pg/cloudnative-pg is multi-arch
+    # (linux/amd64 + linux/arm64 verified via skopeo); postgresql:17 too.
+    replicaCount: 1
+    # Modest footprint for the RK3588 boards.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        memory: 256Mi

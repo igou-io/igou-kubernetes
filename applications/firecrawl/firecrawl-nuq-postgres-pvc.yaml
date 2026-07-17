@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: firecrawl-nuq-postgres
+  namespace: firecrawl
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # OCP used freenas-nvmeof-ssd-csi; on rk8s the NuQ queue-postgres data lives on
+  # node-local local-path for the stop-gap (fresh queue DB, no data import).
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi

@@ -18,6 +18,20 @@ applications:
     source:
       path: clusters/internal/democratic-csi
 
+  cloudnative-pg:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '8'
+    destination:
+      namespace: cnpg-system
+    source:
+      path: components/cloudnative-pg
+
   kube-prometheus-stack:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -58,11 +72,42 @@ applications:
     source:
       path: components/tailscale-operator
 
+  service-accounts:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '13'
+    destination:
+      namespace: service-accounts
+    source:
+      path: components/service-accounts
+
+  molecule:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      # wave 12 (before service-accounts wave 13) so the molecule namespace
+      # exists when the ansible-molecule RoleBinding is applied into it.
+      argocd.argoproj.io/sync-wave: '12'
+    destination:
+      namespace: molecule
+    source:
+      path: components/molecule
+
   headlamp:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
       # After gateway (wave 15): the HTTPRoute here attaches to the
-      # trusted-lan Gateway. ArgoCD retries cover residual ordering gaps.
+      # cluster-wildcard Gateway. ArgoCD retries cover residual ordering
+      # gaps.
       argocd.argoproj.io/sync-wave: '16'
     destination:
       namespace: headlamp
@@ -88,3 +133,129 @@ applications:
       namespace: kubevirt
     source:
       path: components/kubevirt
+
+  gitea:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: gitea
+    source:
+      path: applications/gitea
+
+  forgejo:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: forgejo
+    source:
+      path: applications/forgejo
+
+  gitea-mirror:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: gitea-mirror
+    source:
+      path: applications/gitea-mirror
+
+  firecrawl:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: firecrawl
+    source:
+      path: applications/firecrawl
+
+  gotify:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: gotify
+    source:
+      path: applications/gotify
+
+  jellyfin:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: jellyfin
+    source:
+      path: applications/jellyfin
+
+  minecraft-server:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: minecraft-server
+    source:
+      path: applications/minecraft-server
+
+  searxng:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: searxng
+    source:
+      path: applications/searxng
+
+  squid-proxy:
+    # Staged adoption: the workloads already run live (kubectl-applied
+    # during arm64 verification). No auto-sync — each app is synced
+    # manually, one at a time, and auto-sync gets enabled in a follow-up
+    # once verified healthy under ArgoCD management.
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: squid-proxy
+    source:
+      path: applications/squid-proxy
