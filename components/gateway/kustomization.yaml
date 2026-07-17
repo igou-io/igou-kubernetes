@@ -6,5 +6,9 @@ resources:
   - dns-token-externalsecret.yaml
   - cluster-acme-clusterissuer.yaml
   - wildcard-rk8s-certificate.yaml
+  - wildcard-lan-certificate.yaml
+  - wildcard-iot-certificate.yaml
   - trusted-lan-gateway.yaml
+  - cluster-wildcard-gateway.yaml
+  - iot-gateway.yaml
   - federate-httproute.yaml

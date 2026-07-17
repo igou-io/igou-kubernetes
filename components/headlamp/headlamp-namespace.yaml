@@ -3,7 +3,8 @@ kind: Namespace
 metadata:
   name: headlamp
   labels:
-    # Opt this namespace into the trusted-lan Gateway (components/gateway):
-    # the Gateway's allowedRoutes selects namespaces carrying this label, so
-    # the headlamp HTTPRoute here is permitted to attach.
-    gateway-access/trusted-lan: "true"
+    # Opt this namespace into the cluster-wildcard Gateway
+    # (components/gateway): the Gateway's allowedRoutes selects namespaces
+    # carrying this label, so the headlamp HTTPRoute here is permitted to
+    # attach.
+    gateway-access/cluster-wildcard: "true"

@@ -1,0 +1,51 @@
+---
+# Zero-friction ingress: everything under `*.rk8s.igou.systems` resolves to
+# this Gateway via ONE rb5009 wildcard DNS record (igou-inventory), so
+# merging an HTTPRoute here is the ONLY step to serve something — no
+# per-hostname DNS PR, no router apply. Mirrors ocp's *.apps.ocp wildcard.
+#
+# Exposure: the VIP lives ON VLAN9 (L2/ARP via the `vlan9-wildcard` MetalLB
+# pool — the one L2 exception, see components/metallb/ipaddresspools.yaml),
+# so reachability is whoever rb5009 admits into VLAN9: VLAN9 itself, VLAN10
+# (admin → all), plus any per-VIP pinholes. Anything that should be scoped
+# to a BGP tier instead belongs on a tier gateway (trusted-lan/iot) with an
+# explicit A record.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: cluster-wildcard
+  namespace: nginx-gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  gatewayClassName: nginx
+  infrastructure:
+    # Copied by NGF onto the generated LoadBalancer Service. 10.10.9.11 is
+    # a pinned cross-repo contract with rb5009's `*.rk8s.igou.systems`
+    # regexp DNS record (igou-inventory) — do not change either side alone.
+    annotations:
+      metallb.universe.tf/address-pool: vlan9-wildcard
+      metallb.universe.tf/loadBalancerIPs: 10.10.9.11
+  listeners:
+    - name: https
+      hostname: "*.rk8s.igou.systems"
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          # kind/group are API-server defaults, stated explicitly so
+          # ArgoCD's server-side-apply diff doesn't report the Gateway as
+          # forever OutOfSync.
+          - name: wildcard-rk8s-tls
+            kind: Secret
+            group: ""
+      # Apps opt in by labelling their namespace
+      # `gateway-access/cluster-wildcard: "true"` and creating an HTTPRoute
+      # with parentRefs to this Gateway.
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access/cluster-wildcard: "true"

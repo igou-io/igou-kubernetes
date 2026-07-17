@@ -1,6 +1,6 @@
 ---
 # Exposes ONLY Prometheus /federate over the trusted-lan Gateway, at
-# federate.rk8s.igou.systems, for the ocp cluster's UWM to scrape. The path
+# federate.lan.igou.systems, for the ocp cluster's UWM to scrape. The path
 # prefix is deliberately limited to /federate: TLS terminates at the Gateway
 # but there is no auth in front of it, so we expose the federation endpoint
 # and nothing else of the Prometheus UI/API — trusted LAN + path-limited.
@@ -21,7 +21,7 @@ spec:
       group: gateway.networking.k8s.io
       kind: Gateway
   hostnames:
-    - federate.rk8s.igou.systems
+    - federate.lan.igou.systems
   rules:
     - matches:
         - path:

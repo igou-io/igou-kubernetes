@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: whoami
+  labels:
+    # Opt this namespace into the iot Gateway (components/gateway): the
+    # Gateway's allowedRoutes selects namespaces carrying this label, so
+    # the whoami HTTPRoute here is permitted to attach.
+    gateway-access/iot: "true"

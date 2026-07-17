@@ -1,0 +1,43 @@
+---
+# iot tier gateway (*.iot.igou.systems). Intentional serving only: every
+# hostname needs an explicit rb5009 A record → 10.10.151.129 in
+# igou-inventory. rb5009 admits VLAN 30/35/50 to the iot tier /24.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: iot
+  namespace: nginx-gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  gatewayClassName: nginx
+  infrastructure:
+    # Copied by NGF onto the generated LoadBalancer Service. The VIP is the
+    # reserved `iot-gateway` MetalLB pool (components/metallb) and a pinned
+    # cross-repo contract with rb5009's per-hostname A records — do not
+    # change it without updating both repos.
+    annotations:
+      metallb.universe.tf/address-pool: iot-gateway
+      metallb.universe.tf/loadBalancerIPs: 10.10.151.129
+  listeners:
+    - name: https
+      hostname: "*.iot.igou.systems"
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          # kind/group are API-server defaults, stated explicitly so
+          # ArgoCD's server-side-apply diff doesn't report the Gateway as
+          # forever OutOfSync.
+          - name: wildcard-iot-tls
+            kind: Secret
+            group: ""
+      # Apps opt in by labelling their namespace `gateway-access/iot:
+      # "true"` and creating an HTTPRoute with parentRefs to this Gateway.
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access/iot: "true"

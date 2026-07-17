@@ -34,7 +34,7 @@ docs/                            Operational docs (bootstrap)
 - Sync waves are `argocd.argoproj.io/sync-wave` annotations in those values
   files. Current ordering: argocd/ESO 0 → cert-manager/metallb 5 → NGF 6 →
   democratic-csi 7 → kube-prometheus-stack 10 → loki 11 →
-  tailscale-operator 12 → gateway 15 → kubevirt 50.
+  tailscale-operator 12 → gateway 15 → headlamp/whoami 16 → kubevirt 50.
 - Argo CD renders components with `kustomize build --enable-helm`; CR
   manifests that depend on chart-installed CRDs carry
   `argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true`.
@@ -47,21 +47,26 @@ inventory repo at `igou-inventory/docs/network-topology.md`. **Read it before
 changing anything under `components/metallb/` or `components/gateway/`.**
 What an agent needs to know from this side:
 
-- `components/metallb/` peers this cluster with the homelab router over BGP
-  (no L2 mode). The peer and pool specifics live in those manifests and
-  their header comments.
+- `components/metallb/` peers this cluster with the homelab router over BGP.
+  The peer and pool specifics live in those manifests and their header
+  comments. The ONE L2 exception is the `vlan9-wildcard` pool (the
+  cluster-wildcard ingress VIP `10.10.9.11` — ARP on VLAN9, not BGP); every
+  other pool stays BGP-only.
 - The MetalLB tier pools are **shared with the OpenShift cluster**
   (`igou-openshift/clusters/ocp/metallb/`): each tier range is split between
   the two clusters, and the router's import filter enforces the split per
   peer. Never widen or move a pool boundary in one repo alone.
-- The NGF Gateway VIP (`components/gateway/trusted-lan-gateway.yaml`,
-  reserved pool `trusted-lan-gateway`, hostname `*.rk8s.igou.systems`) is a
-  pinned cross-repo contract — the router carries matching static DNS and
-  firewall rules in igou-inventory. Never change it without a paired
-  igou-inventory change.
-- New LoadBalancer services on a tier need an explicit per-service DNS
-  record on the router (no wildcards) and possibly firewall pinholes — both
-  in igou-inventory.
+- **Two ingress classes** (full policy in the topology doc):
+  - `cluster-wildcard` Gateway (`*.rk8s.igou.systems` → `10.10.9.11`):
+    zero-friction — rb5009 carries ONE wildcard record, so merging an
+    HTTPRoute is the only step to serve. Reachable from VLAN9 + admin.
+  - Tier gateways (`trusted-lan` → `*.lan.igou.systems` @ `10.10.150.129`,
+    `iot` → `*.iot.igou.systems` @ `10.10.151.129`; ocp owns
+    `*.dmz.igou.systems`): intentional serving — every hostname needs an
+    explicit A record in igou-inventory + a `routeros_configure` apply.
+- All gateway VIPs are pinned cross-repo contracts — the router carries
+  matching static DNS and firewall rules in igou-inventory. Never change
+  one without a paired igou-inventory change.
 - The `metallb` app pins `ServerSideDiff=false` (see comment in
   `groups/all/values.yaml`) so pool-boundary changes survive the MetalLB
   validating webhook during client-side diff.
