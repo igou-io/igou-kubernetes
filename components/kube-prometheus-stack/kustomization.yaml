@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: monitoring
 resources:
   - monitoring-namespace.yaml
+  - prometheus-httproute.yaml
+  - alertmanager-httproute.yaml
 helmCharts:
 - name: kube-prometheus-stack
   includeCRDs: true

@@ -7,3 +7,6 @@ metadata:
     # the Gateway's allowedRoutes selects namespaces carrying this label, so
     # the /federate HTTPRoute here is permitted to attach.
     gateway-access/trusted-lan: "true"
+    # Also opt into the cluster-wildcard Gateway for the Prometheus and
+    # Alertmanager UI routes below (*.rk8s.igou.systems, VLAN9/admin only).
+    gateway-access/cluster-wildcard: "true"
