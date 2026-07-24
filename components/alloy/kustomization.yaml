@@ -1,0 +1,156 @@
+---
+# Ship-don't-store log collection for rk8s (igou-openshift#382 phase 5):
+# everything pushes to the ocp log-gateway (Loki push API, VIP
+# 10.10.150.16 = syslog.igou.systems:3500) and lands in the LokiStack
+# `infrastructure` tenant with cluster="rk8s". Two Alloy releases from
+# one chart:
+#   alloy        — DaemonSet: per-node pod logs (kubelet via API,
+#                  pods/log — no /var/log/pods hostPath) + systemd
+#                  journal (hostPath ro)
+#   alloy-events — 1-replica Deployment: cluster events. Separate
+#                  singleton because loki.source.kubernetes_events is
+#                  not cluster-aware — on the DaemonSet every node
+#                  would ship a duplicate copy.
+# The local filesystem Loki (components/loki) is retired once this
+# path is verified — see the issue.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: alloy
+resources:
+  - alloy-namespace.yaml
+helmCharts:
+  - name: alloy
+    includeCRDs: false
+    releaseName: alloy
+    namespace: alloy
+    version: 1.11.0
+    repo: https://grafana.github.io/helm-charts
+    valuesInline:
+      controller:
+        type: daemonset
+        volumes:
+          extra:
+            - name: journal
+              hostPath:
+                path: /var/log/journal
+            - name: machine-id
+              hostPath:
+                path: /etc/machine-id
+                type: File
+      alloy:
+        extraEnv:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        mounts:
+          extra:
+            - name: journal
+              mountPath: /var/log/journal
+              readOnly: true
+            - name: machine-id
+              mountPath: /etc/machine-id
+              readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        configMap:
+          content: |
+            // Pod logs for this node only, fetched through the API
+            // server (pods/log) — no container-runtime log-path
+            // coupling on the SBCs.
+            discovery.kubernetes "pods" {
+              role = "pod"
+              selectors {
+                role  = "pod"
+                field = "spec.nodeName=" + sys.env("NODE_NAME")
+              }
+            }
+
+            discovery.relabel "pods" {
+              targets = discovery.kubernetes.pods.targets
+              rule {
+                source_labels = ["__meta_kubernetes_namespace"]
+                target_label  = "namespace"
+              }
+              rule {
+                source_labels = ["__meta_kubernetes_pod_name"]
+                target_label  = "pod"
+              }
+              rule {
+                source_labels = ["__meta_kubernetes_pod_container_name"]
+                target_label  = "container"
+              }
+              rule {
+                source_labels = ["__meta_kubernetes_pod_node_name"]
+                target_label  = "node"
+              }
+              rule {
+                target_label = "job"
+                replacement  = "rk8s-pods"
+              }
+            }
+
+            loki.source.kubernetes "pods" {
+              targets    = discovery.relabel.pods.output
+              forward_to = [loki.write.gateway.receiver]
+            }
+
+            // Node journal (armbian persistent journald).
+            loki.source.journal "node" {
+              path          = "/var/log/journal"
+              relabel_rules = loki.relabel.journal.rules
+              labels        = { job = "systemd-journal" }
+              forward_to    = [loki.write.gateway.receiver]
+            }
+
+            loki.relabel "journal" {
+              forward_to = []
+              rule {
+                source_labels = ["__journal__hostname"]
+                target_label  = "host"
+              }
+              rule {
+                source_labels = ["__journal__systemd_unit"]
+                target_label  = "unit"
+              }
+            }
+
+            loki.write "gateway" {
+              endpoint {
+                url = "http://syslog.igou.systems:3500/loki/api/v1/push"
+              }
+              external_labels = { cluster = "rk8s" }
+            }
+  - name: alloy
+    includeCRDs: false
+    releaseName: alloy-events
+    namespace: alloy
+    version: 1.11.0
+    repo: https://grafana.github.io/helm-charts
+    valuesInline:
+      controller:
+        type: deployment
+        replicas: 1
+      alloy:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        configMap:
+          content: |
+            loki.source.kubernetes_events "cluster" {
+              forward_to = [loki.write.gateway.receiver]
+            }
+
+            loki.write "gateway" {
+              endpoint {
+                url = "http://syslog.igou.systems:3500/loki/api/v1/push"
+              }
+              external_labels = { cluster = "rk8s" }
+            }
