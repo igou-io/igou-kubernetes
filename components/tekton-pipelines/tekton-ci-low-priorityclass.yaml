@@ -1,0 +1,11 @@
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: tekton-ci-low
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+value: 100
+globalDefault: false
+description: PR PipelineRun pods. Preempted under cluster pressure.
+preemptionPolicy: PreemptLowerPriority

@@ -1,0 +1,130 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: nvidia-gpu-operator
+resources:
+  - nvidia-gpu-operator-namespace.yaml
+  # Per-node driver version pools (driver.nvidiaDriverCRD.enabled: true).
+  - nvidiadriver-pascal-580.yaml
+  - nvidiadriver-burst-595.yaml
+# The gpu-operator ClusterPolicy / NVIDIADriver CRs render before their CRDs
+# exist on a first sync; skip the dry-run so ArgoCD doesn't block.
+commonAnnotations:
+  argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+helmCharts:
+- name: gpu-operator
+  includeCRDs: true
+  releaseName: gpu-operator
+  namespace: nvidia-gpu-operator
+  # Matches the OCP CSV branch (v26.3.x); project-maintained NGC chart.
+  version: v26.3.3
+  repo: https://helm.ngc.nvidia.com/nvidia
+  valuesInline:
+    # NFD comes from the gpu-operator chart's bundled Node Feature Discovery
+    # (upstream default) rather than a separate component. This collapses the
+    # OCP split (openshift-nfd operator + gpu-operator) into one chart for
+    # vanilla k8s. The bundled NFD does not expose the OCP worker tuning
+    # (sleepInterval 300s + pci deviceClassWhitelist) — see gaps.
+    nfd:
+      enabled: true
+
+    # Container Device Interface — matches OCP ClusterPolicy cdi.enabled: true.
+    cdi:
+      enabled: true
+
+    driver:
+      enabled: true
+      kernelModuleType: auto
+      # Per-node driver versions are managed by the NVIDIADriver CRs
+      # (nvidiadriver-pascal-580.yaml / nvidiadriver-burst-595.yaml), porting
+      # the OCP ClusterPolicy driver.useNvidiaDriverCRD: true intent. The chart
+      # default CR is disabled so only the two pools above apply.
+      nvidiaDriverCRD:
+        enabled: true
+        deployDefaultCR: false
+      # Standard driver-container flow (NOT the OCP driver-toolkit/RHCOS
+      # precompiled path). See gaps: rk8s workers are ARM64 CentOS/k3s-adjacent
+      # boards, so the OS-matched driver image differs from the OCP nodes.
+      usePrecompiled: false
+
+    toolkit:
+      enabled: true
+      # k3s ships containerd at a non-default path/socket; the toolkit must be
+      # pointed at them or the nvidia runtime is never registered. These are
+      # the upstream-documented k3s values.
+      env:
+        - name: CONTAINERD_CONFIG
+          value: /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+        - name: CONTAINERD_SOCKET
+          value: /run/k3s/containerd/containerd.sock
+        - name: CONTAINERD_RUNTIME_CLASS
+          value: nvidia
+        - name: CONTAINERD_SET_AS_DEFAULT
+          value: "true"
+
+    devicePlugin:
+      enabled: true
+      # Time-slicing config ported verbatim from the OCP time-slicing-config
+      # ConfigMap (4 replicas per nvidia.com/gpu). Created by the chart and
+      # applied cluster-wide via default: any.
+      config:
+        create: true
+        name: time-slicing-config
+        default: any
+        data:
+          any: |-
+            version: v1
+            flags:
+              migStrategy: none
+            sharing:
+              timeSlicing:
+                renameByDefault: false
+                failRequestsGreaterThanOne: false
+                resources:
+                  - name: nvidia.com/gpu
+                    replicas: 4
+
+    dcgm:
+      enabled: true
+
+    dcgmExporter:
+      enabled: true
+      # Scraped by kube-prometheus-stack (selects ServiceMonitors cluster-wide).
+      serviceMonitor:
+        enabled: true
+
+    gfd:
+      enabled: true
+
+    # OCP ClusterPolicy enabled the node status exporter (chart default: off).
+    nodeStatusExporter:
+      enabled: true
+
+    migManager:
+      enabled: true
+      config:
+        default: all-disabled
+
+    vgpuDeviceManager:
+      enabled: true
+
+    vfioManager:
+      enabled: true
+
+    sandboxDevicePlugin:
+      enabled: true
+
+    daemonsets:
+      updateStrategy: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: "1"
+      # Keep the chart's default nvidia.com/gpu toleration AND tolerate the
+      # casval burst taint so the driver/device-plugin/DCGM/validator
+      # DaemonSets land on the burst node (ported from OCP ClusterPolicy).
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+        - key: workload
+          operator: Equal
+          value: burst
+          effect: NoSchedule

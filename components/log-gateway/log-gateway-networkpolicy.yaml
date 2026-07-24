@@ -1,0 +1,42 @@
+---
+# Devices and host agents send unauthenticated — the fence is this policy:
+# ingest ports only from lab RFC1918 space (10.10.0.0/16 covers every lab
+# VLAN incl. the router's src-address and the trusted-lan pods/VIP ranges).
+# externalTrafficPolicy: Local on the Service keeps real client IPs visible
+# to the ipBlock match. Guest/DMZ VLANs can't route here anyway (router
+# firewall); this is defense in depth.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: log-gateway
+  namespace: log-gateway
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: log-gateway
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 10.10.0.0/16
+      ports:
+        - port: 5514
+          protocol: UDP
+        - port: 5514
+          protocol: TCP
+        - port: 5524
+          protocol: UDP
+        - port: 3500
+          protocol: TCP
+    # The cluster Prometheus scrapes Alloy's telemetry endpoint (the
+    # ServiceMonitor in this component); metrics stay off the ingest VIP.
+    # rk8s runs kube-prometheus-stack in ns `monitoring` (the ocp source
+    # used openshift-user-workload-monitoring).
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 12345
+          protocol: TCP

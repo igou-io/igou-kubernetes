@@ -1,0 +1,70 @@
+---
+# CAPI provider set mirrored from igou-openshift (CoreProvider + Metal3
+# InfrastructureProvider + Metal3 IPAMProvider). The operator installs the
+# matching bootstrap/control-plane bundles that ship inside the core provider
+# release; no separate Bootstrap/ControlPlaneProvider CRs are declared, same
+# as OCP.
+#
+# The OCP providers.yaml also carried two large RFC 6902 patches on the
+# CoreProvider that rewrote ipaddressclaims/ipaddresses.ipam.cluster.x-k8s.io
+# to byte-match the OCP release-image CRDs, so the CVO and capi-operator could
+# share SSA ownership. Vanilla k8s has no CVO writing those CRDs, so the
+# patches are dropped — capi-operator is the sole owner here.
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: CoreProvider
+metadata:
+  name: cluster-api
+  namespace: capi-system
+spec:
+  version: v1.12.7
+  manager:
+    featureGates:
+      MachineTaintPropagation: true
+  deployment:
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: ""
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+---
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: InfrastructureProvider
+metadata:
+  name: metal3
+  namespace: capm3-system
+spec:
+  version: v1.12.4
+  deployment:
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: ""
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+---
+# Metal3 IPAM split out of InfrastructureProvider in v1.11 — required for the
+# IPClaim CRD that CAPM3 depends on.
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: IPAMProvider
+metadata:
+  name: metal3
+  namespace: capm3-system
+spec:
+  version: v1.12.4
+  deployment:
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: ""
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: stackrox
+resources:
+  # The stackrox namespace itself is owned by the stackrox-central-services
+  # component (both share it); this component only adds the init-bundle
+  # ExternalSecrets. Deploy central-services first (lower sync wave).
+  - sensor-tls-externalsecret.yaml
+  - collector-tls-externalsecret.yaml
+  - admission-control-tls-externalsecret.yaml
+helmCharts:
+- name: stackrox-secured-cluster-services
+  includeCRDs: true
+  # The chart's NOTES.txt hard-fails on any other release name.
+  releaseName: stackrox-secured-cluster-services
+  namespace: stackrox
+  # 400.11.1 == appVersion 4.11.1, matching stackrox-central-services.
+  version: 400.11.1
+  repo: https://mirror.openshift.com/pub/rhacs/charts/
+  # valuesFile, not valuesInline: this chart's default values.yaml is entirely
+  # comments (zero real keys), which trips a kustomize bug ("could not parse
+  # values file into rnode: EOF") when merging valuesInline. A separate values
+  # file is passed straight to helm and sidesteps it.
+  valuesFile: values.yaml

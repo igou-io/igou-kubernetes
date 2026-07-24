@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-gateway
+  namespace: log-gateway
+  annotations:
+    # rk8s MetalLB convention (metallb.io/*, not the .universe.tf/* the ocp
+    # cluster uses). The high half of the trusted-lan tier belongs to rk8s
+    # (.129-.254, see components/metallb/ipaddresspools.yaml); .16 is in
+    # ocp's low half and already carries the LIVE syslog.igou.systems VIP.
+    # This picks a distinct high-half address; adopting this gateway means
+    # cutting DNS to it (see gaps).
+    metallb.io/address-pool: trusted-lan
+    metallb.io/loadBalancerIPs: 10.10.150.145
+spec:
+  type: LoadBalancer
+  # Local preserves client source IPs for the NetworkPolicy ipBlock fence
+  # and advertises the VIP only from the node running the pod.
+  externalTrafficPolicy: Local
+  selector:
+    app.kubernetes.io/name: log-gateway
+  ports:
+    - name: syslog-udp
+      port: 514
+      targetPort: syslog-udp
+      protocol: UDP
+    # TCP syslog on 601 (IANA syslog-conn), not sharing 514 with UDP: a
+    # mixed-protocol single port loses UDP steering on some CNIs. Devices
+    # all use UDP; TCP here is an optional spare.
+    - name: syslog-tcp
+      port: 601
+      targetPort: syslog-tcp
+      protocol: TCP
+    # RFC5424/UDP for senders whose format is fixed upstream (TrueNAS); 1514
+    # is the conventional "alternate syslog" port.
+    - name: syslog5424-udp
+      port: 1514
+      targetPort: syslog5424-udp
+      protocol: UDP
+    - name: loki-push
+      port: 3500
+      targetPort: loki-push
+      protocol: TCP

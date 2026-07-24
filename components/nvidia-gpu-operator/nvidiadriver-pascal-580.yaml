@@ -1,0 +1,28 @@
+---
+# p330 — NVIDIA Quadro P620 (GP107, Pascal). The 580.xx driver branch is the
+# LAST to support Pascal; 590/595+ ignore the GPU, so the driver refuses to
+# load (NVRM "will ignore this GPU" / modprobe: No such device) and
+# crash-loops. Pin to the 580 branch.
+#
+# Rendered by the gpu-operator chart's NVIDIADriver CRD (driver.nvidiaDriverCRD
+# .enabled: true, deployDefaultCR: false — this CR replaces the chart default).
+#
+# NOTE: p330 is an OpenShift bare-metal worker, NOT an rk8s node (rk8s workers
+# are ARM64 RK3588 Armbian boards with no discrete NVIDIA GPU). The hostname
+# selector is carried over verbatim so this manifest stays a faithful,
+# ready-to-adopt port; it has no live effect on the current rk8s node set.
+apiVersion: nvidia.com/v1alpha1
+kind: NVIDIADriver
+metadata:
+  name: pascal-580
+  annotations:
+    argocd.argoproj.io/sync-wave: '3'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  driverType: gpu
+  repository: nvcr.io/nvidia
+  image: driver
+  version: 580.105.08
+  kernelModuleType: auto              # resolves to 'proprietary' on Pascal
+  nodeSelector:
+    kubernetes.io/hostname: p330.igou.systems

@@ -1,0 +1,26 @@
+---
+# rk8s Loki (components/loki): single-binary, auth_enabled: false, single
+# tenant, fronted by the loki-gateway Service (namespace loki, :80). Replaces
+# the OCP LokiStack multi-tenant datasources (loki-infrastructure /
+# loki-application / loki-network), which were per-tenant gateway URLs gated
+# by ServiceAccount bearer tokens. Here there is one tenantless Loki and no
+# auth; the three OCP datasource names in the ported dashboards were all
+# rewritten to this one. See gaps — OCP application/network/lokistack log
+# streams have no rk8s equivalent, so those dashboards will render empty.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: loki
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '11'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  datasource:
+    name: loki
+    type: loki
+    access: proxy
+    url: http://loki-gateway.loki-scalable.svc
+    editable: false

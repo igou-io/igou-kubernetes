@@ -1,0 +1,34 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: central-declarative-config
+  namespace: stackrox
+data:
+  # Declarative auth (#546 parity). Declaratively-managed objects are
+  # read-only in the Central UI; change them here in git. htpasswd basic auth
+  # (admin + the chart-generated central-htpasswd secret) stays as
+  # break-glass. Schema: stackrox pkg/declarativeconfig (tag 4.11.1).
+  #
+  # PORT NOTE: the OCP source used an `openshift:` auth provider (OpenShift
+  # OAuth). k3s/rk8s has no OpenShift OAuth, so that provider type is invalid
+  # here. Represented as an `oidc:` provider with a REPLACE-ME issuer — the
+  # group->role mapping (global-admins -> Admin) is preserved verbatim. Wiring
+  # a real OIDC issuer is an adoption prerequisite (see component README /
+  # gaps); until then only htpasswd break-glass login works.
+  auth-providers.yaml: |
+    name: OIDC
+    minimumRole: None
+    uiEndpoint: central.rk8s.igou.systems
+    extraUIEndpoints:
+      - central.rk8s.igou.systems:443
+    groups:
+      - key: groups
+        value: global-admins
+        role: Admin
+    oidc:
+      # REPLACE-ME at adoption: rk8s has no OIDC issuer defined yet.
+      issuer: https://REPLACE-ME.rk8s.igou.systems
+      mode: post
+      clientID: stackrox
+      clientSecret: ""

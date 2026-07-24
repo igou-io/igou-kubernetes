@@ -1,0 +1,35 @@
+---
+# RBAC for the CAPI cluster cache to reach the "workload cluster" — which is
+# the same management cluster in this single-cluster homelab. Bound to the
+# `default` SA in the namespace where the CAPI Cluster + its
+# `<cluster-name>-kubeconfig` Secret get created at bootstrap. Without these
+# perms the Machine controller can't discover Nodes and stays Pending forever.
+#
+# NOTE: the subject namespace `capi-cluster` is a placeholder — an adopter
+# must point it at whatever namespace they create the Cluster/MachineDeployment
+# objects in (and keep it in sync with the autoscaler's
+# autoDiscovery.namespace). No such namespace/Cluster exists yet on rk8s.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: capi-workload-cluster-access
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: capi-workload-cluster-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: capi-workload-cluster-access
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: capi-cluster

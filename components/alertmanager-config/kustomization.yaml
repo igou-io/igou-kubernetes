@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Lands in the existing `monitoring` namespace owned by the
+# kube-prometheus-stack component (wave 10). This component adds ONLY the
+# alert-routing config + its backing secrets; it must never (re)create the
+# namespace or touch the Alertmanager workload.
+namespace: monitoring
+resources:
+  - alertmanager-slack-bot-token-externalsecret.yaml
+  - alertmanager-eda-event-stream-externalsecret.yaml
+  - alertmanager-routing-alertmanagerconfig.yaml

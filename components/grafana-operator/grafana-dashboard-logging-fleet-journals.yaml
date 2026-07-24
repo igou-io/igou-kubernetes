@@ -1,0 +1,24 @@
+---
+# Purpose-built board over the central logging streams (issue #382):
+# variable-driven (host/unit/namespace/severity + free-text line filter)
+# so per-host LogQL never has to be hand-written. JSON lives in
+# dashboards/logging/fleet-journals.json via the configMapGenerator.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-logging-fleet-journals
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: logging
+  resyncPeriod: 24h
+  datasources:
+    - inputName: DS_LOKI_INFRASTRUCTURE
+      datasourceName: loki
+  configMapRef:
+    name: grafana-dashboard-logging-fleet-journals-json
+    key: fleet-journals.json

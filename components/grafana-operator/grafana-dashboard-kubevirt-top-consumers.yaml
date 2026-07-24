@@ -1,0 +1,14 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-kubevirt-top-consumers
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://raw.githubusercontent.com/kubevirt/monitoring/main/dashboards/openshift/kubevirt-top-consumers.json
+  contentCacheDuration: 24h

@@ -1,0 +1,41 @@
+---
+# Central UI/API exposure (ports the OCP passthrough Route to a Gateway API
+# HTTPRoute on the shared trusted-lan Gateway, components/gateway).
+#
+# The Central Service serves HTTPS on port 443 (it terminates its own TLS with
+# the internal service cert), so this is a TLS upstream. NGINX Gateway Fabric
+# needs a BackendTLSPolicy targeting the `central` Service for the route to
+# reach it over HTTPS — that policy is NOT included here (see gaps). A DNS A
+# record central.rk8s.igou.systems -> the trusted-lan VIP (10.10.150.129) must
+# also be added in igou-inventory (the *.rk8s wildcard was dropped; each
+# hostname needs an explicit record). The Gateway listener hostname
+# `*.rk8s.igou.systems` already covers this host, so no new listener is needed.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: central
+  namespace: stackrox
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  # group/kind/weight below are API-server defaults, stated explicitly so
+  # ArgoCD's server-side-apply diff doesn't report the route as forever
+  # OutOfSync (same wart as the gateway component's routes).
+  parentRefs:
+    - name: trusted-lan
+      namespace: nginx-gateway
+      group: gateway.networking.k8s.io
+      kind: Gateway
+  hostnames:
+    - central.rk8s.igou.systems
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: central
+          port: 443
+          group: ""
+          kind: Service
+          weight: 1

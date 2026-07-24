@@ -1,0 +1,23 @@
+---
+# "Kubernetes / Networking / Namespace (Pods)" from kube-prometheus-stack (chart 87.2.1), scoped to the rk8s
+# lab cluster (cluster="rk8s"). The `namespace` label is rewritten to
+# `exported_namespace` because UWM's enforcedNamespaceLabel forces
+# namespace=rk8s-federate on every federated series. Vendored JSON +
+# configMapGenerator; the dashboard's own $datasource template variable
+# resolves to the default prometheus datasource (no __inputs to map).
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-rk8s-namespace-by-pod
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  resyncPeriod: 24h
+  folder: rk8s
+  configMapRef:
+    name: grafana-dashboard-rk8s-namespace-by-pod-json
+    key: namespace-by-pod.json

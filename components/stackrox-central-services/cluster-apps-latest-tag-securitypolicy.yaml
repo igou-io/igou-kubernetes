@@ -1,0 +1,61 @@
+---
+apiVersion: config.stackrox.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: cluster-apps-latest-tag
+  namespace: stackrox
+spec:
+  policyName: 'cluster-apps: Latest tag'
+  description: Clone of the built-in "Latest tag" policy, scoped to the cluster-apps project namespaces + hermes (#559).
+  rationale: A mutable latest tag makes it impossible to tell which code is running; all in-scope images are digest-pinned via Renovate.
+  remediation: Pin the image to a version tag or digest-only reference (repo@sha256:...); Renovate tracks digest bumps.
+  categories:
+    - DevOps Best Practices
+    - Supply Chain Security
+  severity: LOW_SEVERITY
+  lifecycleStages:
+    - DEPLOY
+  # Admission-only actions: inert while the SecuredCluster admissionControl
+  # enforcement knob is Disabled; flipping that knob to Enabled is the single
+  # switch that makes these block (see README).
+  enforcementActions:
+    - FAIL_DEPLOYMENT_CREATE_ENFORCEMENT
+    - FAIL_DEPLOYMENT_UPDATE_ENFORCEMENT
+  # API-managed Slack notifier (#548) -> #igoucloud-alerts-warning; referenced
+  # by name, resolved by config-controller.
+  notifiers:
+    - slack-igoucloud-alerts
+  scope:
+    - namespace: ansible-automation-platform
+    - namespace: comfyui
+    - namespace: firecrawl
+    - namespace: forgejo
+    - namespace: gitea-mirror
+    - namespace: gotify
+    - namespace: hermes
+    - namespace: jellyfin
+    - namespace: llmkube-system
+    - namespace: sands-of-time
+    - namespace: searxng
+  # AAP execution/decision environments are rebuilt and pushed to :latest by
+  # design (igou-inventory group_vars/aap/execution_environments.yml + eda.yml)
+  # and run as transient automation-job/activation-job pods; excluded rather
+  # than pinned.
+  exclusions:
+    - name: AAP controller job pods (EE images track latest by design)
+      deployment:
+        name: automation-job.*
+        scope:
+          namespace: ansible-automation-platform
+    - name: EDA activation pods (DE images track latest by design)
+      deployment:
+        name: activation-job.*
+        scope:
+          namespace: ansible-automation-platform
+  policySections:
+    - sectionName: Criteria
+      policyGroups:
+        - fieldName: Image Tag
+          booleanOperator: OR
+          values:
+            - value: latest

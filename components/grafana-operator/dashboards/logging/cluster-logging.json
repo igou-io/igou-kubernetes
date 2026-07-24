@@ -1,0 +1,1678 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 7,
+  "iteration": 1657216039081,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 41,
+      "panels": [
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1008,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": ["lastNotNull"],
+              "fields": "",
+              "values": false
+            },
+            "stack": false,
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "alertThreshold": false
+          },
+          "pluginVersion": "8.5.0",
+          "targets": [
+            {
+              "expr": "sum by(namespace, app_kubernetes_io_instance) (rate(vector_component_received_bytes_total{component_kind=\"source\", component_type!=\"internal_metrics\"}[5m]))",
+              "legendFormat": "{{namespace}}/{{app_kubernetes_io_instance}}",
+              "interval": "",
+              "exemplar": true,
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Log collection rate (5m avg)",
+          "type": "graph",
+          "span": 6,
+          "renderer": "flot",
+          "yaxes": [
+            {
+              "label": null,
+              "show": true,
+              "logBase": 1,
+              "min": null,
+              "max": null,
+              "format": "Bps",
+              "$$hashKey": "object:332"
+            },
+            {
+              "label": null,
+              "show": false,
+              "logBase": 1,
+              "min": null,
+              "max": null,
+              "format": "short",
+              "$$hashKey": "object:333"
+            }
+          ],
+          "xaxis": {
+            "show": true,
+            "mode": "time",
+            "name": null,
+            "values": [],
+            "buckets": null
+          },
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          },
+          "lines": true,
+          "linewidth": 1,
+          "dashLength": 10,
+          "spaceLength": 10,
+          "pointradius": 2,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false,
+            "rightSide": false,
+            "hideEmpty": false,
+            "hideZero": false
+          },
+          "nullPointMode": "null",
+          "tooltip": {
+            "value_type": "individual",
+            "shared": true,
+            "sort": 0
+          },
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "thresholds": [],
+          "timeRegions": [],
+          "fill": 0,
+          "fillGradient": 0,
+          "dashes": false,
+          "hiddenSeries": false,
+          "points": false,
+          "bars": false,
+          "stack": false,
+          "percentage": false,
+          "steppedLine": false,
+          "datasource": null
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1008,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": ["lastNotNull"],
+              "fields": "",
+              "values": false
+            },
+            "stack": false,
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "alertThreshold": false
+          },
+          "pluginVersion": "8.5.0",
+          "targets": [
+            {
+              "expr": "sum by (namespace, app_kubernetes_io_instance) (rate(vector_component_sent_bytes_total{component_kind=\"sink\", component_type!=\"prometheus_exporter\"}[5m]))",
+              "legendFormat": "{{namespace}}/{{app_kubernetes_io_instance}}",
+              "interval": "",
+              "exemplar": true,
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Log send rate (5m avg)",
+          "type": "graph",
+          "span": 6,
+          "renderer": "flot",
+          "yaxes": [
+            {
+              "label": null,
+              "show": true,
+              "logBase": 1,
+              "min": null,
+              "max": null,
+              "format": "Bps",
+              "$$hashKey": "object:332"
+            },
+            {
+              "label": null,
+              "show": false,
+              "logBase": 1,
+              "min": null,
+              "max": null,
+              "format": "short",
+              "$$hashKey": "object:333"
+            }
+          ],
+          "xaxis": {
+            "show": true,
+            "mode": "time",
+            "name": null,
+            "values": [],
+            "buckets": null
+          },
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          },
+          "lines": true,
+          "linewidth": 1,
+          "dashLength": 10,
+          "spaceLength": 10,
+          "pointradius": 2,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false,
+            "rightSide": false,
+            "hideEmpty": false,
+            "hideZero": false
+          },
+          "nullPointMode": "null",
+          "tooltip": {
+            "value_type": "individual",
+            "shared": true,
+            "sort": 0
+          },
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "thresholds": [],
+          "timeRegions": [],
+          "fill": 0,
+          "fillGradient": 0,
+          "dashes": false,
+          "hiddenSeries": false,
+          "points": false,
+          "bars": false,
+          "stack": false,
+          "percentage": false,
+          "steppedLine": false,
+          "datasource": null
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1008,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": ["lastNotNull"],
+              "fields": "",
+              "values": false
+            },
+            "stack": false,
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "alertThreshold": false
+          },
+          "pluginVersion": "8.5.0",
+          "targets": [
+            {
+              "expr": "sum by(namespace, app_kubernetes_io_instance) (increase(vector_component_errors_total[1h]))",
+              "legendFormat": "{{namespace}}/{{app_kubernetes_io_instance}}",
+              "interval": "",
+              "exemplar": true,
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Total errors last 60m",
+          "type": "graph",
+          "renderer": "flot",
+          "yaxes": [
+            {
+              "label": null,
+              "show": true,
+              "logBase": 1,
+              "min": null,
+              "max": null,
+              "format": "none",
+              "$$hashKey": "object:332"
+            },
+            {
+              "label": null,
+              "show": false,
+              "logBase": 1,
+              "min": null,
+              "max": null,
+              "format": "short",
+              "$$hashKey": "object:333"
+            }
+          ],
+          "xaxis": {
+            "show": true,
+            "mode": "time",
+            "name": null,
+            "values": [],
+            "buckets": null
+          },
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          },
+          "lines": true,
+          "linewidth": 1,
+          "dashLength": 10,
+          "spaceLength": 10,
+          "pointradius": 2,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false,
+            "rightSide": false,
+            "hideEmpty": false,
+            "hideZero": false
+          },
+          "nullPointMode": "null",
+          "tooltip": {
+            "value_type": "individual",
+            "shared": true,
+            "sort": 0
+          },
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "thresholds": [],
+          "timeRegions": [],
+          "fill": 0,
+          "fillGradient": 0,
+          "dashes": false,
+          "hiddenSeries": false,
+          "points": false,
+          "bars": false,
+          "stack": false,
+          "percentage": false,
+          "steppedLine": false,
+          "datasource": null
+        }
+      ],
+      "repeat": "datasource",
+      "showTitle": true,
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 50,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 35
+          },
+          "hiddenSeries": false,
+          "id": 54,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "code",
+              "expr": "sum by (app_kubernetes_io_instance, namespace, component_id, component_type)(irate(vector_component_sent_bytes_total{component_kind=\"sink\", component_type!=\"prometheus_exporter\"}[5m]))",
+              "legendFormat": "{{namespace}}/{{app_kubernetes_io_instance}} | Output: {{component_type}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Rate log bytes sent per output",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:157",
+              "format": "bytes",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:158",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        }
+      ],
+      "repeat": "datasource",
+      "showTitle": true,
+      "title": "Outputs",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 48,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "format": "bytes",
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 44
+          },
+          "hiddenSeries": false,
+          "id": 35,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "code",
+              "expr": "topk(10, round(rate(log_logged_bytes_total[5m])))",
+              "legendFormat": "{{exported_namespace}}/{{podname}}/{{containername}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Top producing containers",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:214",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:215",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "datasource": "${datasource}",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "displayMode": "auto",
+                "filterable": false,
+                "inspect": true
+              },
+              "decimals": 3,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 10
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 44
+          },
+          "id": 37,
+          "options": {
+            "footer": {
+              "enablePagination": false,
+              "fields": "",
+              "reducer": ["sum"],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.5.0",
+          "styles": [
+            {
+              "alias": "Total Bytes",
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down",
+              "linkUrl": "",
+              "pattern": "Value #A",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            },
+            {
+              "alias": "Namespace",
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down to pods",
+              "linkUrl": "",
+              "pattern": "exported_namespace",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            },
+            {
+              "alias": "Pod",
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down to pods",
+              "linkUrl": "",
+              "pattern": "podname",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            },
+            {
+              "alias": "Container",
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down to pods",
+              "linkUrl": "",
+              "pattern": "containername",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            }
+          ],
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "topk(10, sum(increase(log_logged_bytes_total[24h])) by (exported_namespace,  podname, containername))",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Top producing containers in last 24 hours",
+          "transformations": [
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "podname",
+                    "Value",
+                    "exported_namespace",
+                    "containername"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Value": 3,
+                  "containername": 2,
+                  "exported_namespace": 0,
+                  "podname": 1
+                },
+                "renameByName": {
+                  "Value": "Tot. Logs Produced",
+                  "containername": "Container",
+                  "exported_namespace": "Namespace",
+                  "podname": "Pod"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "showTitle": true,
+      "title": "Produced Logs",
+      "type": "row"
+    },
+    {
+      "collapse": false,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": 0,
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 16,
+            "y": 49
+          },
+          "hiddenSeries": false,
+          "id": 41,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "percentage": false,
+          "pluginVersion": "7.1.1",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "topk(10, round(rate(vector_component_received_event_bytes_total{component_type = \"kubernetes_logs\"}[5m])))",
+              "interval": "",
+              "legendFormat": "{{pod_namespace}}/{{pod_name}}/{{container_name}}",
+              "refId": "B"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": 0,
+          "timeRegions": [],
+          "timeShift": 0,
+          "title": "Top collected containers - Bytes/Second",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": 0,
+            "mode": "time",
+            "name": 0,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": 0,
+              "logBase": 1,
+              "max": 0,
+              "min": 0,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "id": 8,
+          "type": "table",
+          "title": "Top collected containers in last 24 hours",
+          "datasource": "${datasource}",
+          "pluginVersion": "8.5.0",
+          "links": [],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "displayMode": "auto",
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "color": {
+                "mode": "thresholds"
+              }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "topk(10, sum by (container_name, pod_name, pod_namespace) (increase(vector_component_received_event_bytes_total{component_type=\"kubernetes_logs\"}[24h]))) / 1024 / 1024",
+              "format": "table",
+              "instant": true,
+              "refId": "A",
+              "step": 20
+            }
+          ],
+          "timeFrom": 0,
+          "timeShift": 0,
+          "options": {
+            "showHeader": true,
+            "footer": {
+              "show": false,
+              "reducer": [
+                "sum"
+              ],
+              "fields": ""
+            },
+            "frameIndex": 1
+          },
+          "thresholds": [],
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "fill": 1,
+          "lines": true,
+          "linewidth": 1,
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "span": 12,
+          "stack": false,
+          "steppedLine": false,
+          "styles": [
+            {
+              "alias": "total(Mb)",
+              "colorMode": 0,
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down",
+              "linkUrl": "",
+              "pattern": "Value #A",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            },
+            {
+              "alias": "namespace",
+              "colorMode": 0,
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down to pods",
+              "linkUrl": "",
+              "pattern": "pod_namespace",
+              "thresholds": [],
+              "type": "string",
+              "unit": "short"
+            },
+            {
+              "alias": "pod",
+              "colorMode": 0,
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down to pods",
+              "linkUrl": "",
+              "pattern": "pod_name",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            },
+            {
+              "alias": "container",
+              "colorMode": 0,
+              "colors": [],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 0,
+              "link": true,
+              "linkTooltip": "Drill down to container",
+              "linkUrl": "",
+              "pattern": "container_name",
+              "thresholds": [],
+              "type": "string",
+              "unit": "short"
+            }
+          ],
+          "tooltip": {
+            "shared": false,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "transform": "table",
+          "yaxes": [
+            {
+              "format": "short",
+              "label": 0,
+              "logBase": 1,
+              "max": 0,
+              "min": 0,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": 0,
+              "logBase": 1,
+              "max": 0,
+              "min": 0,
+              "show": false
+            }
+          ]
+        }
+      ],
+      "repeat": 0,
+      "repeatIteration": 0,
+      "repeatRowId": 0,
+      "showTitle": true,
+      "title": "Collected Logs",
+      "type": "row",
+      "titleSize": "h6"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 14,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 25,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "expr": "sum by(node,namespace,pod)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{container='collector'})",
+              "legendFormat": "{{node}}/{{namespace}}/{{pod}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "CPU",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:395",
+              "format": "none",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:396",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 33,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "expr": "sum by(node,namespace,pod)(node_namespace_pod_container:container_memory_rss{container=\"collector\"})",
+              "legendFormat": "{{node}}/{{namespace}}/{{pod}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Memory",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:456",
+              "format": "bytes",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:457",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 857,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "sum by (node)(kubelet_running_containers{container_state=\"running\"})",
+              "instant": false,
+              "legendFormat": "{{node}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Running containers",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:509",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:510",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 16,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 2,
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "sum by(hostname,namespace,pod)(vector_open_files{component_kind=\"source\", component_type=\"kubernetes_logs\"})",
+              "instant": false,
+              "legendFormat": "{{hostname}}/{{namespace}}/{{pod}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Open files for container logs",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:509",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:510",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 32
+          },
+          "id": 25,
+          "interval": "",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum by(namespace, forwarder)(label_replace(container_file_descriptors{container=~'collector'}, 'forwarder', '$1', 'pod', '(.*).{6}'))",
+              "legendFormat": "{{namespace}}/{{forwarder}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": 0,
+          "timeRegions": [],
+          "timeShift": 0,
+          "title": "File Descriptors In Use",
+          "tooltip": {
+            "shared": true,
+            "sort": 1,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": 0,
+            "mode": "time",
+            "name": 0,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": 0,
+              "format": "short",
+              "label": "Sum",
+              "logBase": 1,
+              "max": 0,
+              "min": 0,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": 0,
+              "logBase": 1,
+              "max": 0,
+              "min": 0,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${datasource}",
+          "format": "bytes",
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 44
+          },
+          "hiddenSeries": false,
+          "id": 35,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": true,
+          "pluginVersion": "8.5.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "code",
+              "expr": "sum by(hostname, component_kind, namespace, app_kubernetes_io_instance)(vector_buffer_byte_size{component_kind='sink', buffer_type='disk'})",
+              "legendFormat": "{{hostname}}/{{namespace}}/{{app_kubernetes_io_instance}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeRegions": [],
+          "title": "Collector buffer consuming bytes disk space on node",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:214",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:215",
+              "format": "short",
+              "logBase": 1,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false
+          }
+        },
+        {
+          "datasource": "${datasource}",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"value": 5, "color": "green"},
+                  {"value": 10, "color": "orange"},
+                  {"value": 15, "color": "red"}
+                ]
+              },
+              "type": "number",
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 18,
+            "x": 6,
+            "y": 5
+          },
+          "id": 4,
+          "styles": [
+            {
+              "alias": "Buffer Usage (%)",
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "pattern": "Value #A",
+              "type": "number",
+              "unit": "percentunit"
+            },
+            {
+              "alias": "instance",
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "pattern": "instance",
+              "type": "string",
+              "unit": "short"
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 5, "color": "green"},
+                {"value": 10, "color": "orange"},
+                {"value": 15, "color": "red"}
+              ]
+            },
+            "footer": {
+              "show": false,
+              "countRows": false,
+              "fields": ""
+            }
+          },
+          "pluginVersion": "8.5.0",
+          "targets": [
+            {
+              "datasource": "${datasource}",
+              "editorMode": "code",
+              "expr": "label_replace(sum by(hostname) (vector_buffer_byte_size{component_kind='sink', buffer_type='disk'}), 'instance', '$1', 'hostname', '(.*)') / on(instance) group_left() sum by(instance) (node_filesystem_size_bytes{mountpoint='/var'})",
+              "refId": "A"
+            }
+          ],
+          "title": "Collector buffer consuming % disk space on node",
+          "transformations": {},
+          "type": "table"
+        }
+      ],
+      "repeat": "datasource",
+      "showTitle": true,
+      "title": "Machine",
+      "type": "row"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["logging"],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true
+  },
+  "timezone": "browser",
+  "title": "Logging / Collection",
+  "uid": "_qMjKrqnz",
+  "version": 32,
+  "weekStart": ""
+}
+

@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Namespaces + provider CRs live alongside the operator chart. No SCC
+# RoleBindings (capi/capm3/ipam nonroot-v2) and no machine-approver-capi
+# RBAC — both were OpenShift-only and are dropped for vanilla k8s (see the
+# component README / gaps for the CSR-approval consequence).
+resources:
+  - capi-operator-system-namespace.yaml
+  - capi-system-namespace.yaml
+  - capm3-system-namespace.yaml
+  - providers.yaml
+  - capi-workload-cluster-access-rbac.yaml
+
+helmCharts:
+  - name: cluster-api-operator
+    releaseName: capi-operator
+    namespace: capi-operator-system
+    version: 0.28.0
+    repo: https://kubernetes-sigs.github.io/cluster-api-operator
+    includeCRDs: true
+    valuesInline:
+      # Pin the manager to a control-plane node (k3s server carries this
+      # label) and tolerate the standard master/control-plane taints.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
