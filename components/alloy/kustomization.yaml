@@ -30,17 +30,23 @@ helmCharts:
         type: daemonset
         volumes:
           extra:
-            # armbian-ramlog puts /var/log on zram and SYMLINKS
-            # /var/log/journal -> /var/log.hdd/journal (the real disk),
-            # so journald writes persist. Neither /var/log/journal (the
-            # symlink — binds a stale dir / dangles in the container)
-            # nor /var/log (parent bind — symlink target outside it)
-            # works as a hostPath; bind the resolved disk path itself
-            # (chased live 2026-07-24).
-            - name: journal
+            # Journal location differs per board: armbian-ramlog puts
+            # /var/log on zram and SYMLINKS /var/log/journal ->
+            # /var/log.hdd/journal (cm3588), while other boards run
+            # volatile journald in /run/log/journal and have no
+            # /var/log.hdd/journal at all (opi5max FailedMount with
+            # type: Directory). Bind BOTH standard locations with no
+            # type check (kubelet creates missing dirs, harmless) at
+            # the container's default journal paths and let sdjournal
+            # pick whichever is populated. Binding the /var/log/journal
+            # symlink itself, or /var/log as a parent, both fail —
+            # chased live 2026-07-24.
+            - name: journal-disk
               hostPath:
                 path: /var/log.hdd/journal
-                type: Directory
+            - name: journal-run
+              hostPath:
+                path: /run/log/journal
             - name: machine-id
               hostPath:
                 path: /etc/machine-id
@@ -53,8 +59,11 @@ helmCharts:
                 fieldPath: spec.nodeName
         mounts:
           extra:
-            - name: journal
-              mountPath: /host/journal
+            - name: journal-disk
+              mountPath: /var/log/journal
+              readOnly: true
+            - name: journal-run
+              mountPath: /run/log/journal
               readOnly: true
             - name: machine-id
               mountPath: /etc/machine-id
@@ -107,10 +116,10 @@ helmCharts:
               forward_to = [loki.write.gateway.receiver]
             }
 
-            // Node journal (armbian journald persists to
-            // /var/log.hdd/journal on disk — see the volumes comment).
+            // Node journal — no path: sdjournal reads the default
+            // locations (/var/log/journal + /run/log/journal), both
+            // bound from the host (see the volumes comment).
             loki.source.journal "node" {
-              path          = "/host/journal"
               relabel_rules = loki.relabel.journal.rules
               labels        = { job = "systemd-journal" }
               forward_to    = [loki.write.gateway.receiver]

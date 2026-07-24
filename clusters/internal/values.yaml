@@ -36,18 +36,10 @@ applications:
     source:
       path: components/kube-prometheus-stack
 
-  loki:
-    annotations:
-      argocd.argoproj.io/compare-options: IgnoreExtraneous
-      argocd.argoproj.io/sync-wave: '11'
-    destination:
-      namespace: loki
-    source:
-      path: components/loki
-
   # Ship-don't-store log collection to the ocp log-gateway
-  # (igou-openshift#382 phase 5); components/loki above is retired once
-  # this path is verified.
+  # (igou-openshift#382 phase 5). The former filesystem Loki
+  # (components/loki) is retired — nothing ever shipped to it and rk8s
+  # logs now land in the central LokiStack.
   alloy:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
