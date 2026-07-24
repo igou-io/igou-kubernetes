@@ -30,15 +30,17 @@ helmCharts:
         type: daemonset
         volumes:
           extra:
-            # Parent mountpoint, NOT /var/log/journal: /var/log is
-            # armbian-ramlog zram and the journal dir inside it gets
-            # replaced after pod start (same device, new inode — a
-            # direct hostPath bind goes stale-empty; hit live
-            # 2026-07-24). Binding the stable mountpoint and resolving
-            # the subpath at read time survives the replacement.
-            - name: varlog
+            # armbian-ramlog puts /var/log on zram and SYMLINKS
+            # /var/log/journal -> /var/log.hdd/journal (the real disk),
+            # so journald writes persist. Neither /var/log/journal (the
+            # symlink — binds a stale dir / dangles in the container)
+            # nor /var/log (parent bind — symlink target outside it)
+            # works as a hostPath; bind the resolved disk path itself
+            # (chased live 2026-07-24).
+            - name: journal
               hostPath:
-                path: /var/log
+                path: /var/log.hdd/journal
+                type: Directory
             - name: machine-id
               hostPath:
                 path: /etc/machine-id
@@ -51,8 +53,8 @@ helmCharts:
                 fieldPath: spec.nodeName
         mounts:
           extra:
-            - name: varlog
-              mountPath: /host/var/log
+            - name: journal
+              mountPath: /host/journal
               readOnly: true
             - name: machine-id
               mountPath: /etc/machine-id
@@ -105,11 +107,10 @@ helmCharts:
               forward_to = [loki.write.gateway.receiver]
             }
 
-            // Node journal (armbian persistent journald on the
-            // ramlog zram — read via the /host/var/log parent bind,
-            // see the volumes comment).
+            // Node journal (armbian journald persists to
+            // /var/log.hdd/journal on disk — see the volumes comment).
             loki.source.journal "node" {
-              path          = "/host/var/log/journal"
+              path          = "/host/journal"
               relabel_rules = loki.relabel.journal.rules
               labels        = { job = "systemd-journal" }
               forward_to    = [loki.write.gateway.receiver]
