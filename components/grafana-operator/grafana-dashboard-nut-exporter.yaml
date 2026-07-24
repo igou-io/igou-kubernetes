@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # UPS metrics dashboard (grafana.com 19308 rev 4, "Prometheus NUT Exporter
 # for DRuggeri") for the upsmonitor Pi's two rack UPSes. Vendored under

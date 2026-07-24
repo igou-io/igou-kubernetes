@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # NetObserv traffic-matrix dashboard: live flow/traffic stats, the
 # namespace→namespace matrix (the NetworkPolicy worklist), top talker

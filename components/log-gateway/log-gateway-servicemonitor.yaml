@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Scrape for the gateway: syslog received / parse-error rates
 # (loki_source_syslog_*) and Loki forward health (loki_write_*). Picked up

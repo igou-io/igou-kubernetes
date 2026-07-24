@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # TrueNAS ZFS & storage-health dashboard (pools, datasets, ARC, middleware).
 # Vendored under dashboards/ + configMapGenerator so the datasource uid refs

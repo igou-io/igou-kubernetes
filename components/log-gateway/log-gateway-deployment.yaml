@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Stateless syslog/loki-push aggregator. Pinned to a control-plane node
 # because the Service uses externalTrafficPolicy: Local — the VIP is only

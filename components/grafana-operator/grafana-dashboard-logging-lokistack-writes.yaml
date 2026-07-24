@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Vendored copy of the operator-shipped console dashboard (ConfigMap
 # grafana-dashboard-lokistack-writes in openshift-config-managed) so the LokiStack /

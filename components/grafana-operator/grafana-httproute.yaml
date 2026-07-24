@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Exposes Grafana over the shared trusted-lan Gateway
 # (components/gateway) at grafana.rk8s.igou.systems. Replaces the OCP

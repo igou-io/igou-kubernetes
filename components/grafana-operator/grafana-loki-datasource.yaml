@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # rk8s Loki (components/loki): single-binary, auth_enabled: false, single
 # tenant, fronted by the loki-gateway Service (namespace loki, :80). Replaces

@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # casval — on-demand bare-metal burst worker. Newest-generation GPU that
 # requires the 595.xx driver branch. casval is tainted workload=burst:NoSchedule,

@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # "Kubernetes / Compute Resources / Pod" from kube-prometheus-stack (chart 87.2.1), scoped to the rk8s
 # lab cluster (cluster="rk8s"). The `namespace` label is rewritten to

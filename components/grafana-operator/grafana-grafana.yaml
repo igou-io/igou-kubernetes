@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Grafana instance, managed by the grafana-operator. On vanilla k3s there is
 # no OpenShift OAuth proxy: the source's sidecar container, service-serving

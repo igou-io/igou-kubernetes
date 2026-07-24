@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # APC AP7900 rack PDU (UP-HortWoods-PDU01) dashboard, reading the snmp-exporter
 # apc_pdu module series scraped by the apc-pdu Probe into UWM/Thanos. Hand

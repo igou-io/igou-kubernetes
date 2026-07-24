@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # RBAC for the CAPI cluster cache to reach the "workload cluster" — which is
 # the same management cluster in this single-cluster homelab. Bound to the

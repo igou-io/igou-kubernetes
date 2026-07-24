@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Custom dashboard for the log-gateway (Alloy) syslog ingress path —
 # received/parse-error rates, forward/drop/retry to LokiStack, write

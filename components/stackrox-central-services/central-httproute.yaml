@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Central UI/API exposure (ports the OCP passthrough Route to a Gateway API
 # HTTPRoute on the shared trusted-lan Gateway, components/gateway).

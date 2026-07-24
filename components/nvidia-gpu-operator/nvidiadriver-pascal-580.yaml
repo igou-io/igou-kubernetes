@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # p330 — NVIDIA Quadro P620 (GP107, Pascal). The 580.xx driver branch is the
 # LAST to support Pascal; 590/595+ ignore the GPU, so the driver refuses to

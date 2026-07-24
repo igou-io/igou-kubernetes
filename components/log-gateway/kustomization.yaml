@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization

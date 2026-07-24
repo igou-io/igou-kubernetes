@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Alert routing for the kube-prometheus-stack Alertmanager, ported from the
 # ocp raw `alertmanager-main` Secret (igou-openshift components/alertmanager-

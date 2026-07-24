@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # The operator only reconciles a TektonConfig named "config". Translated from
 # the OCP TektonConfig: targetNamespace moves from the OCP-managed

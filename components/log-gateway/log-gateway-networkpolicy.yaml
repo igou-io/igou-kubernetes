@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Devices and host agents send unauthenticated — the fence is this policy:
 # ingest ports only from lab RFC1918 space (10.10.0.0/16 covers every lab

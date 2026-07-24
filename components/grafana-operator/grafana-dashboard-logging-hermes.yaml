@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Purpose-built board over the central logging streams (issue #382):
 # variable-driven so per-host/group LogQL never has to be hand-written.

@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 # Purpose-built board over the central logging streams (issue #382):
 # virt-launcher (host-side) logs from the application tenant plus guest

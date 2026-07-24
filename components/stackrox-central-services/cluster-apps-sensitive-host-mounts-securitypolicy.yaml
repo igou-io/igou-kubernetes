@@ -1,3 +1,5 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
 ---
 apiVersion: config.stackrox.io/v1alpha1
 kind: SecurityPolicy
