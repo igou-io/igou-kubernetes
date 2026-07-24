@@ -1,0 +1,15 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: capi-system
+  labels:
+    # CAPI core containers run as UID 65532 with a RuntimeDefault seccomp
+    # profile. On vanilla k8s the nonroot-v2 SCC bindings OCP used are gone;
+    # PSA "baseline" is sufficient (no privileged/hostPath), but pin it so a
+    # restricted namespace default can't block controller pod creation.
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline

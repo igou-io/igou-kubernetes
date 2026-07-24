@@ -1,0 +1,28 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# UPS metrics dashboard (grafana.com 19308 rev 4, "Prometheus NUT Exporter
+# for DRuggeri") for the upsmonitor Pi's two rack UPSes. Vendored under
+# dashboards/ + configMapGenerator instead of spec.grafanaCom: the upstream
+# JSON ships NO __inputs and hardcodes datasource uid "prometheus", so a
+# straight grafana.com import cannot be remapped and every panel would show
+# "datasource not found". The vendored copy rewrites those uid refs to a
+# proper ${DS_PROMETHEUS} input, mapped to prometheus below.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-nut-exporter
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  resyncPeriod: 24h
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+  configMapRef:
+    name: grafana-dashboard-nut-exporter-json
+    key: prometheus-nut-exporter-druggeri.json

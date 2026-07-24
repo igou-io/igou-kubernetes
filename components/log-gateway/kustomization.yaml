@@ -1,0 +1,18 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - log-gateway-namespace.yaml
+  - log-gateway-serviceaccount.yaml
+  - log-gateway-configmap.yaml
+  - log-gateway-deployment.yaml
+  - log-gateway-service.yaml
+  - log-gateway-metrics-service.yaml
+  - log-gateway-servicemonitor.yaml
+  - log-gateway-networkpolicy.yaml
+# NOTE: the ocp component's log-gateway-rbac.yaml (LokiStack
+# infrastructure-tenant writer ClusterRole/Binding) is intentionally NOT
+# ported — vanilla Loki has no tenant-RBAC gateway to authorize against.
+# The SA is kept for identity/future auth. See gaps.

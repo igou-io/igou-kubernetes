@@ -1,0 +1,92 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Stateless syslog/loki-push aggregator. Pinned to a control-plane node
+# because the Service uses externalTrafficPolicy: Local — the VIP is only
+# advertised from the node running the pod, and source IPs must survive for
+# the NetworkPolicy ipBlock fence. Config changes need a manual
+# `rollout restart` (the ConfigMap is not hash-suffixed).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-gateway
+  namespace: log-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: log-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: log-gateway
+    spec:
+      serviceAccountName: log-gateway
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: "true"
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      # Pinned to the alloy image tag the grafana/alloy chart ships for the
+      # collector component (v1.18.0), so both aggregators run the same Alloy.
+      containers:
+        - name: alloy
+          image: docker.io/grafana/alloy:v1.18.0
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --storage.path=/var/lib/alloy/data
+            - --server.http.listen-addr=0.0.0.0:12345
+          ports:
+            - name: syslog-udp
+              containerPort: 5514
+              protocol: UDP
+            - name: syslog-tcp
+              containerPort: 5514
+              protocol: TCP
+            - name: syslog5424-udp
+              containerPort: 5524
+              protocol: UDP
+            - name: loki-push
+              containerPort: 3500
+              protocol: TCP
+            - name: http-metrics
+              containerPort: 12345
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http-metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              # Steady-state working set reached ~450Mi within a day of the
+              # 4-device rollout on ocp — 512Mi left no headroom for ingest
+              # bursts or WAL replay after a restart.
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+            - name: data
+              mountPath: /var/lib/alloy
+      volumes:
+        - name: config
+          configMap:
+            name: log-gateway
+        - name: data
+          emptyDir: {}

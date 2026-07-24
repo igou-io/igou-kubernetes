@@ -1,0 +1,28 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# NetObserv traffic-matrix dashboard: live flow/traffic stats, the
+# namespace→namespace matrix (the NetworkPolicy worklist), top talker
+# workloads, and per-flow pod/port drill-down from the netobserv-loki
+# network tenant. Bytes panels are sampling-corrected (×50) estimates.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-network-netobserv-traffic
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: network
+  resyncPeriod: 24h
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+    - inputName: DS_LOKI_NETWORK
+      datasourceName: loki
+  configMapRef:
+    name: grafana-dashboard-network-netobserv-traffic-json
+    key: netobserv-traffic.json

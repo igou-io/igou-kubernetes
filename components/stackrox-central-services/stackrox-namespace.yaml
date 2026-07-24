@@ -1,0 +1,15 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stackrox
+  labels:
+    # Opt this namespace into the trusted-lan Gateway (components/gateway):
+    # the Gateway's allowedRoutes selects namespaces carrying this label, so
+    # the central-httproute below is permitted to attach.
+    gateway-access/trusted-lan: "true"
+    # Collector (secured-cluster component) runs privileged with host mounts;
+    # k3s ships no default PSA enforcement, but pin the level explicitly so a
+    # future enforce default cannot break the DaemonSet.
+    pod-security.kubernetes.io/enforce: privileged

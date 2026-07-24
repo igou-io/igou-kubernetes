@@ -1,0 +1,12 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: grafana
+  labels:
+    # Opt this namespace into the trusted-lan Gateway (components/gateway):
+    # the Gateway's allowedRoutes selects namespaces carrying this label, so
+    # the grafana HTTPRoute here is permitted to attach.
+    gateway-access/trusted-lan: "true"

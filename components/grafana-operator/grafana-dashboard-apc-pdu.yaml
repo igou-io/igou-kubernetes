@@ -1,0 +1,26 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# APC AP7900 rack PDU (UP-HortWoods-PDU01) dashboard, reading the snmp-exporter
+# apc_pdu module series scraped by the apc-pdu Probe into UWM/Thanos. Hand
+# authored + vendored under dashboards/ (like nut-exporter/truenas) so the
+# datasource input can be mapped to prometheus below; there is no upstream
+# grafana.com dashboard for this exporter/module combination.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-apc-pdu
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  resyncPeriod: 24h
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+  configMapRef:
+    name: grafana-dashboard-apc-pdu-json
+    key: apc-pdu.json

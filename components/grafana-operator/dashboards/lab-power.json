@@ -1,0 +1,1331 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "thanos-querier",
+      "type": "datasource",
+      "pluginId": "prometheus"
+    }
+  ],
+  "__requires": [],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Lab power \u2014 one honest number per measurement tier. ACCOUNTING MODEL: every TOTAL/KPI sums series from EXACTLY ONE tier; cross-tier numbers only appear side-by-side or as a labeled ratio, never summed. TIERS: WALL = whole-UPS %load \u00d7 nameplate (ESTIMATE; apc1500/cyberpower1500) \u2014 most-upstream authority. BRANCH = real downstream measurement (AP7900 bank amps\u2192W; CRS328 PoE-out W). HOST-ACTUAL = BMC chassis watts (TrueNAS IPMI). COMPONENT = none usable (RAPL/DCGM/PD/NVDIMM all absent or read 0). DOUBLE-COUNT GUARDS: (1) never sum WALL + BRANCH PDU \u2014 the AP7900 hangs off a UPS and is already inside its WALL. (2) brick-board PoE-out (4\u20135 W) is incidental, NOT their real draw. (3) the PDU bank has one amp reading \u2014 no per-outlet split. (4) ether24 is a trunk, excluded. (5) TrueNAS is an off-PDU island, kept separate (UPS linkage unverified). GAPS surfaced: per-device x86/ARM watts (ms01/hpg5/p330/cm3588/4 brick boards), per-board Radxa split, casval GPU power, vscode devhost, switch self-consumption \u2014 no source exists. UNITS: all normalized to watts; energy = gauge integral (kWh), no joule counters. All source metrics live in user-workload-monitoring, fanned-in via thanos-querier. No counter rates \u2014 every source is an instantaneous gauge.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "WALL \u2014 Total UPS power",
+      "description": "WALL tier (ESTIMATE). Sum of %load \u00d7 nameplate W across selected UPSes \u2014 the most-upstream honest fleet number. Single tier; nothing downstream (PDU/PoE/IPMI) is added on top.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(network_ups_tools_ups_load{ups=~\"$ups\"} / 100 * on(ups) group_left() network_ups_tools_ups_realpower_nominal)",
+          "refId": "A",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "BRANCH \u2014 PDU bank power",
+      "description": "BRANCH tier (MEASURED). AP7900 single-bank amps \u2192 watts (\u00f710 \u00d7 $pdu_voltage). NOT summed with WALL \u2014 this bank sits under one UPS and is already inside its WALL total.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rPDULoadStatusLoad{job=\"probe/snmp-exporter/apc-pdu\"} / 10 * $pdu_voltage",
+          "refId": "A",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "HOST-ACTUAL \u2014 TrueNAS chassis",
+      "description": "HOST-ACTUAL tier (MEASURED). TrueNAS BMC IPMI DCMI whole-chassis DC watts. Off-PDU island \u2014 never folded into the WALL or BRANCH totals.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "ipmi_dcmi_power_consumption_watts{job=\"truenas-ipmi\"}",
+          "refId": "A",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "BRANCH \u2014 PoE delivered (CRS328)",
+      "description": "BRANCH tier (MEASURED). Watts the CRS328 delivers on access ports (uplink ether24 excluded). This is 'delivered PoE', NOT a Pi-fleet total: the brick-fed ARM ports here are incidental NIC/HAT draw, not those boards' real consumption.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(mktxp_poe_out_power{routerboard_name=\"CRS328\", name!~\"ether24.*\"})",
+          "refId": "A",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "WALL \u2014 Estimated watts per UPS",
+      "description": "WALL tier (ESTIMATE). Each UPS domain as its own line (%load \u00d7 nameplate). Two independent domains \u2014 shown side-by-side, never summed with any BRANCH line on this panel.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "network_ups_tools_ups_load{ups=~\"$ups\"} / 100 * on(ups) group_left() network_ups_tools_ups_realpower_nominal",
+          "refId": "A",
+          "legendFormat": "{{ups}}",
+          "format": "time_series",
+          "range": true
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "WALL \u2014 UPS load % & battery status",
+      "description": "WALL tier (health, not a power total). Load percent per UPS; the overlay marks on-battery/overload/low-battery (OB/OVER/LB) \u2014 red is reserved for those genuine alarm states only.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "points"
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 8
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "network_ups_tools_ups_load{ups=~\"$ups\"}",
+          "refId": "A",
+          "legendFormat": "{{ups}} load%",
+          "format": "time_series",
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "network_ups_tools_ups_status{ups=~\"$ups\", flag=~\"OB|OVER|LB\"} > 0",
+          "refId": "B",
+          "legendFormat": "{{ups}} {{flag}}",
+          "format": "time_series",
+          "range": true
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "BRANCH \u2014 PDU bank power trend",
+      "description": "BRANCH tier (MEASURED). AP7900 bank watts over time (\u00f710 \u00d7 $pdu_voltage). One series, one tier \u2014 kept away from the WALL lines so the two tiers are never visually summed.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rPDULoadStatusLoad{job=\"probe/snmp-exporter/apc-pdu\"} / 10 * $pdu_voltage",
+          "refId": "A",
+          "legendFormat": "PDU bank",
+          "format": "time_series",
+          "range": true
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "barchart",
+      "title": "BRANCH \u2014 PoE per-port (attribution)",
+      "description": "BRANCH tier (MEASURED). Per-port PoE watts. Brick-fed ARM boards (orange-pi-*, rock-5a, opi5pro) shown for VISIBILITY only \u2014 4\u20135 W here is incidental, NOT their real draw. Real PoE devices: upsmonitor, rpi-bench, rpi-builder. Uplink ether24 excluded.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 100,
+        "showValue": "auto",
+        "stacking": "none",
+        "groupWidth": 0.7,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "mktxp_poe_out_power{routerboard_name=\"CRS328\", name!~\"ether24.*\"}",
+          "refId": "A",
+          "legendFormat": "{{name}}",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "BRANCH \u2014 PDU outlet topology & state",
+      "description": "BRANCH tier (topology / on-off, never consumption). AP7900 outlet index \u2192 device name \u2192 on/off state. Red only when an outlet reads off. The AP7900 exposes one bank amp reading only \u2014 outlets cannot be metered individually, so no per-outlet watts appear here.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "State"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "outletStatusOn": {
+                        "text": "ON",
+                        "color": "green",
+                        "index": 0
+                      },
+                      "outletStatusOff": {
+                        "text": "OFF",
+                        "color": "red",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Outlet",
+            "desc": false
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "rPDUOutletStatusIndex",
+                "rPDUOutletStatusOutletName",
+                "rPDUOutletStatusOutletState"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "rPDUOutletStatusIndex": "Outlet",
+              "rPDUOutletStatusOutletName": "Device",
+              "rPDUOutletStatusOutletState": "State"
+            }
+          }
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rPDUOutletStatusOutletState{job=\"probe/snmp-exporter/apc-pdu\"} == 1",
+          "refId": "A",
+          "format": "table",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Attribution map \u2014 device \u2192 tier \u2192 authority (no sums)",
+      "description": "Cross-tier reference. Each row is counted in EXACTLY ONE authoritative tier; overlapping sources must never be added on top. Live rows come from the authoritative series (WALL per-UPS, BRANCH PDU bank, BRANCH real PoE Pis, HOST-ACTUAL TrueNAS). GAP devices (ms01, hpg5, p330, cm3588-nas-01, 4 brick ARM boards, vscode, casval GPUs) have no per-device source and are only inside the PDU bank aggregate.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt",
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "device"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              },
+              {
+                "id": "custom.width",
+                "value": 230
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "device",
+                "Value",
+                "Value #WALL",
+                "Value #PDU",
+                "Value #NAS",
+                "Value #POE"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "device": "Device",
+              "Value": "Watts (this tier)",
+              "Value #WALL": "Watts (this tier)",
+              "Value #PDU": "Watts (this tier)",
+              "Value #NAS": "Watts (this tier)",
+              "Value #POE": "Watts (this tier)"
+            }
+          }
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(sum by (ups)(network_ups_tools_ups_load{ups=~\"$ups\"}/100 * on(ups) group_left() network_ups_tools_ups_realpower_nominal), \"device\", \"$1 UPS domain\", \"ups\", \"(.*)\")",
+          "refId": "WALL",
+          "format": "table",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(rPDULoadStatusLoad{job=\"probe/snmp-exporter/apc-pdu\"}/10*$pdu_voltage, \"device\", \"AP7900 PDU bank\", \"job\", \".*\")",
+          "refId": "PDU",
+          "format": "table",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(ipmi_dcmi_power_consumption_watts{job=\"truenas-ipmi\"}, \"device\", \"TrueNAS (IPMI)\", \"job\", \".*\")",
+          "refId": "NAS",
+          "format": "table",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(mktxp_poe_out_power{routerboard_name=\"CRS328\", name=~\"upsmonitor|rpi-bench.*|rpi-builder.*\"}, \"device\", \"$1\", \"name\", \"(.*)\")",
+          "refId": "POE",
+          "format": "table",
+          "instant": true,
+          "range": false
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Comparison \u2014 WALL vs BRANCH overlap (NEVER sum)",
+      "description": "Cross-tier comparison \u2014 overlapping electrical draw shown as distinct tiers to expose containment. The cyberpower1500 whole-UPS domain (WALL) CONTAINS the AP7900 PDU bank (BRANCH); the PDU line is a subset of the UPS line. NEVER sum these. This stands in for the requested outlet-vs-RAPL comparison, which is a GAP: no RAPL and no per-outlet metering exist.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 28
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 25
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "network_ups_tools_ups_load{ups=\"cyberpower1500\"} / 100 * on(ups) group_left() network_ups_tools_ups_realpower_nominal",
+          "refId": "A",
+          "legendFormat": "UPS whole-domain (contains PDU)",
+          "format": "time_series",
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rPDULoadStatusLoad{job=\"probe/snmp-exporter/apc-pdu\"} / 10 * $pdu_voltage",
+          "refId": "B",
+          "legendFormat": "PDU bank (subset)",
+          "format": "time_series",
+          "range": true
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Energy & cost over range (WALL only)",
+      "description": "WALL tier ONLY. No joule counters exist anywhere, so energy is a gauge integral of the WALL sum over the dashboard range (avg_over_time \u00d7 range_s \u00f7 3600 \u00f7 1000 = kWh). WALL is the single most-upstream authority that composes without overlap \u2014 BRANCH/HOST watts would double-count or under-cover, so they never enter this integral. Cost = kWh \u00d7 $kwh_cost.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 28
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 3,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "kWh"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "kwatth"
+              },
+              {
+                "id": "displayName",
+                "value": "Energy (WALL, $__range)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "cost"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "displayName",
+                "value": "Est. cost @ $kwh_cost/kWh"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time( (sum(network_ups_tools_ups_load{ups=~\"$ups\"}/100 * on(ups) group_left() network_ups_tools_ups_realpower_nominal))[$__range:] ) * $__range_s / 3600 / 1000",
+          "refId": "kWh",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time( (sum(network_ups_tools_ups_load{ups=~\"$ups\"}/100 * on(ups) group_left() network_ups_tools_ups_realpower_nominal))[$__range:] ) * $__range_s / 3600 / 1000 * $kwh_cost",
+          "refId": "cost",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        }
+      ]
+    }
+  ],
+  "preload": false,
+  "refresh": false,
+  "schemaVersion": 39,
+  "tags": [
+    "power"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".+",
+        "name": "ups",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(network_ups_tools_ups_load, ups)",
+        "query": {
+          "query": "label_values(network_ups_tools_ups_load, ups)",
+          "refId": "PrometheusVariable-ups"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "label": "UPS"
+      },
+      {
+        "current": {
+          "text": "120",
+          "value": "120"
+        },
+        "hide": 0,
+        "name": "pdu_voltage",
+        "type": "constant",
+        "query": "120",
+        "label": "PDU voltage (V)",
+        "description": "deciamps\u2192watts factor for the AP7900 (rPDULoadStatusLoad \u00f7 10 \u00d7 V). Single documented knob."
+      },
+      {
+        "current": {
+          "text": "0.16",
+          "value": "0.16"
+        },
+        "hide": 0,
+        "name": "kwh_cost",
+        "type": "textbox",
+        "query": "0.16",
+        "label": "Cost $/kWh",
+        "description": "USD per kWh for the energy/cost panel."
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Lab Power",
+  "uid": "lab-power",
+  "version": 1,
+  "weekStart": ""
+}

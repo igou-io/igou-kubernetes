@@ -1,0 +1,15 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Tekton has no project-maintained Helm chart; the upstream tektoncd/operator
+# ships plain release manifests. Vendor the pinned Kubernetes release.yaml
+# (NOT openshift-release.yaml) — it creates the tekton-operator namespace,
+# the CRDs (incl. TektonConfig), and the operator+webhook Deployments. The
+# operator then reconciles the TektonConfig CR below and installs the
+# pipeline/trigger/chains/dashboard components into targetNamespace.
+resources:
+  - https://github.com/tektoncd/operator/releases/download/v0.80.0/release.yaml
+  - tekton-ci-low-priorityclass.yaml
+  - tektonconfig.yaml
+  - chains-signing-externalsecret.yaml

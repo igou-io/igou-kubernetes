@@ -1,0 +1,21 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# ClusterIP service for Alloy's own telemetry (:12345) — scraped by the
+# cluster kube-prometheus-stack via the ServiceMonitor. Kept separate from
+# the LoadBalancer ingest Service so the metrics port never rides the VIP.
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-gateway-metrics
+  namespace: log-gateway
+  labels:
+    app.kubernetes.io/name: log-gateway
+spec:
+  selector:
+    app.kubernetes.io/name: log-gateway
+  ports:
+    - name: http-metrics
+      port: 12345
+      targetPort: http-metrics
+      protocol: TCP

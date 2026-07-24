@@ -1,0 +1,149 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Alert routing for the kube-prometheus-stack Alertmanager, ported from the
+# ocp raw `alertmanager-main` Secret (igou-openshift components/alertmanager-
+# config/alertmanager.yaml) to a native prometheus-operator AlertmanagerConfig.
+#
+# ADOPTION (kube-prometheus-stack values change — see this stack's `gaps`):
+# This CR is INERT until the kube-prometheus-stack Alertmanager is pointed at
+# it. Preferred wiring is as the *global* top-level config so the route tree +
+# root `gotify` receiver + inhibit rules below become the whole Alertmanager
+# config verbatim:
+#   alertmanager.alertmanagerSpec.alertmanagerConfiguration.name: alertmanager-routing
+# (An unset alertmanagerConfigSelector would otherwise merge this only as a
+# namespace-scoped child route and never see cluster-wide alerts.)
+#
+# Global-only settings that AlertmanagerConfig cannot express live in the
+# alertmanagerSpec (see `gaps`): global.resolveTimeout (5m, already the
+# Alertmanager default) and the OpenShift AlertRelabelConfig has no vanilla
+# analogue and is dropped (see `gaps`).
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: alertmanager-routing
+  namespace: monitoring
+spec:
+  route:
+    groupBy:
+      - alertname
+      - namespace
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 4h
+    receiver: gotify
+    routes:
+      - matchers:
+          - name: alertname
+            value: Watchdog
+            matchType: "="
+        receiver: "null"
+      - matchers:
+          - name: alertname
+            value: AlertmanagerReceiversNotConfigured
+            matchType: "="
+        receiver: "null"
+      # Suppress self-referential delivery-failure alerts when the failing
+      # integration is the gotify-bridge webhook. Bridge v2.3.2 returns HTTP
+      # 400 for alerts missing the `description` annotation, which Alertmanager
+      # treats as a permanent client error. Remove once the bridge is patched.
+      - matchers:
+          - name: alertname
+            value: "Alertmanager(Cluster)?FailedToSendAlerts"
+            matchType: "=~"
+          - name: integration
+            value: webhook
+            matchType: "="
+        receiver: "null"
+      # eda-github-issue route temporarily removed — EDA event-stream pipeline
+      # is not currently set up (secret staged in alertmanager-eda-event-stream
+      # -externalsecret.yaml). Restore the route and receiver together.
+      - matchers:
+          - name: severity
+            value: critical
+            matchType: "="
+        receiver: gotify-and-slack-critical
+      - matchers:
+          - name: severity
+            value: warning
+            matchType: "="
+        receiver: gotify-and-slack-warning
+      - matchers:
+          - name: severity
+            value: info
+            matchType: "="
+        receiver: "null"
+  inhibitRules:
+    - sourceMatch:
+        - name: severity
+          value: critical
+          matchType: "="
+      targetMatch:
+        - name: severity
+          value: "warning|info"
+          matchType: "=~"
+      equal:
+        - namespace
+        - alertname
+    - sourceMatch:
+        - name: severity
+          value: warning
+          matchType: "="
+      targetMatch:
+        - name: severity
+          value: info
+          matchType: "="
+      equal:
+        - namespace
+        - alertname
+  receivers:
+    - name: "null"
+    - name: gotify
+      webhookConfigs:
+        - url: http://alertmanager-gotify-bridge.gotify.svc:8080/gotify_webhook
+          sendResolved: true
+    # Severity receivers fan out to both Gotify (push) and Slack. The
+    # `Alertmanager(Cluster)?FailedToSendAlerts integration=webhook` route above
+    # null-routes the flap the bridge's HTTP 400 would otherwise cause.
+    - name: gotify-and-slack-critical
+      webhookConfigs:
+        - url: http://alertmanager-gotify-bridge.gotify.svc:8080/gotify_webhook
+          sendResolved: true
+      slackConfigs:
+        - channel: "#igoucloud-alerts-critical"
+          # chat.postMessage endpoint (public) + bot token, both keys in the
+          # ESO-managed alertmanager-slack-bot-token Secret.
+          apiURL:
+            name: alertmanager-slack-bot-token
+            key: api_url
+          httpConfig:
+            authorization:
+              credentials:
+                name: alertmanager-slack-bot-token
+                key: password
+          sendResolved: true
+          title: "[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}"
+          text: |-
+            {{ range .Alerts }}*{{ .Annotations.summary }}*
+            {{ .Annotations.description }}
+            {{ end }}
+    - name: gotify-and-slack-warning
+      webhookConfigs:
+        - url: http://alertmanager-gotify-bridge.gotify.svc:8080/gotify_webhook
+          sendResolved: true
+      slackConfigs:
+        - channel: "#igoucloud-alerts-warning"
+          apiURL:
+            name: alertmanager-slack-bot-token
+            key: api_url
+          httpConfig:
+            authorization:
+              credentials:
+                name: alertmanager-slack-bot-token
+                key: password
+          sendResolved: true
+          title: "[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}"
+          text: |-
+            {{ range .Alerts }}*{{ .Annotations.summary }}*
+            {{ .Annotations.description }}
+            {{ end }}

@@ -1,0 +1,34 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# casval — on-demand bare-metal burst worker. Newest-generation GPU that
+# requires the 595.xx driver branch. casval is tainted workload=burst:NoSchedule,
+# so the driver DaemonSet must tolerate it.
+#
+# Rendered by the gpu-operator chart's NVIDIADriver CRD (driver.nvidiaDriverCRD
+# .enabled: true, deployDefaultCR: false — this CR replaces the chart default).
+#
+# NOTE: casval is an OpenShift burst worker (scaled 0->1), NOT an rk8s node.
+# The hostname selector is carried over verbatim so this manifest stays a
+# faithful, ready-to-adopt port; it has no live effect on the current rk8s
+# node set. Confirm the node name on first burst and update if it differs.
+apiVersion: nvidia.com/v1alpha1
+kind: NVIDIADriver
+metadata:
+  name: burst-595
+  annotations:
+    argocd.argoproj.io/sync-wave: '3'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  driverType: gpu
+  repository: nvcr.io/nvidia
+  image: driver
+  version: 595.58.03
+  kernelModuleType: auto
+  nodeSelector:
+    kubernetes.io/hostname: casval.igou.systems
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: burst
+      effect: NoSchedule

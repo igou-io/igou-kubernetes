@@ -1,0 +1,27 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cnpg-system
+# CloudNativePG Barman Cloud Plugin — the first-party, CNPG-maintained CNPG-I
+# replacement for the deprecated in-tree `.spec.backup.barmanObjectStore`.
+#
+# The plugin MUST live in the operator's namespace (cnpg-system) for the
+# operator to discover it over gRPC/mTLS; the `namespace:` transformer pins it
+# there. Unlike OCP (which vendored the raw release manifest hardcoded to
+# `cnpg-system` and stripped runAsUser via a JSON patch), k3s has no SCC, so we
+# consume the project-maintained Helm chart directly — its default
+# securityContext (runAsUser/Group 10001, runAsNonRoot, drop ALL, RO rootfs)
+# applies as-is.
+#
+# Chart 0.7.0 -> plugin app v0.13.0 (OCP is on v0.12.0 via raw manifest; same
+# v0.x line). Prereqs: the live cloudnative-pg component and cert-manager — the
+# chart provisions its own selfsigned Issuer + server/client Certificates for
+# the plugin's mTLS, so cert-manager (rk8s wave 5) must be present.
+helmCharts:
+- name: plugin-barman-cloud
+  includeCRDs: true
+  releaseName: plugin-barman-cloud
+  namespace: cnpg-system
+  version: 0.7.0
+  repo: https://cloudnative-pg.github.io/charts

@@ -1,0 +1,94 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: velero
+resources:
+  - velero-namespace.yaml
+  - velero-s3-externalsecret.yaml
+helmCharts:
+- name: velero
+  includeCRDs: true
+  releaseName: velero
+  namespace: velero
+  version: 12.1.0
+  repo: https://vmware-tanzu.github.io/helm-charts
+  valuesInline:
+    # OADP is Red Hat's Velero distribution; this is the upstream
+    # project-maintained chart standing in for the redhat-oadp-operator
+    # component in igou-openshift. The OCP side installed the operator but
+    # never defined a DataProtectionApplication (no BSL/schedules existed),
+    # so this config is a sensible cold-storage parity baseline, not a
+    # 1:1 port. See gaps.
+    fullnameOverride: velero
+
+    # Backups land in the COLD RustFS S3 (TrueNAS), path-style addressing —
+    # same endpoint/bucket pattern as the loki/netobserv rustfs consumers
+    # in igou-openshift.
+    configuration:
+      # CSI snapshot support is built into Velero core since 1.14; the
+      # freenas-iscsi-ssd-csi driver (democratic-csi) exposes CSI
+      # snapshots, so PVC-backed workloads and KubeVirt VM disks back up
+      # via VolumeSnapshot rather than restic file copy.
+      features: EnableCSI
+      backupStorageLocation:
+        - name: default
+          provider: aws
+          bucket: velero
+          default: true
+          # Credentials come from the existingSecret below; no per-BSL
+          # credential override needed.
+          config:
+            region: us-east-1
+            s3Url: https://truenas.igou.systems:20292
+            s3ForcePathStyle: "true"
+      # No native cloud snapshotter; CSI VolumeSnapshotClass handles volume
+      # snapshots, so no volumeSnapshotLocation is declared.
+      volumeSnapshotLocation: []
+
+    # Consume the ExternalSecret-materialised Secret rather than inlining a
+    # cloud-credentials file.
+    credentials:
+      useSecret: true
+      existingSecret: velero-s3-credentials
+
+    # Plugins as initContainers (parity with OADP defaultPlugins):
+    #   aws  -> BSL object storage + CSI snapshot data
+    #   kubevirt -> quiesce/restore KubeVirt VirtualMachines (the cluster
+    #               runs kubevirt, components/kubevirt)
+    # aws plugin v1.14 tracks Velero 1.18; kubevirt plugin v0.9 is latest.
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.14.2
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      - name: kubevirt-velero-plugin
+        image: quay.io/kubevirt/kubevirt-velero-plugin:v0.9.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+
+    # OADP defined no DataProtectionApplication, so it never enabled the
+    # node-agent (restic/kopia file-system backup + built-in data mover).
+    # Kept off for parity; enabling it is required only if you want
+    # file-system backups or CSI snapshot-data movement to S3 (see gaps).
+    deployNodeAgent: false
+
+    snapshotsEnabled: true
+    backupsEnabled: true
+
+    # OADP defined no Schedule CRs; none are ported. Adopt by adding
+    # entries here (or Schedule manifests) once cadence/retention is set.
+    schedules: {}
+
+    # k3s single-node homelab; keep the controller light.
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi

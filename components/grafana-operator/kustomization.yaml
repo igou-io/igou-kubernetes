@@ -1,0 +1,263 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: grafana
+# grafana-operator ships its own Helm chart (project-maintained). CRDs must be
+# included so the Grafana/GrafanaDatasource/GrafanaDashboard CRs below render.
+helmCharts:
+- name: grafana-operator
+  includeCRDs: true
+  releaseName: grafana-operator
+  namespace: grafana
+  version: 5.24.0
+  repo: oci://ghcr.io/grafana/helm-charts
+resources:
+  - grafana-namespace.yaml
+  - grafana-grafana.yaml
+  - grafana-prometheus-datasource.yaml
+  - grafana-loki-datasource.yaml
+  - grafana-httproute.yaml
+  # Dashboards (ported 1:1 from igou-openshift). datasourceName references
+  # were rewritten: thanos-querier -> prometheus, loki-{infrastructure,
+  # application,network} -> loki. OCP-only boards (lokistack/ocp/netobserv)
+  # are kept but have no rk8s backend and render empty (see README/gaps).
+  - grafana-dashboard-7587.yaml
+  - grafana-dashboard-20340.yaml
+  - grafana-dashboard-12239.yaml
+  - grafana-dashboard-14584.yaml
+  - grafana-dashboard-20417.yaml
+  - grafana-dashboard-13679.yaml
+  - grafana-dashboard-1860.yaml
+  - grafana-dashboard-kubevirt-control-plane.yaml
+  - grafana-dashboard-kubevirt-top-consumers.yaml
+  - grafana-dashboard-external-secrets.yaml
+  - grafana-dashboard-apc-pdu.yaml
+  - grafana-dashboard-nut-exporter.yaml
+  - grafana-dashboard-truenas.yaml
+  - grafana-dashboard-truenas-zfs.yaml
+  - grafana-dashboard-adb-exporter.yaml
+  - grafana-dashboard-15765.yaml
+  - grafana-dashboard-22604.yaml
+  # kube-prometheus-stack dashboard set for the rk8s lab cluster (federated
+  # via UWM). Grouped in the grafana "rk8s" folder; namespace label rewritten
+  # to exported_namespace (enforcedNamespaceLabel forces namespace on scrape).
+  - grafana-dashboard-rk8s-alertmanager-overview.yaml
+  - grafana-dashboard-rk8s-apiserver.yaml
+  - grafana-dashboard-rk8s-cluster-total.yaml
+  - grafana-dashboard-rk8s-grafana-overview.yaml
+  - grafana-dashboard-rk8s-k8s-coredns.yaml
+  - grafana-dashboard-rk8s-k8s-resources-cluster.yaml
+  - grafana-dashboard-rk8s-k8s-resources-multicluster.yaml
+  - grafana-dashboard-rk8s-k8s-resources-namespace.yaml
+  - grafana-dashboard-rk8s-k8s-resources-node.yaml
+  - grafana-dashboard-rk8s-k8s-resources-pod.yaml
+  - grafana-dashboard-rk8s-k8s-resources-workload.yaml
+  - grafana-dashboard-rk8s-k8s-resources-workloads-namespace.yaml
+  - grafana-dashboard-rk8s-kubelet.yaml
+  - grafana-dashboard-rk8s-namespace-by-pod.yaml
+  - grafana-dashboard-rk8s-namespace-by-workload.yaml
+  - grafana-dashboard-rk8s-node-cluster-rsrc-use.yaml
+  - grafana-dashboard-rk8s-node-rsrc-use.yaml
+  - grafana-dashboard-rk8s-nodes.yaml
+  - grafana-dashboard-rk8s-persistentvolumesusage.yaml
+  - grafana-dashboard-rk8s-pod-total.yaml
+  - grafana-dashboard-rk8s-prometheus.yaml
+  - grafana-dashboard-rk8s-workload-total.yaml
+  # Central logging (igou-openshift#382): vendored operator console
+  # dashboards + custom log-gateway board, grouped in the "logging" folder.
+  - grafana-dashboard-logging-cluster-logging.yaml
+  - grafana-dashboard-logging-lokistack-writes.yaml
+  - grafana-dashboard-logging-lokistack-reads.yaml
+  - grafana-dashboard-logging-lokistack-chunks.yaml
+  - grafana-dashboard-logging-lokistack-retention.yaml
+  - grafana-dashboard-logging-log-gateway.yaml
+  - grafana-dashboard-logging-fleet-journals.yaml
+  - grafana-dashboard-logging-device-syslog.yaml
+  - grafana-dashboard-logging-rk8s-logs.yaml
+  - grafana-dashboard-logging-ocp-application-logs.yaml
+  - grafana-dashboard-logging-ocp-infrastructure-logs.yaml
+  - grafana-dashboard-logging-mikrotik.yaml
+  - grafana-dashboard-logging-hermes.yaml
+  - grafana-dashboard-logging-kubevirt-vms.yaml
+  - grafana-dashboard-logging-sands-of-time.yaml
+  # NetObserv flow analytics (network folder)
+  - grafana-dashboard-network-netobserv-traffic.yaml
+configMapGenerator:
+  - name: grafana-dashboard-apc-pdu-json
+    namespace: grafana
+    files:
+      - dashboards/apc-pdu.json
+  - name: grafana-dashboard-nut-exporter-json
+    namespace: grafana
+    files:
+      - dashboards/prometheus-nut-exporter-druggeri.json
+  - name: grafana-dashboard-truenas-json
+    namespace: grafana
+    files:
+      - dashboards/truenas.json
+  - name: grafana-dashboard-truenas-zfs-json
+    namespace: grafana
+    files:
+      - dashboards/truenas-zfs.json
+  - name: grafana-dashboard-adb-exporter-json
+    namespace: grafana
+    files:
+      - dashboards/adb-exporter.json
+  # rk8s kube-prometheus-stack dashboards (vendored + transformed JSON).
+  - name: grafana-dashboard-rk8s-alertmanager-overview-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/alertmanager-overview.json
+  - name: grafana-dashboard-rk8s-apiserver-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/apiserver.json
+  - name: grafana-dashboard-rk8s-cluster-total-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/cluster-total.json
+  - name: grafana-dashboard-rk8s-grafana-overview-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/grafana-overview.json
+  - name: grafana-dashboard-rk8s-k8s-coredns-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-coredns.json
+  - name: grafana-dashboard-rk8s-k8s-resources-cluster-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-cluster.json
+  - name: grafana-dashboard-rk8s-k8s-resources-multicluster-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-multicluster.json
+  - name: grafana-dashboard-rk8s-k8s-resources-namespace-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-namespace.json
+  - name: grafana-dashboard-rk8s-k8s-resources-node-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-node.json
+  - name: grafana-dashboard-rk8s-k8s-resources-pod-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-pod.json
+  - name: grafana-dashboard-rk8s-k8s-resources-workload-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-workload.json
+  - name: grafana-dashboard-rk8s-k8s-resources-workloads-namespace-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/k8s-resources-workloads-namespace.json
+  - name: grafana-dashboard-rk8s-kubelet-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/kubelet.json
+  - name: grafana-dashboard-rk8s-namespace-by-pod-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/namespace-by-pod.json
+  - name: grafana-dashboard-rk8s-namespace-by-workload-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/namespace-by-workload.json
+  - name: grafana-dashboard-rk8s-node-cluster-rsrc-use-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/node-cluster-rsrc-use.json
+  - name: grafana-dashboard-rk8s-node-rsrc-use-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/node-rsrc-use.json
+  - name: grafana-dashboard-rk8s-nodes-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/nodes.json
+  - name: grafana-dashboard-rk8s-persistentvolumesusage-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/persistentvolumesusage.json
+  - name: grafana-dashboard-rk8s-pod-total-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/pod-total.json
+  - name: grafana-dashboard-rk8s-prometheus-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/prometheus.json
+  - name: grafana-dashboard-rk8s-workload-total-json
+    namespace: grafana
+    files:
+      - dashboards/rk8s/workload-total.json
+  - name: grafana-dashboard-logging-cluster-logging-json
+    namespace: grafana
+    files:
+      - dashboards/logging/cluster-logging.json
+  - name: grafana-dashboard-logging-lokistack-writes-json
+    namespace: grafana
+    files:
+      - dashboards/logging/lokistack-writes.json
+  - name: grafana-dashboard-logging-lokistack-reads-json
+    namespace: grafana
+    files:
+      - dashboards/logging/lokistack-reads.json
+  - name: grafana-dashboard-logging-lokistack-chunks-json
+    namespace: grafana
+    files:
+      - dashboards/logging/lokistack-chunks.json
+  - name: grafana-dashboard-logging-lokistack-retention-json
+    namespace: grafana
+    files:
+      - dashboards/logging/lokistack-retention.json
+  - name: grafana-dashboard-logging-log-gateway-json
+    namespace: grafana
+    files:
+      - dashboards/logging/log-gateway.json
+  - name: grafana-dashboard-logging-fleet-journals-json
+    namespace: grafana
+    files:
+      - dashboards/logging/fleet-journals.json
+  - name: grafana-dashboard-logging-device-syslog-json
+    namespace: grafana
+    files:
+      - dashboards/logging/device-syslog.json
+  - name: grafana-dashboard-logging-rk8s-logs-json
+    namespace: grafana
+    files:
+      - dashboards/logging/rk8s-logs.json
+  - name: grafana-dashboard-logging-ocp-application-logs-json
+    namespace: grafana
+    files:
+      - dashboards/logging/ocp-application-logs.json
+  - name: grafana-dashboard-logging-ocp-infrastructure-logs-json
+    namespace: grafana
+    files:
+      - dashboards/logging/ocp-infrastructure-logs.json
+  - name: grafana-dashboard-logging-mikrotik-json
+    namespace: grafana
+    files:
+      - dashboards/logging/mikrotik.json
+  - name: grafana-dashboard-logging-hermes-json
+    namespace: grafana
+    files:
+      - dashboards/logging/hermes.json
+  - name: grafana-dashboard-logging-kubevirt-vms-json
+    namespace: grafana
+    files:
+      - dashboards/logging/kubevirt-vms.json
+  - name: grafana-dashboard-logging-sands-of-time-json
+    namespace: grafana
+    files:
+      - dashboards/logging/sands-of-time.json
+  - name: grafana-dashboard-network-netobserv-traffic-json
+    namespace: grafana
+    files:
+      - dashboards/network/netobserv-traffic.json
+generatorOptions:
+  disableNameSuffixHash: true
+commonAnnotations:
+  argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

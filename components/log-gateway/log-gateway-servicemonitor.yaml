@@ -1,0 +1,19 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Scrape for the gateway: syslog received / parse-error rates
+# (loki_source_syslog_*) and Loki forward health (loki_write_*). Picked up
+# by the cluster-wide kube-prometheus-stack Prometheus
+# (serviceMonitorSelectorNilUsesHelmValues: false).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: log-gateway
+  namespace: log-gateway
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: log-gateway
+  endpoints:
+    - port: http-metrics
+      interval: 30s

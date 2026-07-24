@@ -1,0 +1,14 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: capi-operator-system
+  labels:
+    # cluster-api-operator runs with allowPrivilegeEscalation and as root —
+    # required by the upstream chart. Pin the PSA level so the namespace
+    # default (restricted on hardened clusters) can't block the manager pod.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

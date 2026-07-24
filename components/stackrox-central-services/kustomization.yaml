@@ -1,0 +1,113 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: stackrox
+resources:
+  - stackrox-namespace.yaml
+  - central-declarative-config-configmap.yaml
+  - central-httproute.yaml
+  # Policy-as-code (#547/#559 parity). The central-services chart ships both
+  # the config.stackrox.io/v1alpha1 SecurityPolicy CRD (includeCRDs) and the
+  # config-controller Deployment that reconciles these CRs into Central — so
+  # unlike the OCP operator path, no operator is needed. PORT NOTE: the scope
+  # namespaces below are the OCP cluster-apps app namespaces and will differ
+  # on rk8s; adjust to the rk8s app namespaces at adoption (see gaps).
+  - cluster-apps-privileged-container-securitypolicy.yaml
+  - cluster-apps-sensitive-host-mounts-securitypolicy.yaml
+  - cluster-apps-runtime-socket-mount-securitypolicy.yaml
+  - cluster-apps-cap-sys-admin-securitypolicy.yaml
+  - cluster-apps-secret-in-env-securitypolicy.yaml
+  - cluster-apps-latest-tag-securitypolicy.yaml
+helmCharts:
+- name: stackrox-central-services
+  includeCRDs: true
+  # The chart's NOTES.txt hard-fails on any other release name.
+  releaseName: stackrox-central-services
+  namespace: stackrox
+  # 400.11.1 == appVersion 4.11.1 (RHACS/StackRox). charts.stackrox.io is
+  # frozen at 3.74 and the stackrox/helm-charts GitHub repo ships no repo
+  # index; mirror.openshift.com is the project's 4.x helm-repo distribution.
+  version: 400.11.1
+  repo: https://mirror.openshift.com/pub/rhacs/charts/
+  valuesInline:
+    # k3s, not OpenShift — disable platform autosense so the chart emits no
+    # OpenShift Route/SCC/monitoring objects.
+    env:
+      openshift: false
+    # PORT NOTE: chart images default to registry.redhat.io/advanced-cluster-
+    # security, which needs a pull secret this cluster has not wired yet.
+    # allowNone lets the manifests render; before this actually pulls, either
+    # add a pull secret or repoint image.registry to quay.io/stackrox-io. See
+    # gaps.
+    imagePullSecrets:
+      allowNone: true
+    # PSPs are gone in k8s 1.25+ (k3s); do not emit them.
+    system:
+      enablePodSecurityPolicies: false
+    # Config-controller reconciles the SecurityPolicy CRs above (policy-as-code).
+    configAsCode:
+      enabled: true
+    # OCP integrated platform monitoring is absent on k3s; kube-prometheus-
+    # stack scrapes via ServiceMonitor instead (see gaps).
+    monitoring:
+      openshift:
+        enabled: false
+    central:
+      # Match OCP: no phone-home.
+      telemetry:
+        enabled: false
+      # Mount the declarative-config ConfigMap (auth provider + role mapping).
+      declarativeConfiguration:
+        mounts:
+          configMaps:
+            - central-declarative-config
+      # No OpenShift Route; UI is exposed via central-httproute.yaml instead.
+      exposure:
+        route:
+          enabled: false
+      # PORT NOTE: OCP pinned Central + DB to hostname truenas-w1 (its only
+      # non-tenant worker). That hostname does not exist on rk8s, so the
+      # nodeSelectors are dropped — pinning would make the pods unschedulable.
+      # Requests copied from the OCP phase-1 measurement (#381).
+      resources:
+        requests:
+          cpu: 50m
+          memory: 1536Mi
+        limits:
+          memory: 4Gi
+      db:
+        # Durable Postgres on TrueNAS iSCSI (democratic-csi). size is in Gi.
+        persistence:
+          persistentVolumeClaim:
+            claimName: central-db
+            createClaim: true
+            storageClass: freenas-iscsi-ssd-csi
+            size: 40
+        resources:
+          requests:
+            cpu: 50m
+            memory: 512Mi
+          limits:
+            memory: 4Gi
+    # Scanner (StackRox Scanner v2) kept; Scanner V4 disabled to match OCP's
+    # minimal footprint.
+    scanner:
+      replicas: 1
+      autoscaling:
+        disable: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 640Mi
+        limits:
+          memory: 3Gi
+      dbResources:
+        requests:
+          cpu: 200m
+          # ~2Gi flat steady-state working set (OCP p50 1946Mi / p95 2007Mi).
+          memory: 2Gi
+        limits:
+          memory: 3Gi
+    scannerV4:
+      disable: true

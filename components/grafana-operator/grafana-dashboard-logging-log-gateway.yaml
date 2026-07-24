@@ -1,0 +1,28 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Custom dashboard for the log-gateway (Alloy) syslog ingress path —
+# received/parse-error rates, forward/drop/retry to LokiStack, write
+# latency, and per-device line volume from the infrastructure tenant.
+# Metrics come from the UWM scrape added in components/log-gateway.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-logging-log-gateway
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: logging
+  resyncPeriod: 24h
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+    - inputName: DS_LOKI_INFRASTRUCTURE
+      datasourceName: loki
+  configMapRef:
+    name: grafana-dashboard-logging-log-gateway-json
+    key: log-gateway.json

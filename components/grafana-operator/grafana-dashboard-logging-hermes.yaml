@@ -1,0 +1,25 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Purpose-built board over the central logging streams (issue #382):
+# variable-driven so per-host/group LogQL never has to be hand-written.
+# JSON lives in dashboards/logging/hermes.json via the configMapGenerator.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-logging-hermes
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: logging
+  resyncPeriod: 24h
+  datasources:
+    - inputName: DS_LOKI_INFRASTRUCTURE
+      datasourceName: loki
+  configMapRef:
+    name: grafana-dashboard-logging-hermes-json
+    key: hermes.json

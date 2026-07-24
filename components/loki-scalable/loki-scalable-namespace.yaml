@@ -1,0 +1,6 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: loki-scalable

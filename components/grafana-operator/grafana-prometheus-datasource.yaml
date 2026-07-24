@@ -1,0 +1,29 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Default datasource: the in-cluster kube-prometheus-stack Prometheus
+# (components/kube-prometheus-stack, namespace monitoring, Service
+# kube-prometheus-stack-prometheus:9090). Replaces the OCP Thanos Querier
+# datasource — rk8s has no Thanos, and in-cluster Prometheus needs no bearer
+# token/TLS (the source injected a ServiceAccount token + tlsSkipVerify for
+# the OCP monitoring stack; both dropped here).
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: prometheus
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '11'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  datasource:
+    name: prometheus
+    type: prometheus
+    access: proxy
+    url: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 30s

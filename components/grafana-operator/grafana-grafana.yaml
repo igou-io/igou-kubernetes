@@ -1,0 +1,51 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Grafana instance, managed by the grafana-operator. On vanilla k3s there is
+# no OpenShift OAuth proxy: the source's sidecar container, service-serving
+# cert, SAR-gated login and Route are all dropped (see README/gaps). Exposure
+# is a plain HTTPRoute on the shared trusted-lan Gateway; the operator
+# generates admin credentials into the `grafana-admin-credentials` Secret.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+  namespace: grafana
+  labels:
+    # Datasource/dashboard CRs select this instance via the same label
+    # (spec.instanceSelector.matchLabels.dashboards: grafana).
+    dashboards: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '11'
+spec:
+  persistentVolumeClaim:
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      # TrueNAS iSCSI via democratic-csi (the OCP instance used nvmeof, which
+      # does not exist on rk8s).
+      storageClassName: freenas-iscsi-ssd-csi
+  config:
+    log:
+      mode: console
+      level: info
+    server:
+      http_port: '3000'
+      root_url: https://grafana.rk8s.igou.systems
+    # No oauth-proxy on vanilla k8s: fall back to Grafana's own local login
+    # form (admin creds in the operator-generated Secret). Anonymous access
+    # stays off. See gaps — SSO is not wired up.
+    auth:
+      disable_login_form: 'false'
+    auth.anonymous:
+      enabled: 'false'
+  service:
+    spec:
+      ports:
+        - name: grafana
+          port: 3000
+          protocol: TCP
+          targetPort: 3000

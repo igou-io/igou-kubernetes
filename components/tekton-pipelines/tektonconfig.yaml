@@ -1,0 +1,53 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# The operator only reconciles a TektonConfig named "config". Translated from
+# the OCP TektonConfig: targetNamespace moves from the OCP-managed
+# openshift-pipelines namespace to the upstream default tekton-pipelines, and
+# the OpenShift-only spec.platforms.openshift block (Pipelines-as-Code +
+# OpenShift Console URLs) is dropped — see the component notes for the gap.
+apiVersion: operator.tekton.dev/v1alpha1
+kind: TektonConfig
+metadata:
+  name: config
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,ServerSideApply=true
+spec:
+  # "all" installs pipeline + trigger + chains + dashboard (upstream default
+  # profile set). No OpenShift Console here, so the dashboard is the UI.
+  profile: all
+  targetNamespace: tekton-pipelines
+  pruner:
+    disabled: false
+    schedule: "0 4 * * *"
+    keep: 20
+    resources:
+      - pipelinerun
+      - taskrun
+  pipeline:
+    enable-bundles-resolver: true
+    enable-cluster-resolver: true
+    enable-git-resolver: true
+    enable-hub-resolver: true
+    default-service-account: pipeline
+    default-timeout-minutes: 60
+    enable-step-actions: true
+    # Seccomp is intentionally not pinned in the pod template; TaskRun pods
+    # inherit the kubelet's RuntimeDefault. Every CI PipelineRun pod runs
+    # non-root, drops the SA token, and lands on the preemptible
+    # tekton-ci-low PriorityClass so it yields under cluster pressure.
+    default-pod-template: |
+      securityContext:
+        runAsNonRoot: true
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      priorityClassName: tekton-ci-low
+  chain:
+    artifacts.taskrun.format: in-toto
+    artifacts.taskrun.storage: oci
+    artifacts.pipelinerun.format: in-toto
+    artifacts.pipelinerun.storage: oci
+    artifacts.oci.storage: oci
+    transparency.enabled: "false"
+    signers.x509.fulcio.enabled: false

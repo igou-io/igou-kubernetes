@@ -1,0 +1,99 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Alloy pipeline: three ingest paths, one write. Ported from igou-openshift
+# components/log-gateway; the only substantive change vs the ocp version is
+# the write target — the LokiStack tenant-RBAC gateway (bearer token +
+# service-ca TLS, /api/logs/v1/infrastructure/...) is replaced by a plain,
+# unauthenticated push to the SimpleScalable loki-gateway (see the
+# log-gateway README + gaps: vanilla Loki has no tenant model).
+#   :5514 udp/tcp — RFC3164 syslog from appliances/devices (RouterOS,
+#                   Synology, Home Assistant, UniFi)
+#   :5524 udp     — RFC5424 syslog from senders whose format is fixed
+#                   upstream (TrueNAS syslog-ng `syslog()` driver)
+#   :3500 tcp     — Loki push API from Alloy host agents and the rk8s
+#                   DaemonSet
+# Everything lands with source=external; `host` comes from the syslog
+# hostname (or the agent's own labels).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-gateway
+  namespace: log-gateway
+data:
+  config.alloy: |
+    // Appliance/device syslog (RFC3164, bsd-syslog)
+    loki.source.syslog "lan" {
+      listener {
+        address                = "0.0.0.0:5514"
+        protocol               = "udp"
+        syslog_format          = "rfc3164"
+        // RFC3164 timestamps have no year; without this the parser yields
+        // year 0 and loki.write fails encoding ("before 0001-01-01").
+        rfc3164_default_to_current_year = true
+        use_incoming_timestamp = false
+        labels                 = { job = "syslog" }
+      }
+      listener {
+        address                = "0.0.0.0:5514"
+        protocol               = "tcp"
+        syslog_format          = "rfc3164"
+        // RFC3164 timestamps have no year; without this the parser yields
+        // year 0 and loki.write fails encoding ("before 0001-01-01").
+        rfc3164_default_to_current_year = true
+        use_incoming_timestamp = false
+        labels                 = { job = "syslog" }
+      }
+      relabel_rules = loki.relabel.syslog.rules
+      forward_to    = [loki.write.lokigateway.receiver]
+    }
+
+    // RFC5424 (IETF) syslog on a separate port: a listener parses ONE
+    // format, and TrueNAS's middleware-generated syslog-ng destination
+    // uses the RFC5424 `syslog()` driver with no format knob — its
+    // messages were arriving on :5514 and counting up
+    // loki_source_syslog_parsing_errors_total. Kept on a distinct numeric
+    // port (not a second protocol of 5514) — same reason the Service
+    // splits 601/1514 out.
+    loki.source.syslog "lan_rfc5424" {
+      listener {
+        address                = "0.0.0.0:5524"
+        protocol               = "udp"
+        syslog_format          = "rfc5424"
+        use_incoming_timestamp = false
+        labels                 = { job = "syslog" }
+      }
+      relabel_rules = loki.relabel.syslog.rules
+      forward_to    = [loki.write.lokigateway.receiver]
+    }
+
+    // Host agents + rk8s DaemonSet push here (Loki push API)
+    loki.source.api "agents" {
+      http {
+        listen_address = "0.0.0.0"
+        listen_port    = 3500
+      }
+      forward_to = [loki.write.lokigateway.receiver]
+    }
+
+    loki.relabel "syslog" {
+      forward_to = []
+      rule {
+        source_labels = ["__syslog_message_hostname"]
+        target_label  = "host"
+      }
+      rule {
+        source_labels = ["__syslog_message_severity"]
+        target_label  = "level"
+      }
+    }
+
+    // Unauthenticated push to the central SimpleScalable Loki. auth_enabled
+    // is off on that Loki and its gateway is a ClusterIP; external ingest is
+    // fenced by the NetworkPolicy (RFC1918 ipBlock), not by a bearer token.
+    loki.write "lokigateway" {
+      endpoint {
+        url = "http://loki-gateway.loki-scalable.svc.cluster.local:80/loki/api/v1/push"
+      }
+      external_labels = { source = "external" }
+    }

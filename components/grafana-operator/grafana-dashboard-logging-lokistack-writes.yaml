@@ -1,0 +1,24 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+---
+# Vendored copy of the operator-shipped console dashboard (ConfigMap
+# grafana-dashboard-lokistack-writes in openshift-config-managed) so the LokiStack /
+# collector health is visible in the lab Grafana, not just the OCP
+# console. The ${datasource} template var resolves to the instance
+# default (prometheus). Re-vendor when the logging operators bump.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-logging-lokistack-writes
+  namespace: grafana
+  annotations:
+    argocd.argoproj.io/sync-wave: '12'
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: logging
+  resyncPeriod: 24h
+  configMapRef:
+    name: grafana-dashboard-logging-lokistack-writes-json
+    key: lokistack-writes.json

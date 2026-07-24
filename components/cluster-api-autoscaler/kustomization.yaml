@@ -1,0 +1,113 @@
+# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
+# cluster - validate end-to-end before adopting on rk8s.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cluster-api-autoscaler-system
+
+# Ported from the OCP raw cluster-autoscaler Deployment/RBAC to the
+# project-maintained cluster-autoscaler chart with cloudProvider=clusterapi.
+# The chart renders the SA, the clusterapi ClusterRole/Bindings, and the
+# Deployment; only the infra-provider read grant and the OCP flag/scheduling
+# set are layered on via values.
+resources:
+  - cluster-api-autoscaler-system-namespace.yaml
+
+helmCharts:
+  - name: cluster-autoscaler
+    releaseName: cluster-api-autoscaler
+    namespace: cluster-api-autoscaler-system
+    version: 9.59.0
+    repo: https://kubernetes.github.io/autoscaler
+    includeCRDs: true
+    valuesInline:
+      cloudProvider: clusterapi
+      # incluster-incluster: management and workload cluster are the same
+      # (single-node homelab), so no external kubeconfig secret is needed.
+      clusterAPIMode: incluster-incluster
+
+      fullnameOverride: cluster-api-autoscaler
+
+      # Node-group auto-discovery. The chart renders this into
+      # --node-group-auto-discovery=clusterapi:clusterName=<>,namespace=<>.
+      # PLACEHOLDER values — an adopter must set these to match the CAPI
+      # Cluster + the namespace its MachineDeployments live in (keep in sync
+      # with capi-workload-cluster-access-rbac.yaml in the operator component).
+      autoDiscovery:
+        clusterName: rk8s
+        namespace: capi-cluster
+
+      image:
+        # appVersion 1.35.0. Track the cluster's k8s minor on upgrade.
+        tag: v1.35.0
+        pullPolicy: IfNotPresent
+
+      # Chart auto-adds --cloud-provider, --namespace, and
+      # --node-group-auto-discovery. Everything else mirrors the OCP raw
+      # Deployment args — tuned for slow bare-metal provisioning and to
+      # actually power down idle workers.
+      extraArgs:
+        logtostderr: true
+        stderrthreshold: info
+        v: 4
+        leader-elect: true
+        leader-elect-resource-name: cluster-api-autoscaler
+        # Proactively scale groups up to their min-size annotation instead of
+        # treating it only as a scale-down floor (replicas=0/min-size=1 would
+        # otherwise sit at 0 until an unschedulable pod appears).
+        enforce-node-group-min-size: true
+        scale-down-enabled: true
+        scale-down-delay-after-add: 10m
+        scale-down-delay-after-delete: 1m
+        scale-down-delay-after-failure: 3m
+        scale-down-unneeded-time: 10m
+        scale-down-utilization-threshold: 0.5
+        max-node-provision-time: 30m
+        max-graceful-termination-sec: 600
+        balance-similar-node-groups: false
+        skip-nodes-with-system-pods: false
+        skip-nodes-with-local-storage: false
+        expander: least-waste
+
+      rbac:
+        create: true
+        clusterScoped: true
+        serviceAccount:
+          create: true
+          name: cluster-api-autoscaler
+        # The chart's clusterapi ClusterRole covers cluster.x-k8s.io machine*
+        # resources but not the infra provider. Add read on the MachineSet's
+        # infrastructureRef target (Metal3MachineTemplate here) so the
+        # autoscaler can introspect node groups. Wildcard covers any provider.
+        additionalRules:
+          - apiGroups: ["infrastructure.cluster.x-k8s.io"]
+            resources: ["*"]
+            verbs: ["get", "list", "watch"]
+
+      priorityClassName: system-cluster-critical
+
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
