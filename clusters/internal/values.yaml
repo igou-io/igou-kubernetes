@@ -45,6 +45,18 @@ applications:
     source:
       path: components/loki
 
+  # Ship-don't-store log collection to the ocp log-gateway
+  # (igou-openshift#382 phase 5); components/loki above is retired once
+  # this path is verified.
+  alloy:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '11'
+    destination:
+      namespace: alloy
+    source:
+      path: components/alloy
+
   gateway:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
