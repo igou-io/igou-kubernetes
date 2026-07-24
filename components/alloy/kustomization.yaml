@@ -30,9 +30,15 @@ helmCharts:
         type: daemonset
         volumes:
           extra:
-            - name: journal
+            # Parent mountpoint, NOT /var/log/journal: /var/log is
+            # armbian-ramlog zram and the journal dir inside it gets
+            # replaced after pod start (same device, new inode — a
+            # direct hostPath bind goes stale-empty; hit live
+            # 2026-07-24). Binding the stable mountpoint and resolving
+            # the subpath at read time survives the replacement.
+            - name: varlog
               hostPath:
-                path: /var/log/journal
+                path: /var/log
             - name: machine-id
               hostPath:
                 path: /etc/machine-id
@@ -45,8 +51,8 @@ helmCharts:
                 fieldPath: spec.nodeName
         mounts:
           extra:
-            - name: journal
-              mountPath: /var/log/journal
+            - name: varlog
+              mountPath: /host/var/log
               readOnly: true
             - name: machine-id
               mountPath: /etc/machine-id
@@ -99,9 +105,11 @@ helmCharts:
               forward_to = [loki.write.gateway.receiver]
             }
 
-            // Node journal (armbian persistent journald).
+            // Node journal (armbian persistent journald on the
+            // ramlog zram — read via the /host/var/log parent bind,
+            // see the volumes comment).
             loki.source.journal "node" {
-              path          = "/var/log/journal"
+              path          = "/host/var/log/journal"
               relabel_rules = loki.relabel.journal.rules
               labels        = { job = "systemd-journal" }
               forward_to    = [loki.write.gateway.receiver]
