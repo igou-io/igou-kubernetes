@@ -59,13 +59,13 @@ helmCharts:
     # aws plugin v1.14 tracks Velero 1.18; kubevirt plugin v0.9 is latest.
     initContainers:
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:v1.14.2
+        image: velero/velero-plugin-for-aws:v1.14.2@sha256:0751144c1c8e52d52c48717fbd13ad5a3061e612ae4d7ad744a946cd5b139d1a
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - mountPath: /target
             name: plugins
       - name: kubevirt-velero-plugin
-        image: quay.io/kubevirt/kubevirt-velero-plugin:v0.9.0
+        image: quay.io/kubevirt/kubevirt-velero-plugin:v0.9.0@sha256:65453684c747c4ae392191f3dacd11c34993e682ba2fb2a19e694b7341d5be57
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - mountPath: /target
