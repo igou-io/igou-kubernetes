@@ -9,8 +9,12 @@ resources:
 # igou-openshift's components/ vs clusters/ split. Both drivers are the
 # pure-API freenas-api-* variants authenticating as the dedicated
 # TrueNAS `csi` user — no sshConnection anywhere.
-# volumeSnapshotClasses stay empty until a snapshot controller +
-# snapshot.storage.k8s.io CRDs are deployed on this cluster.
+# Snapshot CRDs + controller come from components/snapshot-controller
+# (sync-wave 6). Local classes are same-pool ZFS snapshots; -detached
+# classes are full send/receive copies onto the cold pool (see the
+# detachedSnapshotsDatasetParentName in the driver configs).
+# detachedVolumesFromSnapshots on the StorageClasses is required to
+# restore from a -detached snapshot (cross-pool zfs clone is impossible).
 helmCharts:
 # ---- NFS ----
 - name: democratic-csi
@@ -37,6 +41,7 @@ helmCharts:
         allowVolumeExpansion: true
         parameters:
           fsType: nfs
+          detachedVolumesFromSnapshots: true
         mountOptions:
           - noatime
           - nfsvers=4
@@ -46,7 +51,15 @@ helmCharts:
           node-stage-secret:
           node-publish-secret:
           controller-expand-secret:
-    volumeSnapshotClasses: []
+    volumeSnapshotClasses:
+      - name: freenas-nfs-ssd-csi
+        deletionPolicy: Delete
+        parameters:
+          detachedSnapshots: "false"
+      - name: freenas-nfs-ssd-csi-detached
+        deletionPolicy: Delete
+        parameters:
+          detachedSnapshots: "true"
     driver:
       existingConfigSecret: "democratic-csi-nfs-config"
       config:
@@ -77,6 +90,7 @@ helmCharts:
         allowVolumeExpansion: true
         parameters:
           fsType: ext4
+          detachedVolumesFromSnapshots: true
         mountOptions: []
         secrets:
           provisioner-secret:
@@ -84,7 +98,15 @@ helmCharts:
           node-stage-secret:
           node-publish-secret:
           controller-expand-secret:
-    volumeSnapshotClasses: []
+    volumeSnapshotClasses:
+      - name: freenas-iscsi-ssd-csi
+        deletionPolicy: Delete
+        parameters:
+          detachedSnapshots: "false"
+      - name: freenas-iscsi-ssd-csi-detached
+        deletionPolicy: Delete
+        parameters:
+          detachedSnapshots: "true"
     driver:
       existingConfigSecret: "democratic-csi-iscsi-config"
       config:

@@ -1,0 +1,27 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: snapshot-controller
+resources:
+  - snapshot-controller-namespace.yaml
+# Cluster-wide CSI snapshot infrastructure k3s does not bundle: the
+# snapshot.storage.k8s.io CRDs + the sig-storage snapshot-controller.
+# Must be present before democratic-csi's volumeSnapshotClasses (this
+# app syncs at wave 6, democratic-csi at 7).
+helmCharts:
+- name: snapshot-controller
+  namespace: snapshot-controller
+  includeCRDs: true
+  releaseName: snapshot-controller
+  version: 5.2.0
+  repo: https://piraeus.io/helm-charts/
+  valuesInline:
+    controller:
+      replicaCount: 1
+      # Modest footprint for the RK3588 boards.
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
