@@ -54,6 +54,10 @@ helmCharts:
     volumeSnapshotClasses:
       - name: freenas-nfs-ssd-csi
         deletionPolicy: Delete
+        # Per-driver default so implicit class selection (classless
+        # VolumeSnapshots, future KubeVirt/CDI) gets the local class.
+        annotations:
+          snapshot.storage.kubernetes.io/is-default-class: "true"
         parameters:
           detachedSnapshots: "false"
       - name: freenas-nfs-ssd-csi-detached
@@ -101,6 +105,10 @@ helmCharts:
     volumeSnapshotClasses:
       - name: freenas-iscsi-ssd-csi
         deletionPolicy: Delete
+        # Per-driver default so implicit class selection (classless
+        # VolumeSnapshots, future KubeVirt/CDI) gets the local class.
+        annotations:
+          snapshot.storage.kubernetes.io/is-default-class: "true"
         parameters:
           detachedSnapshots: "false"
       - name: freenas-iscsi-ssd-csi-detached
