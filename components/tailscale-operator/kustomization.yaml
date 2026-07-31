@@ -24,7 +24,7 @@ helmCharts:
     operatorConfig:
       defaultTags:
         - "tag:rk8s-operator"
-      hostname: "tailscale-operator"
+      hostname: "rk8s-operator"
       logging: "info"
 
     proxyConfig:
