@@ -129,6 +129,16 @@ applications:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
       argocd.argoproj.io/sync-wave: '50'
+    # The pinned CDI v1.65.0 install manifest still ships the deprecated
+    # v1alpha1 API in the cdis CRD; the running cdi-operator owns the CRD at
+    # runtime and keeps it v1beta1-only, so versions/conversion diff forever.
+    ignoreDifferences:
+      - group: apiextensions.k8s.io
+        kind: CustomResourceDefinition
+        name: cdis.cdi.kubevirt.io
+        jsonPointers:
+          - /spec/versions
+          - /spec/conversion
     destination:
       namespace: kubevirt
     source:
