@@ -9,6 +9,17 @@ applications:
     source:
       path: clusters/internal
 
+  # CSI snapshot CRDs + controller (k3s bundles neither); must precede
+  # democratic-csi's volumeSnapshotClasses.
+  snapshot-controller:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '6'
+    destination:
+      namespace: snapshot-controller
+    source:
+      path: components/snapshot-controller
+
   democratic-csi:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous
