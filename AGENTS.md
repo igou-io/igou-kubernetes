@@ -32,7 +32,7 @@ docs/                            Operational docs (bootstrap)
   `clusters/<name>/values.yaml` (and `clusters/<name>/<app>/` for
   cluster-specific manifests like the democratic-csi driver configs).
 - Sync waves are `argocd.argoproj.io/sync-wave` annotations in those values
-  files. Current ordering: argocd/ESO 0 → cert-manager/metallb 5 → NGF 6 →
+  files. Current ordering: argocd/ESO 0 → cert-manager/metallb 5 → NGF/snapshot-controller 6 →
   democratic-csi 7 → kube-prometheus-stack 10 → loki 11 →
   tailscale-operator 12 → gateway 15 → headlamp/whoami 16 → kubevirt 50.
 - Argo CD renders components with `kustomize build --enable-helm`; CR
