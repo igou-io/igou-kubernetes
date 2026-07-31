@@ -18,14 +18,17 @@ helmCharts:
 
     installCRDs: true
 
+    # Tailnet tag scheme: the operator device is tag:rk8s-operator (set on
+    # the OAuth client too), and proxies it creates get tag:rk8s. ACL must
+    # define tagOwners {"tag:rk8s-operator": [], "tag:rk8s": ["tag:rk8s-operator"]}.
     operatorConfig:
       defaultTags:
-        - "tag:k8s-operator"
+        - "tag:rk8s-operator"
       hostname: "tailscale-operator"
       logging: "info"
 
     proxyConfig:
-      defaultTags: "tag:k8s"
+      defaultTags: "tag:rk8s"
       firewallMode: auto
 
     apiServerProxyConfig:
