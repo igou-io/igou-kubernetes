@@ -9,7 +9,7 @@ helmCharts:
   includeCRDs: true
   releaseName: headlamp
   namespace: headlamp
-  version: 0.43.0
+  version: 0.44.0
   repo: https://kubernetes-sigs.github.io/headlamp/
   valuesInline:
     # Token login (Headlamp's default): the chart creates the `headlamp`
