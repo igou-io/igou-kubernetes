@@ -23,5 +23,5 @@ helmCharts:
   includeCRDs: true
   releaseName: plugin-barman-cloud
   namespace: cnpg-system
-  version: 0.7.0
+  version: 0.7.1
   repo: https://cloudnative-pg.github.io/charts
