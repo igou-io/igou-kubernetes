@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: nginx-gateway
 resources:
   - nginx-gateway-namespace.yaml
+  - nginx-gateway-podmonitor.yaml
   # Gateway API CRDs at the exact version this NGF release is built against
   - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.6.7
 helmCharts:

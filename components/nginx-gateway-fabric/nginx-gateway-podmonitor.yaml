@@ -1,0 +1,24 @@
+---
+# The NGF chart exposes control-plane metrics on :9113 (prometheus.io/scrape
+# annotations only - no ServiceMonitor template), so scrape it with an
+# explicit PodMonitor. kps discovers all PodMonitors
+# (podMonitorSelectorNilUsesHelmValues: false). The job is pinned to
+# "nginx-gateway-fabric" - the ocp UWM federation match[] references it.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: nginx-gateway
+  namespace: nginx-gateway
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx-gateway-fabric
+      app.kubernetes.io/instance: nginx-gateway
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 60s
+      path: /metrics
+      relabelings:
+        - action: replace
+          targetLabel: job
+          replacement: nginx-gateway-fabric
