@@ -17,7 +17,7 @@ helmCharts:
   releaseName: stackrox-secured-cluster-services
   namespace: stackrox
   # 400.11.1 == appVersion 4.11.1, matching stackrox-central-services.
-  version: 400.11.1
+  version: 400.11.2
   repo: https://mirror.openshift.com/pub/rhacs/charts/
   # valuesFile, not valuesInline: this chart's default values.yaml is entirely
   # comments (zero real keys), which trips a kustomize bug ("could not parse
