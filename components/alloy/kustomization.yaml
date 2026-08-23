@@ -23,7 +23,7 @@ helmCharts:
     includeCRDs: false
     releaseName: alloy
     namespace: alloy
-    version: 1.11.0
+    version: 1.11.1
     repo: https://grafana.github.io/helm-charts
     valuesInline:
       controller:
@@ -147,7 +147,7 @@ helmCharts:
     includeCRDs: false
     releaseName: alloy-events
     namespace: alloy
-    version: 1.11.0
+    version: 1.11.1
     repo: https://grafana.github.io/helm-charts
     valuesInline:
       controller:
