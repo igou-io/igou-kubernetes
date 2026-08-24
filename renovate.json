@@ -24,5 +24,15 @@
       "matchDepTypes": ["HelmChart"],
       "pinDigests": false
     }
+  ],
+  "customManagers": [
+    {
+      "description": "democratic-csi driver image pinned via inline tag@sha256 (chart's nonstandard image.registry+image.tag schema isn't picked up by helm-values manager)",
+      "customType": "regex",
+      "managerFilePatterns": ["/^components/democratic-csi/kustomization\\.yaml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+tag: \"(?<currentValue>[^@\"]+)@(?<currentDigest>sha256:[a-f0-9]+)\""
+      ]
+    }
   ]
 }
