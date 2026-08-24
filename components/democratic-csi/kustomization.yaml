@@ -29,10 +29,18 @@ helmCharts:
     controller:
       driver:
         enabled: true
+        image:
+          registry: "ghcr.io/democratic-csi/democratic-csi"
+          # renovate: datasource=docker depName=ghcr.io/democratic-csi/democratic-csi
+          tag: "latest@sha256:944d0e65077efbd9c1fdf23997eec8fac4b4bfb7c3de400f63e33a0a849c5ced"
     node:
       driver:
         enabled: true
         localtimeHostPath: null
+        image:
+          registry: "ghcr.io/democratic-csi/democratic-csi"
+          # renovate: datasource=docker depName=ghcr.io/democratic-csi/democratic-csi
+          tag: "latest@sha256:944d0e65077efbd9c1fdf23997eec8fac4b4bfb7c3de400f63e33a0a849c5ced"
     storageClasses:
       - name: freenas-nfs-ssd-csi
         defaultClass: false
@@ -81,11 +89,19 @@ helmCharts:
     controller:
       driver:
         enabled: true
+        image:
+          registry: "ghcr.io/democratic-csi/democratic-csi"
+          # renovate: datasource=docker depName=ghcr.io/democratic-csi/democratic-csi
+          tag: "latest@sha256:944d0e65077efbd9c1fdf23997eec8fac4b4bfb7c3de400f63e33a0a849c5ced"
       hostNetwork: true
     node:
       driver:
         enabled: true
         localtimeHostPath: null
+        image:
+          registry: "ghcr.io/democratic-csi/democratic-csi"
+          # renovate: datasource=docker depName=ghcr.io/democratic-csi/democratic-csi
+          tag: "latest@sha256:944d0e65077efbd9c1fdf23997eec8fac4b4bfb7c3de400f63e33a0a849c5ced"
     storageClasses:
       - name: freenas-iscsi-ssd-csi
         defaultClass: false
