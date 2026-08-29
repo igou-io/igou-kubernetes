@@ -240,6 +240,49 @@ clusterRoles:
           - patch
           - delete
 
+  # Read-only cluster identity for scoped agent sessions (igou-devenv
+  # ADR-0006, `envs/rk8s-cluster-reader.env`). Vanilla Kubernetes has no
+  # `cluster-reader` aggregate like OpenShift, so: the built-in `view`
+  # ClusterRole (namespaced resources, no secrets) plus this cluster-scoped
+  # read set. Deliberately excludes secrets everywhere.
+  - name: cluster-read-only
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - nodes
+          - nodes/status
+          - namespaces
+          - persistentvolumes
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - storage.k8s.io
+          - apiextensions.k8s.io
+          - rbac.authorization.k8s.io
+          - scheduling.k8s.io
+          - node.k8s.io
+          - metrics.k8s.io
+          - gateway.networking.k8s.io
+          - kubevirt.io
+          - cdi.kubevirt.io
+          - instancetype.kubevirt.io
+          - snapshot.kubevirt.io
+          - argoproj.io
+          - external-secrets.io
+          - monitoring.coreos.com
+          - velero.io
+          - tekton.dev
+          - k8s.cni.cncf.io
+        resources:
+          - "*"
+        verbs:
+          - get
+          - list
+          - watch
+
 serviceAccounts:
   - name: ansible-molecule
     roleBindings:
@@ -286,4 +329,24 @@ serviceAccounts:
               secretKey: token
               remoteRef:
                 remoteKey: rk8s-virtualmachine-ops
+                property: token
+
+  - name: cluster-read-only
+    clusterRoleBindings:
+      - name: cluster-read-only-view
+        clusterRole: view
+      - name: cluster-read-only
+        clusterRole: cluster-read-only
+    pushSecrets:
+      - name: cluster-read-only-token-push
+        refreshInterval: "0"
+        secretStoreRefs:
+          - name: onepassword-lab-rk8s
+            kind: ClusterSecretStore
+        data:
+          - conversionStrategy: None
+            match:
+              secretKey: token
+              remoteRef:
+                remoteKey: rk8s-cluster-read-only
                 property: token
