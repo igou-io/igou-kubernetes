@@ -9,7 +9,7 @@ helmCharts:
   includeCRDs: true
   releaseName: tailscale
   namespace: tailscale
-  version: 1.102.2
+  version: 1.102.3
   repo: https://pkgs.tailscale.com/helmcharts
   valuesInline:
     # OAuth credentials come from the operator-oauth ExternalSecret, not
