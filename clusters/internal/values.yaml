@@ -47,6 +47,19 @@ applications:
     source:
       path: components/kube-prometheus-stack
 
+  # Alert routing: rk8s critical|warning -> hermes-sre am-relay on ocp
+  # (read-only SRE Hermes investigates and posts to Slack). After
+  # kube-prometheus-stack (wave 10), which owns the monitoring namespace
+  # and the Alertmanager that adopts this config.
+  alertmanager-config:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '11'
+    destination:
+      namespace: monitoring
+    source:
+      path: components/alertmanager-config
+
   # Ship-don't-store log collection to the ocp log-gateway
   # (igou-openshift#382 phase 5). The former filesystem Loki
   # (components/loki) is retired — nothing ever shipped to it and rk8s

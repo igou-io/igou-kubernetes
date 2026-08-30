@@ -44,6 +44,11 @@ helmCharts:
 
     alertmanager:
       alertmanagerSpec:
+        # Adopt components/alertmanager-config's AlertmanagerConfig as the
+        # GLOBAL config (route tree + receivers verbatim, cluster-wide).
+        # Without this the CR is inert and alerts route nowhere.
+        alertmanagerConfiguration:
+          name: alertmanager-routing
         # Persist silences + notification dedup state across restarts.
         storage:
           volumeClaimTemplate:
