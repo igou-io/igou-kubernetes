@@ -1,5 +1,3 @@
-# UNTESTED: ported from igou-openshift (PR #914) and never applied to a live
-# cluster - validate end-to-end before adopting on rk8s.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 # Lands in the existing `monitoring` namespace owned by the
@@ -8,6 +6,11 @@ kind: Kustomization
 # namespace or touch the Alertmanager workload.
 namespace: monitoring
 resources:
-  - alertmanager-slack-bot-token-externalsecret.yaml
-  - alertmanager-eda-event-stream-externalsecret.yaml
+  - hermes-sre-am-relay-externalsecret.yaml
   - alertmanager-routing-alertmanagerconfig.yaml
+  # Staged, NOT deployed: these reference ClusterSecretStore
+  # onepassword-lab-aap, which does not exist on this cluster. Re-enable
+  # together with their gotify/Slack/EDA receivers in the
+  # AlertmanagerConfig once those services are set up on rk8s.
+  # - alertmanager-slack-bot-token-externalsecret.yaml
+  # - alertmanager-eda-event-stream-externalsecret.yaml
