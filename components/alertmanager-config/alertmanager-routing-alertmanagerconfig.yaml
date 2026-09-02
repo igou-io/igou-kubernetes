@@ -38,6 +38,13 @@ spec:
             value: Watchdog
             matchType: '='
         receiver: 'null'
+      # rk8s deliberately uses RWO block storage for VM disks and does not
+      # support live migration, so this RWX-oriented CDI alert is expected.
+      - matchers:
+          - name: alertname
+            value: CDIDefaultStorageClassDegraded
+            matchType: '='
+        receiver: 'null'
       - matchers:
           - name: severity
             value: critical|warning
