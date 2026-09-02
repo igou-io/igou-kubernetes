@@ -23,6 +23,14 @@ helmCharts:
         # gateway component + igou-openshift UWM additionalScrapeConfig).
         externalLabels:
           cluster: rk8s
+        # rk8s intentionally uses RWO iSCSI for KubeVirt and CDI and does not
+        # support live migration, so this RWX-oriented alert is expected; other
+        # CDI alerts remain enabled.
+        additionalAlertRelabelConfigs:
+          - sourceLabels:
+              - alertname
+            regex: CDIDefaultStorageClassDegraded
+            action: drop
         # Pick up all ServiceMonitors/PodMonitors/Rules cluster-wide, not
         # just the ones with the chart's release label.
         serviceMonitorSelectorNilUsesHelmValues: false
