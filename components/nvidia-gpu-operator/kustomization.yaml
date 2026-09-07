@@ -18,7 +18,7 @@ helmCharts:
   releaseName: gpu-operator
   namespace: nvidia-gpu-operator
   # Matches the OCP CSV branch (v26.3.x); project-maintained NGC chart.
-  version: v26.3.3
+  version: v26.7.0
   repo: https://helm.ngc.nvidia.com/nvidia
   valuesInline:
     # NFD comes from the gpu-operator chart's bundled Node Feature Discovery
