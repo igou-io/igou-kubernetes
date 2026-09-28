@@ -11,7 +11,7 @@ helmCharts:
   includeCRDs: true
   releaseName: velero
   namespace: velero
-  version: 12.1.0
+  version: 12.2.0
   repo: https://vmware-tanzu.github.io/helm-charts
   valuesInline:
     # OADP is Red Hat's Velero distribution; this is the upstream
