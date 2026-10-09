@@ -23,7 +23,7 @@ group `rk8s`; they are the same cluster.
 clusters/<name>/                 Per-cluster GitOps root (values.yaml lists that cluster's apps)
 components/<name>/               Reusable platform components (namespace + kustomize + upstream helm chart)
 groups/all/                      Kustomize component with AppProjects + baseline apps every cluster gets
-docs/                            Operational docs (bootstrap)
+igou-docs/kubernetes/             Operational docs (companion repo)
 ```
 
 - Baseline apps every cluster gets live in `groups/all/values.yaml`
@@ -42,8 +42,7 @@ docs/                            Operational docs (bootstrap)
 ## Networking (MetalLB / BGP / Gateway)
 
 The full network design — peer addressing, ASNs, tier split boundaries, the
-pinned-VIP registry, and the invariants behind them — lives in the private
-inventory repo at `igou-inventory/docs/network-topology.md`. **Read it before
+pinned-VIP registry, and the invariants behind them — lives in the central vault at `igou-docs/networking/Network Fabric - VLANs, VIPs, BGP, and MetalLB Tiers.md`. **Read it before
 changing anything under `components/metallb/` or `components/gateway/`.**
 What an agent needs to know from this side:
 
@@ -97,6 +96,15 @@ make test   # yamllint, helm lint, kustomize build, kubeconform
   nodes hold static DHCP reservations the router's BGP filter depends on)
 - Router half of the BGP/DNS/firewall contract:
   `igou-inventory/host_vars/` (router config) +
-  `igou-inventory/docs/network-topology.md` (design doc)
+  `igou-docs/networking/Network Fabric - VLANs, VIPs, BGP, and MetalLB Tiers.md` (design doc)
 - The peer OpenShift cluster's MetalLB config:
   `igou-openshift/clusters/ocp/metallb/`
+
+## Documentation ownership
+
+Operational runbooks and durable architecture decisions belong in
+`/workspace/igou-docs`. Keep implementation plans in the conversation; if a
+persistent record is needed, write a concise decision note in that vault.
+Do not create `docs/superpowers/` or repository-local agent execution plans.
+Keep public API/collection documentation, READMEs, and agent instructions
+beside the code. Update the relevant vault note when behavior changes.

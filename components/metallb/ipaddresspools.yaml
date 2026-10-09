@@ -1,6 +1,6 @@
 # Three BGP-advertised tiers; rb5009 enforces per-tier client isolation in
 # its forward chain (see igou-inventory #32). Two exposure classes ride on
-# these pools (full policy: igou-inventory/docs/network-topology.md):
+# these pools (full policy: igou-docs/networking/Network Fabric - VLANs, VIPs, BGP, and MetalLB Tiers.md):
 #   - tier gateways (trusted-lan .150.129, iot .151.129): intentional
 #     serving — one explicit A record per hostname on rb5009, tier-scoped
 #     domains (*.lan / *.iot / *.dmz igou.systems)
