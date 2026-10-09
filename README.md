@@ -40,11 +40,11 @@ Helm chart via kustomize's `helmCharts` field, plus any raw manifests
 homelab router, this cluster's half of the shared VIP tiers) and **gateway**
 pins the `*.rk8s.igou.systems` ingress VIP — both are contracts with config
 in other repos; see [AGENTS.md](AGENTS.md) §Networking and
-`igou-inventory/docs/network-topology.md` before changing them.
+`igou-docs/networking/Network Fabric - VLANs, VIPs, BGP, and MetalLB Tiers.md` before changing them.
 
 ## Bootstrap
 
-See [docs/bootstrap.md](docs/bootstrap.md).
+See [igou-docs/kubernetes/Bootstrapping the rk8s Cluster.md](https://github.com/igou-io/igou-docs/blob/main/kubernetes/Bootstrapping%20the%20rk8s%20Cluster.md).
 
 ## Validation
 
