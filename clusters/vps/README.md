@@ -6,12 +6,15 @@ OpenShift Argo CD reconciles them; no Argo CD, ESO, MetalLB, or monitoring
 server is installed on the VPS. Do not include `groups/all` in this root.
 
 - `bootstrap/`: VPS namespaces, dedicated Argo deployment identity, and a
-  separate ESO writer restricted to three namespaces. Bootstrap generates
+  separate ESO writer restricted to three namespaces, and the node-exporter
+  DaemonSet. Bootstrap generates
   service-account credentials; their values never enter Git.
 - `bootstrap-management/`: initial OCP root Application and AppProject.
 - `management/`: OCP API egress, ExternalSecrets, remote SecretStores,
   PushSecrets, and the remote Argo cluster registration.
-- `platform/`: pinned cert-manager, NGINX Gateway Fabric, and Tailscale operator.
+- `platform/`: pinned cert-manager, NGINX Gateway Fabric, Tailscale operator,
+  and node-exporter. The bootstrap Application owns node-exporter so it is
+  available for the k3s baseline before platform/application rollout.
 - `gateway/`: DNS-01 issuer, certificate, shared Gateway, and redirects.
 - `applications/`: the static website image, Gotify, local PVC, and network policies.
 - `migration/`: one-time Gotify restoration Job, deliberately excluded from
@@ -37,3 +40,9 @@ Generated credentials and keys remain protected on the host and in 1Password.
 The architecture, cutover acceptance, resource measurements, recovery policy,
 and legacy AAP retirement are owned by
 `igou-docs/kubernetes/VPS Kubernetes Architecture and Migration.md`.
+
+Node-exporter is a non-root host-network/host-PID pod with read-only host
+mounts. The host public-interface guard blocks port 9100; central OpenShift
+monitoring keeps the existing Tailscale endpoint. No host exporter service or
+local Prometheus instance is installed. The host bootstrap disables a legacy
+exporter service if present.

@@ -22,3 +22,4 @@ resources:
   - vps-tailscale-secret-writer-rolebinding.yaml
   - vps-gotify-secret-writer-role.yaml
   - vps-gotify-secret-writer-rolebinding.yaml
+  - ../platform/node-exporter
