@@ -5,7 +5,6 @@ namespace: vps-gitops
 
 resources:
   - vps-appproject.yaml
-  - vps-management-appproject.yaml
 
 helmGlobals:
   chartHome: ../../.helm/charts

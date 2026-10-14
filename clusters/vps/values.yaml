@@ -25,25 +25,6 @@ default:
         maxDuration: 3m
 
 applications:
-  vps-management:
-    project: vps-management
-    annotations:
-      argocd.argoproj.io/sync-wave: '-5'
-    destination:
-      namespace: vps-secrets
-      server: https://kubernetes.default.svc
-    source:
-      path: clusters/vps/management
-    ignoreDifferences:
-      - group: ''
-        kind: Service
-        name: vps-k3s-api
-        namespace: vps-secrets
-        jsonPointers:
-          - /spec/externalName
-    syncOptions:
-      - RespectIgnoreDifferences=true
-
   vps-bootstrap:
     annotations:
       argocd.argoproj.io/sync-wave: '0'
@@ -51,6 +32,22 @@ applications:
       namespace: vps-system
     source:
       path: clusters/vps/bootstrap
+
+  vps-external-secrets:
+    annotations:
+      argocd.argoproj.io/sync-wave: '3'
+    destination:
+      namespace: external-secrets
+    source:
+      path: clusters/vps/platform/external-secrets
+
+  vps-secret-store:
+    annotations:
+      argocd.argoproj.io/sync-wave: '4'
+    destination:
+      namespace: external-secrets
+    source:
+      path: clusters/vps/platform/secret-store
 
   vps-cert-manager:
     annotations:

@@ -8,3 +8,4 @@ resources:
   - vps-argocd.yaml
   - vps-root-appproject.yaml
   - vps-application.yaml
+  - vps-secrets-application.yaml

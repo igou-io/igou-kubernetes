@@ -17,9 +17,11 @@ bootstrap access resources, and OpenShift-side management manifests live in
 that directory. Its dedicated OpenShift Argo CD instance is `vps` in
 `vps-gitops`; its root Application/AppProjects and remote registration live
 there. The existing OCP instance owns `bootstrap-management/` provisioning;
-the VPS instance manages its applications and `vps-secrets` management resources.
+the VPS instance manages remote applications. The existing OCP instance also owns
+the `vps-secrets` Application in `openshift-gitops`, including secret delivery.
 Do not import `groups/all` into the VPS root: that group installs local
-Argo CD/ESO, MetalLB, and homelab services that the VPS deliberately omits.
+Argo CD, full ESO defaults, MetalLB, and homelab services. The VPS runs a
+single ESO controller with its own local mirrored-Secret provider.
 
 ## Layout
 
@@ -84,7 +86,9 @@ What an agent needs to know from this side:
   wildcard selectors and template expressions. Put a list item's first
   field on the same line as its dash, as in `- name: example`.
 - Secrets are ExternalSecrets backed by the `onepassword` ClusterSecretStores
-  (`components/external-secrets-operator/`) — never commit secret values
+  (`components/external-secrets-operator/`) on rk8s. VPS ExternalSecrets use
+  `ClusterSecretStore/vps-secrets`, reading OpenShift-mirrored Secrets in
+  `external-secrets`; no Connect credential on the VPS. Never commit secret values
 - When adding or moving manifests, update the component's
   `kustomization.yaml`; prefer `<metadata.name>-<kind>.yaml` filenames
 - k3s defaults `local-path` as the default StorageClass — PVCs that need

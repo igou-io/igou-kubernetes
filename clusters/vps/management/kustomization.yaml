@@ -4,11 +4,9 @@ kind: Kustomization
 
 resources:
   - vps-k3s-api-service.yaml
-  - vps-connection-externalsecret.yaml
+  - vps-secrets-externalsecret.yaml
   - vps-cluster-externalsecret.yaml
-  - vps-cert-manager-secretstore.yaml
-  - vps-tailscale-secretstore.yaml
-  - vps-gotify-secretstore.yaml
+  - vps-secrets-secretstore.yaml
   - vps-cloudflare-source-externalsecret.yaml
   - vps-cloudflare-pushsecret.yaml
   - vps-tailscale-source-externalsecret.yaml
