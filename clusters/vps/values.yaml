@@ -4,103 +4,91 @@ default:
     enabled: true
     enableAutoSync: true
     autoSyncPrune: false
-    project: "vps"
+    project: vps
     labels:
-      app-source: "cluster-vps"
+      app-source: cluster-vps
     destination:
-      namespace: "vps-system"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: vps-system
+      server: https://vps-k3s-api.tailscale.svc.cluster.local:6443
     source:
-      repoURL: "https://github.com/igou-io/igou-kubernetes.git"
-      targetRevision: "master"
+      repoURL: https://github.com/igou-io/igou-kubernetes.git
+      targetRevision: master
     syncOptions:
-      - "ServerSideApply=true"
-      - "CreateNamespace=false"
-      - "SkipDryRunOnMissingResource=true"
+      - ServerSideApply=true
+      - CreateNamespace=false
+      - SkipDryRunOnMissingResource=true
     syncPolicyRetry:
       limit: 10
       backoff:
-        duration: "5s"
+        duration: 5s
         factor: 2
-        maxDuration: "3m"
+        maxDuration: 3m
+
 applications:
   vps-management:
-    project: "vps-management"
-    enableAutoSync: true
+    project: vps-management
     annotations:
-      argocd.argoproj.io/sync-wave: "-5"
+      argocd.argoproj.io/sync-wave: '-5'
     destination:
-      namespace: "vps-secrets"
-      server: "https://kubernetes.default.svc"
+      namespace: vps-secrets
+      server: https://kubernetes.default.svc
     source:
-      path: "clusters/vps/management"
+      path: clusters/vps/management
+
   vps-bootstrap:
-    project: "vps"
-    enableAutoSync: true
     annotations:
-      argocd.argoproj.io/sync-wave: "0"
+      argocd.argoproj.io/sync-wave: '0'
     destination:
-      namespace: "vps-system"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: vps-system
     source:
-      path: "clusters/vps/bootstrap"
+      path: clusters/vps/bootstrap
+
   vps-cert-manager:
-    project: "vps"
-    enableAutoSync: true
     annotations:
-      argocd.argoproj.io/sync-wave: "5"
+      argocd.argoproj.io/sync-wave: '5'
     destination:
-      namespace: "cert-manager"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: cert-manager
     source:
-      path: "clusters/vps/platform/cert-manager"
+      path: clusters/vps/platform/cert-manager
+
   vps-nginx-gateway:
-    project: "vps"
-    enableAutoSync: true
     annotations:
-      argocd.argoproj.io/sync-wave: "6"
+      argocd.argoproj.io/sync-wave: '6'
     destination:
-      namespace: "nginx-gateway"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: nginx-gateway
     source:
-      path: "clusters/vps/platform/nginx-gateway"
+      path: clusters/vps/platform/nginx-gateway
+
   vps-tailscale-operator:
-    project: "vps"
-    enableAutoSync: true
     annotations:
-      argocd.argoproj.io/sync-wave: "8"
+      argocd.argoproj.io/sync-wave: '8'
     destination:
-      namespace: "tailscale"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: tailscale
     source:
-      path: "clusters/vps/platform/tailscale-operator"
+      path: clusters/vps/platform/tailscale-operator
+
   vps-gateway:
-    project: "vps"
-    enableAutoSync: true
     annotations:
-      argocd.argoproj.io/sync-wave: "10"
+      argocd.argoproj.io/sync-wave: '10'
     destination:
-      namespace: "nginx-gateway"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: nginx-gateway
     source:
-      path: "clusters/vps/gateway"
+      path: clusters/vps/gateway
+
   vps-igou-io:
-    project: "vps"
     enableAutoSync: false
     annotations:
-      argocd.argoproj.io/sync-wave: "20"
+      argocd.argoproj.io/sync-wave: '20'
     destination:
-      namespace: "igou-io"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: igou-io
     source:
-      path: "clusters/vps/applications/igou-io"
+      path: clusters/vps/applications/igou-io
+
   vps-gotify:
-    project: "vps"
     enableAutoSync: false
     annotations:
-      argocd.argoproj.io/sync-wave: "20"
+      argocd.argoproj.io/sync-wave: '20'
     destination:
-      namespace: "gotify"
-      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+      namespace: gotify
     source:
-      path: "clusters/vps/applications/gotify"
+      path: clusters/vps/applications/gotify

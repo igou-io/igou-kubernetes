@@ -1,20 +1,17 @@
 ---
-apiVersion: "gateway.networking.k8s.io/v1"
-kind: "HTTPRoute"
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: "igou-io"
-  namespace: "igou-io"
+  name: igou-io
+  namespace: igou-io
 spec:
   parentRefs:
-    -
-      name: "vps-public"
-      namespace: "nginx-gateway"
-      sectionName: "https"
+    - name: vps-public
+      namespace: nginx-gateway
+      sectionName: https
   hostnames:
-    - "igou.io"
+    - igou.io
   rules:
-    -
-      backendRefs:
-        -
-          name: "igou-io"
+    - backendRefs:
+        - name: igou-io
           port: 80

@@ -1,13 +1,12 @@
 ---
-apiVersion: "rbac.authorization.k8s.io/v1"
-kind: "ClusterRole"
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: "vps-eso-permission-review"
+  name: vps-eso-permission-review
 rules:
-  -
-    apiGroups:
-      - "authorization.k8s.io"
+  - apiGroups:
+      - authorization.k8s.io
     resources:
-      - "selfsubjectrulesreviews"
+      - selfsubjectrulesreviews
     verbs:
-      - "create"
+      - create

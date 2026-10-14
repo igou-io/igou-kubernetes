@@ -1,7 +1,7 @@
 ---
-apiVersion: "v1"
-kind: "Namespace"
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: "tailscale"
+  name: tailscale
   labels:
-    app.kubernetes.io/part-of: "vps"
+    app.kubernetes.io/part-of: vps

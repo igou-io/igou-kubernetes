@@ -1,21 +1,21 @@
 ---
-apiVersion: "argoproj.io/v1alpha1"
-kind: "Application"
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
-  name: "vps"
-  namespace: "openshift-gitops"
+  name: vps
+  namespace: openshift-gitops
 spec:
-  project: "vps-root"
+  project: vps-root
   destination:
-    namespace: "openshift-gitops"
-    server: "https://kubernetes.default.svc"
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
   source:
-    repoURL: "https://github.com/igou-io/igou-kubernetes.git"
-    targetRevision: "master"
-    path: "clusters/vps"
+    repoURL: https://github.com/igou-io/igou-kubernetes.git
+    targetRevision: master
+    path: clusters/vps
   syncPolicy:
     automated:
       selfHeal: true
     syncOptions:
-      - "ServerSideApply=true"
-      - "CreateNamespace=false"
+      - ServerSideApply=true
+      - CreateNamespace=false

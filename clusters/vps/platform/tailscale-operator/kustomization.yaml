@@ -1,34 +1,35 @@
 ---
-apiVersion: "kustomize.config.k8s.io/v1beta1"
-kind: "Kustomization"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tailscale
+
 resources: []
-namespace: "tailscale"
+
 helmCharts:
-  -
-    name: "tailscale-operator"
-    releaseName: "tailscale"
-    namespace: "tailscale"
-    version: "1.104.1"
-    repo: "https://pkgs.tailscale.com/helmcharts"
+  - name: tailscale-operator
+    releaseName: tailscale
+    namespace: tailscale
+    version: 1.104.1
+    repo: https://pkgs.tailscale.com/helmcharts
     includeCRDs: true
     valuesInline:
       oauth: {}
       installCRDs: true
       operatorConfig:
         defaultTags:
-          - "tag:vps-operator"
-        hostname: "vps-operator"
+          - tag:vps-operator
+        hostname: vps-operator
         resources:
           requests:
-            cpu: "10m"
-            memory: "64Mi"
+            cpu: 10m
+            memory: 64Mi
           limits:
-            memory: "256Mi"
+            memory: 256Mi
         image:
-          pullPolicy: "IfNotPresent"
+          pullPolicy: IfNotPresent
       proxyConfig:
-        defaultTags: "tag:vps-app"
-        firewallMode: "auto"
+        defaultTags: tag:vps-app
+        firewallMode: auto
       apiServerProxyConfig:
-        mode: "false"
-        allowImpersonation: "false"
+        mode: 'false'
+        allowImpersonation: 'false'

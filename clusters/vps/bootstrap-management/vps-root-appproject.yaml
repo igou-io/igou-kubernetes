@@ -1,22 +1,19 @@
 ---
-apiVersion: "argoproj.io/v1alpha1"
-kind: "AppProject"
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
 metadata:
-  name: "vps-root"
-  namespace: "openshift-gitops"
+  name: vps-root
+  namespace: openshift-gitops
 spec:
-  description: "Dedicated VPS vps-root resources"
+  description: Dedicated VPS vps-root resources
   sourceRepos:
-    - "https://github.com/igou-io/igou-kubernetes.git"
+    - https://github.com/igou-io/igou-kubernetes.git
   destinations:
-    -
-      namespace: "openshift-gitops"
-      server: "https://kubernetes.default.svc"
+    - namespace: openshift-gitops
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist: []
   namespaceResourceWhitelist:
-    -
-      group: "argoproj.io"
-      kind: "Application"
-    -
-      group: "argoproj.io"
-      kind: "AppProject"
+    - group: argoproj.io
+      kind: Application
+    - group: argoproj.io
+      kind: AppProject

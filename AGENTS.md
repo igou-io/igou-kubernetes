@@ -76,6 +76,10 @@ What an agent needs to know from this side:
 
 - YAML: 2-space indent, `---` header, `true`/`false` booleans, block style
   (`{}`/`[]` only for genuinely empty values)
+- Keep ordinary strings unquoted. Quote values that must remain strings
+  when YAML would interpret them as numbers, booleans, or null; also quote
+  wildcard selectors and template expressions. Put a list item's first
+  field on the same line as its dash, as in `- name: example`.
 - Secrets are ExternalSecrets backed by the `onepassword` ClusterSecretStores
   (`components/external-secrets-operator/`) — never commit secret values
 - When adding or moving manifests, update the component's

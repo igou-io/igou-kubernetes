@@ -1,23 +1,24 @@
 ---
-apiVersion: "kustomize.config.k8s.io/v1beta1"
-kind: "Kustomization"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 resources:
-  - "vps-system-namespace.yaml"
-  - "cert-manager-namespace.yaml"
-  - "tailscale-namespace.yaml"
-  - "nginx-gateway-namespace.yaml"
-  - "igou-io-namespace.yaml"
-  - "gotify-namespace.yaml"
-  - "vps-argocd-serviceaccount.yaml"
-  - "vps-argocd-auth-secret.yaml"
-  - "vps-eso-serviceaccount.yaml"
-  - "vps-eso-auth-secret.yaml"
-  - "vps-argocd-clusterrolebinding.yaml"
-  - "vps-eso-permission-review-clusterrole.yaml"
-  - "vps-eso-permission-review-clusterrolebinding.yaml"
-  - "vps-cert-manager-secret-writer-role.yaml"
-  - "vps-cert-manager-secret-writer-rolebinding.yaml"
-  - "vps-tailscale-secret-writer-role.yaml"
-  - "vps-tailscale-secret-writer-rolebinding.yaml"
-  - "vps-gotify-secret-writer-role.yaml"
-  - "vps-gotify-secret-writer-rolebinding.yaml"
+  - vps-system-namespace.yaml
+  - cert-manager-namespace.yaml
+  - tailscale-namespace.yaml
+  - nginx-gateway-namespace.yaml
+  - igou-io-namespace.yaml
+  - gotify-namespace.yaml
+  - vps-argocd-serviceaccount.yaml
+  - vps-argocd-auth-secret.yaml
+  - vps-eso-serviceaccount.yaml
+  - vps-eso-auth-secret.yaml
+  - vps-argocd-clusterrolebinding.yaml
+  - vps-eso-permission-review-clusterrole.yaml
+  - vps-eso-permission-review-clusterrolebinding.yaml
+  - vps-cert-manager-secret-writer-role.yaml
+  - vps-cert-manager-secret-writer-rolebinding.yaml
+  - vps-tailscale-secret-writer-role.yaml
+  - vps-tailscale-secret-writer-rolebinding.yaml
+  - vps-gotify-secret-writer-role.yaml
+  - vps-gotify-secret-writer-rolebinding.yaml
