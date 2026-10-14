@@ -5,12 +5,12 @@ kind: Kustomization
 resources:
   - argocd-namespace.yaml
   - external-secrets-namespace.yaml
-  - vps-system-namespace.yaml
+  - node-exporter-namespace.yaml
   - cert-manager-namespace.yaml
   - tailscale-namespace.yaml
   - nginx-gateway-namespace.yaml
   - igou-io-namespace.yaml
   - gotify-namespace.yaml
-  - vps-argocd-serviceaccount.yaml
-  - vps-argocd-auth-secret.yaml
-  - vps-argocd-clusterrolebinding.yaml
+  - argocd-manager-serviceaccount.yaml
+  - argocd-manager-token-secret.yaml
+  - argocd-manager-clusterrolebinding.yaml

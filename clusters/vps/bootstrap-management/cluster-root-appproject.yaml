@@ -1,0 +1,21 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cluster-root
+  namespace: vps-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  description: Dedicated VPS cluster-root resources
+  sourceRepos:
+    - https://github.com/igou-io/igou-kubernetes.git
+  destinations:
+    - namespace: vps-gitops
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist: []
+  namespaceResourceWhitelist:
+    - group: argoproj.io
+      kind: Application
+    - group: argoproj.io
+      kind: AppProject

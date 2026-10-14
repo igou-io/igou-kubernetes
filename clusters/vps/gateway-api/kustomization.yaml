@@ -1,0 +1,11 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - dns-token-externalsecret.yaml
+  - cluster-acme-clusterissuer.yaml
+  - gateway-public-tls-certificate.yaml
+  - public-gateway.yaml
+  - public-http-redirect-httproute.yaml
+  - igou-io-www-redirect-httproute.yaml

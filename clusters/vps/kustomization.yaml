@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: vps-gitops
 
 resources:
-  - vps-appproject.yaml
+  - cluster-config-appproject.yaml
 
 helmGlobals:
   chartHome: ../../.helm/charts

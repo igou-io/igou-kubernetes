@@ -4,11 +4,11 @@ default:
     enabled: true
     enableAutoSync: true
     autoSyncPrune: false
-    project: vps
+    project: cluster-config
     labels:
       app-source: cluster-vps
     destination:
-      namespace: vps-system
+      namespace: node-exporter
       server: https://vps-k3s-api.vps-secrets.svc.cluster.local:6443
     source:
       repoURL: https://github.com/igou-io/igou-kubernetes.git
@@ -25,76 +25,76 @@ default:
         maxDuration: 3m
 
 applications:
-  vps-bootstrap:
+  bootstrap:
     annotations:
       argocd.argoproj.io/sync-wave: '0'
     destination:
-      namespace: vps-system
+      namespace: node-exporter
     source:
       path: clusters/vps/bootstrap
 
-  vps-external-secrets:
+  external-secrets-operator:
     annotations:
       argocd.argoproj.io/sync-wave: '3'
     destination:
       namespace: external-secrets
     source:
-      path: clusters/vps/platform/external-secrets
+      path: clusters/vps/external-secrets-operator
 
-  vps-secret-store:
+  external-secrets-config:
     annotations:
       argocd.argoproj.io/sync-wave: '4'
     destination:
       namespace: external-secrets
     source:
-      path: clusters/vps/platform/secret-store
+      path: clusters/vps/external-secrets-config
 
-  vps-cert-manager:
+  cert-manager:
     annotations:
       argocd.argoproj.io/sync-wave: '5'
     destination:
       namespace: cert-manager
     source:
-      path: clusters/vps/platform/cert-manager
+      path: clusters/vps/cert-manager
 
-  vps-nginx-gateway:
+  nginx-gateway-fabric:
     annotations:
       argocd.argoproj.io/sync-wave: '6'
     destination:
       namespace: nginx-gateway
     source:
-      path: clusters/vps/platform/nginx-gateway
+      path: clusters/vps/nginx-gateway-fabric
 
-  vps-tailscale-operator:
+  tailscale-operator:
     annotations:
       argocd.argoproj.io/sync-wave: '8'
     destination:
       namespace: tailscale
     source:
-      path: clusters/vps/platform/tailscale-operator
+      path: clusters/vps/tailscale-operator
 
-  vps-gateway:
+  gateway-api:
     annotations:
       argocd.argoproj.io/sync-wave: '10'
     destination:
       namespace: nginx-gateway
     source:
-      path: clusters/vps/gateway
+      path: clusters/vps/gateway-api
 
-  vps-igou-io:
+  igou-io:
     enableAutoSync: false
     annotations:
       argocd.argoproj.io/sync-wave: '20'
     destination:
       namespace: igou-io
     source:
-      path: clusters/vps/applications/igou-io
+      path: clusters/vps/igou-io
 
-  vps-gotify:
+  gotify:
     enableAutoSync: false
     annotations:
       argocd.argoproj.io/sync-wave: '20'
     destination:
       namespace: gotify
     source:
-      path: clusters/vps/applications/gotify
+      path: clusters/vps/gotify

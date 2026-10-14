@@ -4,4 +4,4 @@ kind: Kustomization
 
 resources:
   - ../seed
-  - ../platform/node-exporter
+  - ../node-exporter

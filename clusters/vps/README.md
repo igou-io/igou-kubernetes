@@ -8,7 +8,7 @@ The existing OpenShift instance owns secret delivery through its
 cert-manager, NGINX Gateway Fabric and the Tailscale operator. Argo CD,
 Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/all`.
 
-- `seed/`: eight namespaces and the cluster-admin `argocd/vps-argocd`
+- `seed/`: eight namespaces and the cluster-admin `argocd/argocd-manager`
   ServiceAccount, binding and generated-token Secret. AAP applies only this
   bundle using the root-owned system:admin kubeconfig. No workload is seeded.
 - `bootstrap/`: adopts the seed and adds the node-exporter DaemonSet through Argo.
@@ -18,16 +18,19 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
 - `management/`: API egress in OpenShift `vps-secrets`, remote registration in
   `vps-gitops`, and source ExternalSecrets/PushSecrets plus the connection
   Secret and remote SecretStore in `openshift-gitops`.
-- `platform/`: pinned controllers, local ClusterSecretStore and exporter.
-- `gateway/`: local Cloudflare ExternalSecret, DNS-01 issuer, certificate,
-  shared Gateway and redirects.
-- `applications/`: website, Gotify, local PVC, NetworkPolicies and Gotify's ExternalSecret.
+- `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
+  and the local mirrored-Secret ClusterSecretStore.
+- `cert-manager/`, `nginx-gateway-fabric/`, `tailscale-operator/` and
+  `node-exporter/`: the other pinned cluster components.
+- `gateway-api/`: DNS credential, issuer, certificate, public Gateway and redirects.
+- `igou-io/` and `gotify/`: application Deployments, Services, HTTPRoutes,
+  NetworkPolicies, and Gotify's local PVC/ExternalSecret.
 - `migration/`: one-time Gotify restoration Job, excluded from the normal root.
   It refuses a nonempty destination and mounts only protected staged Gotify data.
 
 OpenShift PushSecrets mirror `vps-cloudflare`, `vps-tailscale` and `vps-gotify`
-into the VPS `external-secrets` namespace. Local `ClusterSecretStore/vps-secrets`
-reads that namespace using TokenRequest authentication as `vps-secrets-reader`.
+into the VPS `external-secrets` namespace. Local `ClusterSecretStore/local-mirrors`
+reads that namespace using TokenRequest authentication as `mirror-reader`.
 Its reader can only read mirror Secrets and review its permissions; its consumer
 namespace allowlist is `cert-manager`, `tailscale` and `gotify`. Local
 ExternalSecrets create the final application Secrets. OpenShift uses the seeded
@@ -64,3 +67,8 @@ OpenShift monitoring retains its existing Tailscale scrape endpoint.
 The durable architecture, migration acceptance, resource measurements and
 legacy AAP retirement live in
 `igou-docs/kubernetes/VPS Kubernetes Architecture and Migration.md`.
+
+Manifest files use `<metadata.name>-<kind>.yaml`, with `-pvc.yaml` for PVCs,
+as defined by `igou-openshift/CODE_STANDARDS.md`. Local objects use purpose
+names (`cluster-acme`, `public`, `gateway-public-tls`, `argocd-manager`,
+`mirror-reader`); shared OpenShift delivery objects keep the `vps` prefix.

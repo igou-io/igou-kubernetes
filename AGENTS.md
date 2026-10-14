@@ -87,10 +87,14 @@ What an agent needs to know from this side:
   field on the same line as its dash, as in `- name: example`.
 - Secrets are ExternalSecrets backed by the `onepassword` ClusterSecretStores
   (`components/external-secrets-operator/`) on rk8s. VPS ExternalSecrets use
-  `ClusterSecretStore/vps-secrets`, reading OpenShift-mirrored Secrets in
+  `ClusterSecretStore/local-mirrors`, reading OpenShift-mirrored Secrets in
   `external-secrets`; no Connect credential on the VPS. Never commit secret values
-- When adding or moving manifests, update the component's
-  `kustomization.yaml`; prefer `<metadata.name>-<kind>.yaml` filenames
+- Follow `igou-openshift/CODE_STANDARDS.md` for authored manifests: one object
+  per file, named `<metadata.name>-<lowercase-kind>.yaml`; use `-pv.yaml` and
+  `-pvc.yaml` for volumes/claims. Update the nearest `kustomization.yaml`.
+- Under `clusters/vps/`, use component directories and component-named Argo
+  Applications, as in `clusters/ocp/`. Local resources use purpose names;
+  prefix shared OpenShift management resources with `vps` to identify their cluster.
 - k3s defaults `local-path` as the default StorageClass — PVCs that need
   TrueNAS storage must pin `storageClassName` explicitly
 

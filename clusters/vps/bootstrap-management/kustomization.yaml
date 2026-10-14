@@ -6,6 +6,6 @@ resources:
   - vps-gitops-namespace.yaml
   - vps-secrets-namespace.yaml
   - vps-argocd.yaml
-  - vps-root-appproject.yaml
+  - cluster-root-appproject.yaml
   - vps-application.yaml
   - vps-secrets-application.yaml

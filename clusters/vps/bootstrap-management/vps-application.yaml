@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: '2'
     argocd.argoproj.io/ignore-healthcheck: 'true'
 spec:
-  project: vps-root
+  project: cluster-root
   destination:
     namespace: vps-gitops
     server: https://kubernetes.default.svc
