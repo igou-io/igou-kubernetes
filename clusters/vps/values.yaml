@@ -1,0 +1,106 @@
+---
+default:
+  app:
+    enabled: true
+    enableAutoSync: true
+    autoSyncPrune: false
+    project: "vps"
+    labels:
+      app-source: "cluster-vps"
+    destination:
+      namespace: "vps-system"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      repoURL: "https://github.com/igou-io/igou-kubernetes.git"
+      targetRevision: "master"
+    syncOptions:
+      - "ServerSideApply=true"
+      - "CreateNamespace=false"
+      - "SkipDryRunOnMissingResource=true"
+    syncPolicyRetry:
+      limit: 10
+      backoff:
+        duration: "5s"
+        factor: 2
+        maxDuration: "3m"
+applications:
+  vps-management:
+    project: "vps-management"
+    enableAutoSync: true
+    annotations:
+      argocd.argoproj.io/sync-wave: "-5"
+    destination:
+      namespace: "vps-secrets"
+      server: "https://kubernetes.default.svc"
+    source:
+      path: "clusters/vps/management"
+  vps-bootstrap:
+    project: "vps"
+    enableAutoSync: true
+    annotations:
+      argocd.argoproj.io/sync-wave: "0"
+    destination:
+      namespace: "vps-system"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/bootstrap"
+  vps-cert-manager:
+    project: "vps"
+    enableAutoSync: true
+    annotations:
+      argocd.argoproj.io/sync-wave: "5"
+    destination:
+      namespace: "cert-manager"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/platform/cert-manager"
+  vps-nginx-gateway:
+    project: "vps"
+    enableAutoSync: true
+    annotations:
+      argocd.argoproj.io/sync-wave: "6"
+    destination:
+      namespace: "nginx-gateway"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/platform/nginx-gateway"
+  vps-tailscale-operator:
+    project: "vps"
+    enableAutoSync: true
+    annotations:
+      argocd.argoproj.io/sync-wave: "8"
+    destination:
+      namespace: "tailscale"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/platform/tailscale-operator"
+  vps-gateway:
+    project: "vps"
+    enableAutoSync: true
+    annotations:
+      argocd.argoproj.io/sync-wave: "10"
+    destination:
+      namespace: "nginx-gateway"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/gateway"
+  vps-igou-io:
+    project: "vps"
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/sync-wave: "20"
+    destination:
+      namespace: "igou-io"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/applications/igou-io"
+  vps-gotify:
+    project: "vps"
+    enableAutoSync: false
+    annotations:
+      argocd.argoproj.io/sync-wave: "20"
+    destination:
+      namespace: "gotify"
+      server: "https://vps-k3s-api.tailscale.svc.cluster.local:6443"
+    source:
+      path: "clusters/vps/applications/gotify"

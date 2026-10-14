@@ -10,11 +10,13 @@ following the same ArgoCD app-of-apps layout as
 platform operators from their official upstream Helm charts (via kustomize
 `helmCharts`) instead of OLM.
 
-**Cluster naming:** the only cluster today is `clusters/internal/` — this is
-the cluster called **`rk8s`** everywhere else (the `rk8s*` inventory groups in
-igou-inventory, the k3s-on-ARM-boards cluster in igou-ansible docs, "rk8s" in
-igou-openshift federation configs). GitOps dir name `internal` == Ansible
-group `rk8s`; they are the same cluster.
+**Cluster naming:** `clusters/internal/` is **`rk8s`** (the ARM cluster and
+`rk8s*` inventory groups). `clusters/vps/` is the standalone Debian cluster
+**`vps`**, reconciled by OpenShift Argo CD. Its namespaces and workloads,
+bootstrap access resources, and OpenShift-side management manifests live in
+that directory. Its root Application/AppProjects live in `openshift-gitops`.
+Do not import `groups/all` into the VPS root: that group installs local
+Argo CD/ESO, MetalLB, and homelab services that the VPS deliberately omits.
 
 ## Layout
 

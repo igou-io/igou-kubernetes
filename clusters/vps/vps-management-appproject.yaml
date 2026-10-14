@@ -1,0 +1,28 @@
+---
+apiVersion: "argoproj.io/v1alpha1"
+kind: "AppProject"
+metadata:
+  name: "vps-management"
+  namespace: "openshift-gitops"
+spec:
+  description: "Dedicated VPS vps-management resources"
+  sourceRepos:
+    - "https://github.com/igou-io/igou-kubernetes.git"
+  destinations:
+    -
+      namespace: "vps-secrets"
+      server: "https://kubernetes.default.svc"
+    -
+      namespace: "tailscale"
+      server: "https://kubernetes.default.svc"
+    -
+      namespace: "openshift-gitops"
+      server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+    -
+      group: ""
+      kind: "Namespace"
+  namespaceResourceWhitelist:
+    -
+      group: "*"
+      kind: "*"
