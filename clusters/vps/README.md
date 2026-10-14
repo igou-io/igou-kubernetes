@@ -68,8 +68,10 @@ Argo installs ESO at wave 3, the local store at 4, NGINX at 6,
 Tailscale at 8 and the Gateway at 10. Credentials synchronize independently;
 verify mirror and local ExternalSecret readiness before application acceptance.
 
-The separate `node-exporter` Application runs its DaemonSet at wave 10, with
-non-root host-network/host-PID access and read-only host mounts. AAP stops and
+The separate `node-exporter` Application renders the Prometheus community
+`prometheus-node-exporter` chart `4.60.0` at wave 10, with non-root
+host-network/host-PID access and read-only host mounts. The image digest and
+resource limits remain pinned in its Kustomization. AAP stops and
 disables any legacy host exporter service.
 OpenShift monitoring retains its existing Tailscale scrape endpoint.
 
