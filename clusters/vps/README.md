@@ -5,33 +5,43 @@ Only manifests installed on the VPS live here. The dedicated
 OpenShift Argo CD instance `vps` in `vps-gitops` reconciles remote workloads.
 The existing OpenShift instance owns secret delivery through its
 `openshift-gitops/vps-secrets` Application. The VPS runs one ESO controller,
-cert-manager, NGINX Gateway Fabric and the Tailscale operator. Argo CD,
+NGINX Gateway Fabric and the Tailscale operator. Argo CD, cert-manager,
 Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/all`.
 
-- `seed/`: eight namespaces and the cluster-admin `argocd/argocd-manager`
+- `seed/`: seven namespaces and the cluster-admin `argocd/argocd-manager`
   ServiceAccount, binding and generated-token Secret. AAP applies only this
   bundle using the root-owned system:admin kubeconfig. No workload is seeded.
 - `bootstrap/`: adopts only the namespace and Argo identity seed.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
-- `cert-manager/`, `nginx-gateway-fabric/`, `tailscale-operator/` and
+- `nginx-gateway-fabric/`, `tailscale-operator/` and
   `node-exporter/`: the other pinned cluster components.
-- `gateway-api/`: DNS credential, issuer, certificate, public Gateway and redirects.
+- `gateway-api/`: mirrored TLS ExternalSecret, public Gateway and redirects.
 - `igou-io/` and `gotify/`: application Deployments, Services, HTTPRoutes,
   NetworkPolicies, and Gotify's local PVC/ExternalSecret.
 - `migration/`: one-time Gotify restoration Job, excluded from the normal root.
   It refuses a nonempty destination and mounts only protected staged Gotify data.
 
-OpenShift PushSecrets mirror `vps-cloudflare`, `vps-tailscale` and `vps-gotify`
+OpenShift PushSecrets mirror `vps-public-tls`, `vps-tailscale` and `vps-gotify`
 into the VPS `external-secrets` namespace. Local `ClusterSecretStore/local-mirrors`
 reads that namespace using TokenRequest authentication as `mirror-reader`.
 Its reader can only read mirror Secrets and review its permissions; its consumer
-namespace allowlist is `cert-manager`, `tailscale` and `gotify`. Local
+namespace allowlist is `nginx-gateway`, `tailscale` and `gotify`. Local
 ExternalSecrets create the final application Secrets. OpenShift uses the seeded
 cluster-admin Argo credential for remote pushes as well as remote registration;
 `remoteNamespace` controls delivery and does not restrict that token's privileges.
 The generated token, CA and admin kubeconfig are published to `lab_agents/vps-k3s`;
 the admin kubeconfig stays in the management vault. No `eso_token` is generated.
+
+OpenShift cert-manager issues and renews a dedicated certificate for `igou.io`
+and `*.igou.io`. The Cloudflare token and ACME account stay in OpenShift.
+PushSecret sends a single JSON `bundle` containing `tls.crt` and `tls.key`
+to the Opaque `external-secrets/vps-public-tls` mirror. Local ESO renders
+`nginx-gateway/gateway-public-tls` as `kubernetes.io/tls`; the Gateway's
+certificate reference is unchanged. Each hop refreshes every five minutes.
+Existing mirrors and TLS Secrets are retained if delivery stops. Public HTTPS
+continues until the installed certificate expires; renewal delivery depends
+on OpenShift and Tailscale. No DNS API credential or ACME controller runs here.
 
 The private API is reached through OpenShift's
 `vps-k3s-api.vps-secrets.svc.cluster.local:6443` Tailscale egress Service.
@@ -54,7 +64,7 @@ The website pins a public `quay.io/igou/igou.io:vps` digest. CI publishes succes
 master builds; Renovate proposes digest updates. Application auto-sync starts
 disabled until the website is verified and Gotify's PVC is restored before startup.
 Host provisioning uses `vps_bootstrap_host` and `vps_publish_access` in AAP.
-Argo installs ESO at wave 3, the local store at 4, cert-manager at 5, NGINX at 6,
+Argo installs ESO at wave 3, the local store at 4, NGINX at 6,
 Tailscale at 8 and the Gateway at 10. Credentials synchronize independently;
 verify mirror and local ExternalSecret readiness before application acceptance.
 
@@ -69,5 +79,5 @@ legacy AAP retirement live in
 
 Manifest files use `<metadata.name>-<kind>.yaml`, with `-pvc.yaml` for PVCs,
 as defined by `igou-openshift/CODE_STANDARDS.md`. Local objects use purpose
-names (`cluster-acme`, `public`, `gateway-public-tls`, `argocd-manager`,
+names (`public`, `gateway-public-tls`, `argocd-manager`,
 `mirror-reader`).

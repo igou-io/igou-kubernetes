@@ -20,7 +20,9 @@ OpenShift Argo CD instance `vps` in `vps-gitops` reconciles the remote VPS
 manifests from this repository; its Application catalog lives in igou-openshift.
 Do not import `groups/all` into the VPS root: that group installs local
 Argo CD, full ESO defaults, MetalLB, and homelab services. The VPS runs a
-single ESO controller with its own local mirrored-Secret provider.
+single ESO controller with its own local mirrored-Secret provider. OpenShift
+cert-manager owns public certificate issuance and renewal; only the TLS bundle
+is delivered to the VPS, whose Gateway consumes a local ESO-managed TLS Secret.
 
 ## Layout
 

@@ -6,7 +6,6 @@ resources:
   - argocd-namespace.yaml
   - external-secrets-namespace.yaml
   - node-exporter-namespace.yaml
-  - cert-manager-namespace.yaml
   - tailscale-namespace.yaml
   - nginx-gateway-namespace.yaml
   - igou-io-namespace.yaml
