@@ -2,14 +2,17 @@
 
 `vps` is the standalone Debian/k3s cluster for `igou.io` and Gotify.
 All cluster resources and its OpenShift-side management manifests live here.
-OpenShift Argo CD reconciles them; no Argo CD, ESO, MetalLB, or monitoring
+The dedicated OpenShift Argo CD instance `vps` in `vps-gitops` reconciles
+them; no Argo CD, ESO, MetalLB, or monitoring
 server is installed on the VPS. Do not include `groups/all` in this root.
 
 - `bootstrap/`: VPS namespaces, dedicated Argo deployment identity, and a
   separate ESO writer restricted to three namespaces, and the node-exporter
   DaemonSet. Bootstrap generates
   service-account credentials; their values never enter Git.
-- `bootstrap-management/`: initial OCP root Application and AppProject.
+- `bootstrap-management/`: OpenShift namespaces, the dedicated Argo CD
+  instance, and its initial root Application/AppProject. The existing OCP
+  instance owns these resources through its `vps-gitops` Application.
 - `management/`: OCP API egress, ExternalSecrets, remote SecretStores,
   PushSecrets, and the remote Argo cluster registration.
 - `platform/`: pinned cert-manager, NGINX Gateway Fabric, Tailscale operator,
@@ -22,10 +25,19 @@ server is installed on the VPS. Do not include `groups/all` in this root.
   protected staged Gotify data directory.
 
 The API endpoint is private host Tailscale, reached by OCP through
-`vps-k3s-api.tailscale.svc.cluster.local:6443`. The host has `tag:vps`,
+`vps-k3s-api.vps-secrets.svc.cluster.local:6443`. The host has `tag:vps`,
 the operator has `tag:vps-operator`, and service proxies default to
 `tag:vps-app`. API proxy mode is off. Creating a public Gateway does not expose
 the Kubernetes API.
+
+The dedicated instance has its own server, controller, repo server, Redis,
+OpenShift OAuth and Route at `https://vps-argocd.apps.ocp.igou.systems`.
+Its local namespace access is limited to `vps-gitops` and `vps-secrets`;
+`vps-secrets` is labeled for the GitOps Operator to grant namespace permissions.
+Keep it out of `ARGOCD_CLUSTER_CONFIG_NAMESPACES`: only the remote VPS
+registration uses a privileged deployment token. Its annotation tracking has
+installation ID `vps`. ApplicationSet is disabled; Kustomize Helm rendering
+and child Application health are configured for this app-of-apps root.
 
 The website uses a digest of the public `quay.io/igou/igou.io:vps` image.
 Renovate discovers digest changes; CI publishes only successful master builds.

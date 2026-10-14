@@ -3,11 +3,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: vps
-  namespace: openshift-gitops
+  namespace: vps-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+    argocd.argoproj.io/ignore-healthcheck: 'true'
 spec:
   project: vps-root
   destination:
-    namespace: openshift-gitops
+    namespace: vps-gitops
     server: https://kubernetes.default.svc
   source:
     repoURL: https://github.com/igou-io/igou-kubernetes.git

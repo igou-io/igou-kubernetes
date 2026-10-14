@@ -1,0 +1,85 @@
+---
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  name: vps
+  namespace: vps-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  applicationSet:
+    enabled: false
+  controller:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: '1'
+        memory: 1Gi
+  repo:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: '1'
+        memory: 1Gi
+  redis:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
+  server:
+    host: vps-argocd.apps.ocp.igou.systems
+    insecure: true
+    route:
+      enabled: true
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  sso:
+    provider: dex
+    dex:
+      openShiftOAuth: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 500m
+          memory: 128Mi
+  rbac:
+    defaultPolicy: role:none
+    policy: |
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, admin, role:admin
+    scopes: >-
+      [groups, preferred_username]
+  resourceTrackingMethod: annotation
+  extraConfig:
+    installationID: vps
+  kustomizeBuildOptions: --enable-helm --load-restrictor LoadRestrictionsNone --helm-kube-version v1.36.5
+  resourceHealthChecks:
+    - group: argoproj.io
+      kind: Application
+      check: |
+        local health = {}
+        health.status = "Progressing"
+        health.message = "Waiting for child Application health"
+        if obj.status ~= nil and obj.status.health ~= nil then
+          health.status = obj.status.health.status
+          health.message = obj.status.health.message
+        end
+        return health

@@ -14,7 +14,10 @@ platform operators from their official upstream Helm charts (via kustomize
 `rk8s*` inventory groups). `clusters/vps/` is the standalone Debian cluster
 **`vps`**, reconciled by OpenShift Argo CD. Its namespaces and workloads,
 bootstrap access resources, and OpenShift-side management manifests live in
-that directory. Its root Application/AppProjects live in `openshift-gitops`.
+that directory. Its dedicated OpenShift Argo CD instance is `vps` in
+`vps-gitops`; its root Application/AppProjects and remote registration live
+there. The existing OCP instance owns `bootstrap-management/` provisioning;
+the VPS instance manages its applications and `vps-secrets` management resources.
 Do not import `groups/all` into the VPS root: that group installs local
 Argo CD/ESO, MetalLB, and homelab services that the VPS deliberately omits.
 

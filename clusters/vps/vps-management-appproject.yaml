@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: vps-management
-  namespace: openshift-gitops
+  namespace: vps-gitops
 spec:
   description: Dedicated VPS vps-management resources
   sourceRepos:
@@ -11,13 +11,9 @@ spec:
   destinations:
     - namespace: vps-secrets
       server: https://kubernetes.default.svc
-    - namespace: tailscale
+    - namespace: vps-gitops
       server: https://kubernetes.default.svc
-    - namespace: openshift-gitops
-      server: https://kubernetes.default.svc
-  clusterResourceWhitelist:
-    - group: ''
-      kind: Namespace
+  clusterResourceWhitelist: []
   namespaceResourceWhitelist:
     - group: '*'
       kind: '*'

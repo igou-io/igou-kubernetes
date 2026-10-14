@@ -9,7 +9,7 @@ default:
       app-source: cluster-vps
     destination:
       namespace: vps-system
-      server: https://vps-k3s-api.tailscale.svc.cluster.local:6443
+      server: https://vps-k3s-api.vps-secrets.svc.cluster.local:6443
     source:
       repoURL: https://github.com/igou-io/igou-kubernetes.git
       targetRevision: master
@@ -34,6 +34,15 @@ applications:
       server: https://kubernetes.default.svc
     source:
       path: clusters/vps/management
+    ignoreDifferences:
+      - group: ''
+        kind: Service
+        name: vps-k3s-api
+        namespace: vps-secrets
+        jsonPointers:
+          - /spec/externalName
+    syncOptions:
+      - RespectIgnoreDifferences=true
 
   vps-bootstrap:
     annotations:

@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: vps-k3s-api
-  namespace: tailscale
+  namespace: vps-secrets
   annotations:
     tailscale.com/tailnet-fqdn: racknerd-49580b0.weasel-alioth.ts.net
     tailscale.com/tags: tag:openshift
