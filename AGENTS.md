@@ -12,13 +12,12 @@ platform operators from their official upstream Helm charts (via kustomize
 
 **Cluster naming:** `clusters/internal/` is **`rk8s`** (the ARM cluster and
 `rk8s*` inventory groups). `clusters/vps/` is the standalone Debian cluster
-**`vps`**, reconciled by OpenShift Argo CD. Its namespaces and workloads,
-bootstrap access resources, and OpenShift-side management manifests live in
-that directory. Its dedicated OpenShift Argo CD instance is `vps` in
-`vps-gitops`; its root Application/AppProjects and remote registration live
-there. The existing OCP instance owns `bootstrap-management/` provisioning;
-the VPS instance manages remote applications. The existing OCP instance also owns
-the `vps-secrets` Application in `openshift-gitops`, including secret delivery.
+**`vps`**. It contains only objects installed on the VPS, including its seed,
+platform controllers and workloads. OpenShift-hosted Argo CD, Applications,
+AppProjects, remote registration, API egress and central secret delivery belong
+in `igou-openshift/clusters/ocp/{vps-gitops,vps,vps-secrets}/`. The dedicated
+OpenShift Argo CD instance `vps` in `vps-gitops` reconciles the remote VPS
+manifests from this repository; its Application catalog lives in igou-openshift.
 Do not import `groups/all` into the VPS root: that group installs local
 Argo CD, full ESO defaults, MetalLB, and homelab services. The VPS runs a
 single ESO controller with its own local mirrored-Secret provider.
@@ -92,9 +91,9 @@ What an agent needs to know from this side:
 - Follow `igou-openshift/CODE_STANDARDS.md` for authored manifests: one object
   per file, named `<metadata.name>-<lowercase-kind>.yaml`; use `-pv.yaml` and
   `-pvc.yaml` for volumes/claims. Update the nearest `kustomization.yaml`.
-- Under `clusters/vps/`, use component directories and component-named Argo
-  Applications, as in `clusters/ocp/`. Local resources use purpose names;
-  prefix shared OpenShift management resources with `vps` to identify their cluster.
+- Under `clusters/vps/`, use component directories and purpose-named resources.
+  Define its component-named Argo Applications in igou-openshift, where they run.
+  Keep every object destined for OpenShift in that repository.
 - k3s defaults `local-path` as the default StorageClass — PVCs that need
   TrueNAS storage must pin `storageClassName` explicitly
 

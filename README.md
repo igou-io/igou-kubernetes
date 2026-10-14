@@ -20,6 +20,10 @@ Helm chart via kustomize's `helmCharts` field, plus any raw manifests
 (namespace, RBAC, ExternalSecrets). Argo CD renders them with
 `kustomize build --enable-helm`.
 
+The VPS profile in `clusters/vps/` contains remote-cluster resources only.
+Its OpenShift-hosted Argo CD and Application catalog are maintained in
+`igou-openshift/clusters/ocp/{vps-gitops,vps,vps-secrets}/`.
+
 ## Components
 
 | Component | Source | Sync wave |

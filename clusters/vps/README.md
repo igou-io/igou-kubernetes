@@ -1,7 +1,7 @@
 # VPS cluster
 
 `vps` is the standalone Debian/k3s cluster for `igou.io` and Gotify.
-Its manifests and OpenShift management resources live here. The dedicated
+Only manifests installed on the VPS live here. The dedicated
 OpenShift Argo CD instance `vps` in `vps-gitops` reconciles remote workloads.
 The existing OpenShift instance owns secret delivery through its
 `openshift-gitops/vps-secrets` Application. The VPS runs one ESO controller,
@@ -12,12 +12,6 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
   ServiceAccount, binding and generated-token Secret. AAP applies only this
   bundle using the root-owned system:admin kubeconfig. No workload is seeded.
 - `bootstrap/`: adopts only the namespace and Argo identity seed.
-- `bootstrap-management/`: OpenShift namespaces, dedicated Argo CD instance,
-  its initial root Application/AppProject and the existing instance's
-  `vps-secrets` Application. OCP owns this through its `vps-gitops` pointer.
-- `management/`: API egress in OpenShift `vps-secrets`, remote registration in
-  `vps-gitops`, and source ExternalSecrets/PushSecrets plus the connection
-  Secret and remote SecretStore in `openshift-gitops`.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
 - `cert-manager/`, `nginx-gateway-fabric/`, `tailscale-operator/` and
@@ -44,6 +38,10 @@ The private API is reached through OpenShift's
 The host has `tag:vps`, the operator `tag:vps-operator`, and optional service
 proxies default to `tag:vps-app`. API proxy mode is off. Public web ingress
 uses ports 80/443; the public-interface guard blocks API and metrics access.
+
+The OpenShift controller definitions and Application catalog live in
+`igou-openshift/clusters/ocp/vps-gitops/` and `clusters/ocp/vps/`; registration,
+egress and source/push Secrets live in `clusters/ocp/vps-secrets/` there.
 
 The dedicated Argo instance has its own server, controller, repo server, Redis,
 OpenShift OAuth and Route at `https://vps-argocd.apps.ocp.igou.systems`.
@@ -72,4 +70,4 @@ legacy AAP retirement live in
 Manifest files use `<metadata.name>-<kind>.yaml`, with `-pvc.yaml` for PVCs,
 as defined by `igou-openshift/CODE_STANDARDS.md`. Local objects use purpose
 names (`cluster-acme`, `public`, `gateway-public-tls`, `argocd-manager`,
-`mirror-reader`); shared OpenShift delivery objects keep the `vps` prefix.
+`mirror-reader`).
