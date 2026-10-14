@@ -11,7 +11,7 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
 - `seed/`: eight namespaces and the cluster-admin `argocd/argocd-manager`
   ServiceAccount, binding and generated-token Secret. AAP applies only this
   bundle using the root-owned system:admin kubeconfig. No workload is seeded.
-- `bootstrap/`: adopts the seed and adds the node-exporter DaemonSet through Argo.
+- `bootstrap/`: adopts only the namespace and Argo identity seed.
 - `bootstrap-management/`: OpenShift namespaces, dedicated Argo CD instance,
   its initial root Application/AppProject and the existing instance's
   `vps-secrets` Application. OCP owns this through its `vps-gitops` pointer.
@@ -60,8 +60,9 @@ Argo installs ESO at wave 3, the local store at 4, cert-manager at 5, NGINX at 6
 Tailscale at 8 and the Gateway at 10. Credentials synchronize independently;
 verify mirror and local ExternalSecret readiness before application acceptance.
 
-Node-exporter runs as a non-root host-network/host-PID DaemonSet with read-only
-host mounts. Argo owns it; AAP stops and disables any legacy host exporter service.
+The separate `node-exporter` Application runs its DaemonSet at wave 10, with
+non-root host-network/host-PID access and read-only host mounts. AAP stops and
+disables any legacy host exporter service.
 OpenShift monitoring retains its existing Tailscale scrape endpoint.
 
 The durable architecture, migration acceptance, resource measurements and

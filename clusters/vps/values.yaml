@@ -8,7 +8,7 @@ default:
     labels:
       app-source: cluster-vps
     destination:
-      namespace: node-exporter
+      namespace: argocd
       server: https://vps-k3s-api.vps-secrets.svc.cluster.local:6443
     source:
       repoURL: https://github.com/igou-io/igou-kubernetes.git
@@ -29,7 +29,7 @@ applications:
     annotations:
       argocd.argoproj.io/sync-wave: '0'
     destination:
-      namespace: node-exporter
+      namespace: argocd
     source:
       path: clusters/vps/bootstrap
 
@@ -80,6 +80,14 @@ applications:
       namespace: nginx-gateway
     source:
       path: clusters/vps/gateway-api
+
+  node-exporter:
+    annotations:
+      argocd.argoproj.io/sync-wave: '10'
+    destination:
+      namespace: node-exporter
+    source:
+      path: clusters/vps/node-exporter
 
   igou-io:
     enableAutoSync: false
