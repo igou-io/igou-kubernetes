@@ -75,7 +75,7 @@ resource limits remain pinned in its Kustomization. AAP stops and
 disables any legacy host exporter service.
 OpenShift monitoring retains its existing Tailscale scrape endpoint.
 
-The durable architecture, migration acceptance, resource measurements and
+The architecture, migration acceptance checks, resource measurements and
 legacy AAP retirement live in
 `igou-docs/kubernetes/VPS Kubernetes Architecture and Migration.md`.
 

@@ -15,7 +15,7 @@ groups/all/                      Kustomize component with AppProjects + baseline
 docs/                            Operational docs
 ```
 
-Every component directory is a `kustomization.yaml` that pulls an upstream
+Every component directory contains a `kustomization.yaml` that pulls an upstream
 Helm chart via kustomize's `helmCharts` field, plus any raw manifests
 (namespace, RBAC, ExternalSecrets). Argo CD renders them with
 `kustomize build --enable-helm`.
