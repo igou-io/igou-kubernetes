@@ -15,10 +15,14 @@ groups/all/                      Kustomize component with AppProjects + baseline
 docs/                            Operational docs
 ```
 
-Every component directory is a `kustomization.yaml` that pulls an upstream
+Every component directory contains a `kustomization.yaml` that pulls an upstream
 Helm chart via kustomize's `helmCharts` field, plus any raw manifests
 (namespace, RBAC, ExternalSecrets). Argo CD renders them with
 `kustomize build --enable-helm`.
+
+The VPS profile in `clusters/vps/` contains remote-cluster resources only.
+Its OpenShift-hosted Argo CD and Application catalog are maintained in
+`igou-openshift/clusters/ocp/{vps-gitops,vps,vps-secrets}/`.
 
 ## Components
 

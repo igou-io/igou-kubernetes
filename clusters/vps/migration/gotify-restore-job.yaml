@@ -1,0 +1,54 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gotify-restore
+  namespace: gotify
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: restore
+          image: quay.io/igou/igou.io:vps@sha256:6c559e265c2c6c8890a0d1639b668252add5a6aa64de73d0cb12d0a77a5dff69
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              test -z "$(ls -A /data)"
+              cp -a /source/. /data/
+              chown -R 1000:1000 /data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+          volumeMounts:
+            - name: source
+              mountPath: /source
+              readOnly: true
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: source
+          hostPath:
+            path: /var/lib/vps-migration/gotify
+            type: Directory
+        - name: data
+          persistentVolumeClaim:
+            claimName: gotify-data

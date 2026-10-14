@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tailscale
+
+resources:
+  - operator-oauth-externalsecret.yaml
+
+helmCharts:
+  - name: tailscale-operator
+    releaseName: tailscale
+    namespace: tailscale
+    version: 1.104.1
+    repo: https://pkgs.tailscale.com/helmcharts
+    includeCRDs: true
+    valuesInline:
+      oauth: {}
+      installCRDs: true
+      operatorConfig:
+        defaultTags:
+          - tag:vps-operator
+        hostname: vps-operator
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        image:
+          pullPolicy: IfNotPresent
+      proxyConfig:
+        defaultTags: tag:vps-app
+        firewallMode: auto
+      apiServerProxyConfig:
+        mode: 'false'
+        allowImpersonation: 'false'

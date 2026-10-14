@@ -1,0 +1,11 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - gotify-admin-externalsecret.yaml
+  - allow-web-networkpolicy.yaml
+  - gotify-data-pvc.yaml
+  - gotify-deployment.yaml
+  - gotify-service.yaml
+  - gotify-httproute.yaml

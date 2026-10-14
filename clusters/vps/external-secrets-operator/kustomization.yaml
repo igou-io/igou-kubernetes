@@ -1,0 +1,48 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: external-secrets
+
+resources:
+  - mirror-reader-serviceaccount.yaml
+  - mirror-reader-role.yaml
+  - mirror-reader-rolebinding.yaml
+  - mirror-reader-clusterrole.yaml
+  - mirror-reader-clusterrolebinding.yaml
+
+helmCharts:
+  - name: external-secrets
+    releaseName: external-secrets
+    namespace: external-secrets
+    version: 2.11.0
+    repo: https://charts.external-secrets.io
+    includeCRDs: true
+    valuesInline:
+      replicaCount: 1
+      installCRDs: true
+      crds:
+        createClusterExternalSecret: false
+        createClusterSecretStore: true
+        createClusterPushSecret: false
+        createPushSecret: false
+        annotations:
+          argocd.argoproj.io/sync-options: ServerSideApply=true
+        conversion:
+          enabled: false
+      processClusterExternalSecret: false
+      processClusterPushSecret: false
+      processPushSecret: false
+      processClusterGenerator: false
+      leaderElect: false
+      webhook:
+        create: false
+      certController:
+        create: false
+      bitwarden-sdk-server:
+        enabled: false
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          memory: 256Mi

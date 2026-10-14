@@ -1,0 +1,52 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: nginx-gateway
+
+resources:
+  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2
+
+helmCharts:
+  - name: nginx-gateway-fabric
+    releaseName: nginx-gateway
+    namespace: nginx-gateway
+    version: 2.7.2
+    repo: oci://ghcr.io/nginx/charts
+    includeCRDs: true
+    valuesInline:
+      nginxGateway:
+        replicas: 1
+        gatewayClassName: nginx
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        productTelemetry:
+          enable: false
+        metrics:
+          enable: false
+      nginx:
+        replicas: 1
+        container:
+          hostPorts:
+            - port: 80
+              containerPort: 80
+            - port: 443
+              containerPort: 443
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+        service:
+          type: ClusterIP
+        patches:
+          - type: StrategicMerge
+            value:
+              spec:
+                strategy:
+                  type: Recreate
+                  rollingUpdate: null

@@ -10,11 +10,19 @@ following the same ArgoCD app-of-apps layout as
 platform operators from their official upstream Helm charts (via kustomize
 `helmCharts`) instead of OLM.
 
-**Cluster naming:** the only cluster today is `clusters/internal/` — this is
-the cluster called **`rk8s`** everywhere else (the `rk8s*` inventory groups in
-igou-inventory, the k3s-on-ARM-boards cluster in igou-ansible docs, "rk8s" in
-igou-openshift federation configs). GitOps dir name `internal` == Ansible
-group `rk8s`; they are the same cluster.
+**Cluster naming:** `clusters/internal/` is **`rk8s`** (the ARM cluster and
+`rk8s*` inventory groups). `clusters/vps/` is the standalone Debian cluster
+**`vps`**. It contains only objects installed on the VPS, including its seed,
+platform controllers and workloads. OpenShift-hosted Argo CD, Applications,
+AppProjects, remote registration, API egress and central secret delivery belong
+in `igou-openshift/clusters/ocp/{vps-gitops,vps,vps-secrets}/`. The dedicated
+OpenShift Argo CD instance `vps` in `vps-gitops` reconciles the remote VPS
+manifests from this repository; its Application catalog lives in igou-openshift.
+Do not import `groups/all` into the VPS root: that group installs local
+Argo CD, full ESO defaults, MetalLB, and homelab services. The VPS runs a
+single ESO controller with its own local mirrored-Secret provider. OpenShift
+cert-manager owns public certificate issuance and renewal; only the TLS bundle
+is delivered to the VPS, whose Gateway consumes a local ESO-managed TLS Secret.
 
 ## Layout
 
@@ -74,10 +82,20 @@ What an agent needs to know from this side:
 
 - YAML: 2-space indent, `---` header, `true`/`false` booleans, block style
   (`{}`/`[]` only for genuinely empty values)
+- Keep ordinary strings unquoted. Quote values that must remain strings
+  when YAML would interpret them as numbers, booleans, or null; also quote
+  wildcard selectors and template expressions. Put a list item's first
+  field on the same line as its dash, as in `- name: example`.
 - Secrets are ExternalSecrets backed by the `onepassword` ClusterSecretStores
-  (`components/external-secrets-operator/`) — never commit secret values
-- When adding or moving manifests, update the component's
-  `kustomization.yaml`; prefer `<metadata.name>-<kind>.yaml` filenames
+  (`components/external-secrets-operator/`) on rk8s. VPS ExternalSecrets use
+  `ClusterSecretStore/local-mirrors`, reading OpenShift-mirrored Secrets in
+  `external-secrets`; no Connect credential on the VPS. Never commit secret values
+- Follow `igou-openshift/CODE_STANDARDS.md` for authored manifests: one object
+  per file, named `<metadata.name>-<lowercase-kind>.yaml`; use `-pv.yaml` and
+  `-pvc.yaml` for volumes/claims. Update the nearest `kustomization.yaml`.
+- Under `clusters/vps/`, use component directories and purpose-named resources.
+  Define its component-named Argo Applications in igou-openshift, where they run.
+  Keep every object destined for OpenShift in that repository.
 - k3s defaults `local-path` as the default StorageClass — PVCs that need
   TrueNAS storage must pin `storageClassName` explicitly
 
