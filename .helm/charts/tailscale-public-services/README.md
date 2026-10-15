@@ -18,25 +18,23 @@ requires public `hostnames`. Each port names an existing Gateway listener.
 Multiple HTTP hostnames can share a listener; each TCP/UDP route needs its
 own listener. The example uses HTTPS 443, TCP 27015, and UDP 27016.
 
-Adoption also requires:
+The VPS platform configuration includes the `public-services` namespace,
+namespace-scoped AAP identity, and a fixed pool: TCP 27010–27017 and UDP
+27018–27025. Gateway listeners are named `tcp-<port>` and `udp-<port>`, with
+matching host-port mappings. The example above is manual wiring with dedicated
+`arena-tcp`/`arena-udp` listener names; provide those listeners or change its
+values to use the fixed pool.
 
-- Create the `public-services` namespace in `clusters/vps/bootstrap`, with
-  `vps.igou.io/public-ingress: 'true'`. Permit this namespace in OpenShift's
-  VPS AppProject and register the new VPS Application there after its sources merge.
-- Include the local chart in a VPS Kustomization without a top-level
-  `namespace` transformer: its bridge and ReferenceGrant belong in `tailscale`.
-- Add the TCP/UDP listeners to `clusters/vps/gateway-api/public-gateway.yaml`
-  and their container/host port mappings to the NGINX chart. Retain 80/443,
-  redirects, resource limits, and the existing rollout strategy.
-- Set application-specific tailnet grants from `tag:vps-public-egress` to
-  the OpenShift endpoint tags and exact ports. Authorize tag creation by the
-  operator clients. This chart does not change policy or OAuth credentials.
-- Configure DNS, Ansible-managed firewall allowances, and NetworkPolicies
-  for the selected application. Keep the API, metrics, and other management
-  ports private. Review proxy ingress rules for Tailscale's UDP peer traffic
-  as well as the application ports.
-- Ignore only `/spec/externalName` for the generated `ocp-<name>` egress
-  Services in the Argo Application; that field belongs to Tailscale.
+The AAP implementation is in `igou-ansible/playbooks/kubernetes/public-share.yaml`.
+It creates equivalent temporary Services, grants, policies, and routes with
+expiration metadata. Its scheduled cleanup runs hourly. Those runtime objects
+must not also be reconciled by Argo. The platform RBAC lives in
+`clusters/vps/public-sharing` and is registered by OpenShift's VPS catalog.
+
+Before publishing, configure the exact Tailscale publication grants and operator
+tag ownership, DNS, and the approved OpenShift endpoint. Keep management ports
+private. If adopting this chart directly through Argo instead of AAP, ignore
+only `/spec/externalName` on generated egress Services because Tailscale owns it.
 
 `proxyNamespace` must match the operator's namespace. The bridge selects both
 the parent Service name and namespace so identically named Services elsewhere
