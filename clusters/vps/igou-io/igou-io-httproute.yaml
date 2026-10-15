@@ -6,12 +6,21 @@ metadata:
   namespace: igou-io
 spec:
   parentRefs:
-    - name: public
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
       namespace: nginx-gateway
       sectionName: https
   hostnames:
     - igou.io
   rules:
-    - backendRefs:
-        - name: igou-io
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''
+          kind: Service
+          name: igou-io
           port: 80
+          weight: 1

@@ -6,13 +6,19 @@ metadata:
   namespace: nginx-gateway
 spec:
   parentRefs:
-    - name: public
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
       namespace: nginx-gateway
       sectionName: https
   hostnames:
     - www.igou.io
   rules:
-    - filters:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      filters:
         - type: RequestRedirect
           requestRedirect:
             scheme: https
