@@ -9,8 +9,9 @@ NGINX Gateway Fabric and the Tailscale operator. Argo CD, cert-manager,
 Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/all`.
 
 - `seed/`: seven namespaces and the cluster-admin `argocd/argocd-manager`
-  ServiceAccount, binding and generated-token Secret. AAP applies only this
-  bundle using the root-owned system:admin kubeconfig. No workload is seeded.
+  ServiceAccount, binding and generated-token Secret. AAP submits only this
+  bundle through the Kubernetes API, reading the native system:admin kubeconfig
+  into memory. It stages no manifest or Secret files. No workload is seeded.
 - `bootstrap/`: adopts only the namespace and Argo identity seed.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
@@ -71,8 +72,8 @@ verify mirror and local ExternalSecret readiness before application acceptance.
 The separate `node-exporter` Application renders the Prometheus community
 `prometheus-node-exporter` chart `4.60.0` at wave 10, with non-root
 host-network/host-PID access and read-only host mounts. The image digest and
-resource limits remain pinned in its Kustomization. AAP stops and
-disables any legacy host exporter service.
+resource limits remain pinned in its Kustomization. Ansible does not manage
+an exporter service on the VPS.
 OpenShift monitoring retains its existing Tailscale scrape endpoint.
 
 The architecture, migration acceptance checks, resource measurements and
