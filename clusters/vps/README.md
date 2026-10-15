@@ -15,9 +15,10 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
 - `bootstrap/`: adopts the access seed and creates the platform/application
   namespaces at wave 0. Add new workload namespaces here; AAP need not run again.
 - `monitoring/`: the dedicated metrics-reader identity and scoped proxy access;
-  its namespace and the `kube-state-metrics` namespace are also GitOps-owned.
+  its namespace is reconciled with this component, outside bootstrap.
 - `kube-state-metrics/`: the official Prometheus community chart, restricted to
-  the collectors needed for node, workload and PVC state.
+  the collectors needed for node, workload and PVC state, plus its own namespace
+  and metrics-proxy RBAC. NGINX metrics-proxy RBAC lives with NGINX Gateway Fabric.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
 - `nginx-gateway-fabric/`, `tailscale-operator/` and

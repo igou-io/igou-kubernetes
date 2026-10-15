@@ -10,5 +10,3 @@ resources:
   - nginx-gateway-namespace.yaml
   - igou-io-namespace.yaml
   - gotify-namespace.yaml
-  - kube-state-metrics-namespace.yaml
-  - monitoring-namespace.yaml

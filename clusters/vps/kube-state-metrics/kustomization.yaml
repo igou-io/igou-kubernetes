@@ -3,6 +3,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: kube-state-metrics
 
+resources:
+  - kube-state-metrics-namespace.yaml
+  - metrics-reader-kube-state-role.yaml
+  - metrics-reader-kube-state-rolebinding.yaml
+
 helmCharts:
   - name: kube-state-metrics
     releaseName: kube-state-metrics
