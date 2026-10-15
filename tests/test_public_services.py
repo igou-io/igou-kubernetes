@@ -37,6 +37,7 @@ class PublicServicesTests(unittest.TestCase):
         bridge = next(o for o in objects if o["kind"] == "Service" and o["spec"]["type"] == "ClusterIP")
         self.assertEqual(bridge["metadata"]["namespace"], "tailscale")
         self.assertEqual(bridge["spec"]["selector"]["tailscale.com/parent-resource-ns"], "public-services")
+        self.assertEqual(bridge["spec"]["selector"]["tailscale.com/parent-resource-type"], "svc")
         grant = next(o for o in objects if o["kind"] == "ReferenceGrant")
         self.assertEqual(grant["spec"]["to"], [{"group": "", "kind": "Service", "name": bridge["metadata"]["name"]}])
         self.assertEqual({p["kind"] for p in grant["spec"]["from"]}, {"HTTPRoute", "TCPRoute", "UDPRoute"})

@@ -46,6 +46,7 @@ spec:
   type: ClusterIP
   selector:
     tailscale.com/managed: 'true'
+    tailscale.com/parent-resource-type: svc
     tailscale.com/parent-resource: ocp-{{ $service.name }}
     tailscale.com/parent-resource-ns: {{ $.Values.namespace | quote }}
   ports:
