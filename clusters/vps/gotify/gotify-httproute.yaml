@@ -6,12 +6,21 @@ metadata:
   namespace: gotify
 spec:
   parentRefs:
-    - name: public
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
       namespace: nginx-gateway
       sectionName: https
   hostnames:
     - gotify.igou.io
   rules:
-    - backendRefs:
-        - name: gotify
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''
+          kind: Service
+          name: gotify
           port: 80
+          weight: 1
