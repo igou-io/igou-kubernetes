@@ -1,0 +1,66 @@
+{{- $listeners := dict }}
+{{- $hosts := dict }}
+{{- $listenerTypes := dict }}
+{{- $routeNames := dict }}
+{{- range $service := .Values.services }}
+{{- range $port := $service.ports }}
+{{- $kind := printf "%sRoute" $port.protocol }}
+{{- $routeName := printf "%s-%s" $service.name $port.name }}
+{{- $routeKey := printf "%s/%s" $kind $routeName }}
+{{- if hasKey $routeNames $routeKey }}
+{{- fail (printf "duplicate route name: %s" $routeKey) }}
+{{- end }}
+{{- $_ := set $routeNames $routeKey true }}
+{{- if and (hasKey $listenerTypes $port.listener) (ne (index $listenerTypes $port.listener) $port.protocol) }}
+{{- fail (printf "conflicting protocols for listener: %s" $port.listener) }}
+{{- end }}
+{{- $_ := set $listenerTypes $port.listener $port.protocol }}
+{{- if eq $port.protocol "HTTP" }}
+{{- range $host := $port.hostnames }}
+{{- $key := printf "%s/%s" $port.listener $host }}
+{{- if hasKey $hosts $key }}
+{{- fail (printf "duplicate HTTP listener/hostname: %s" $key) }}
+{{- end }}
+{{- $_ := set $hosts $key true }}
+{{- end }}
+{{- else }}
+{{- if hasKey $listeners $port.listener }}
+{{- fail (printf "listener already used: %s" $port.listener) }}
+{{- end }}
+{{- $_ := set $listeners $port.listener true }}
+{{- end }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: {{ $kind }}
+metadata:
+  name: {{ $routeName | quote }}
+  namespace: {{ $.Values.namespace | quote }}
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ $.Values.gateway.name | quote }}
+      namespace: {{ $.Values.gateway.namespace | quote }}
+      sectionName: {{ $port.listener | quote }}
+  {{- if eq $port.protocol "HTTP" }}
+  hostnames:
+    {{- toYaml $port.hostnames | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- if eq $port.protocol "HTTP" }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+    {{- else }}
+    - backendRefs:
+    {{- end }}
+        - group: ''
+          kind: Service
+          name: ocp-{{ $service.name }}-bridge
+          namespace: {{ $.Values.proxyNamespace | quote }}
+          port: {{ $port.port }}
+          weight: 1
+{{- end }}
+{{- end }}

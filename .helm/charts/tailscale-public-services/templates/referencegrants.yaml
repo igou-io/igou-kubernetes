@@ -1,0 +1,23 @@
+{{- range $service := .Values.services }}
+{{- $kinds := dict }}
+{{- range $port := $service.ports }}
+{{- $_ := set $kinds (printf "%sRoute" $port.protocol) true }}
+{{- end }}
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: ocp-{{ $service.name }}
+  namespace: {{ $.Values.proxyNamespace | quote }}
+spec:
+  from:
+    {{- range $kind := keys $kinds | sortAlpha }}
+    - group: gateway.networking.k8s.io
+      kind: {{ $kind }}
+      namespace: {{ $.Values.namespace | quote }}
+    {{- end }}
+  to:
+    - group: ''
+      kind: Service
+      name: ocp-{{ $service.name }}-bridge
+{{- end }}

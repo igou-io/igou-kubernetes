@@ -1,0 +1,6 @@
+---
+apiVersion: v2
+name: tailscale-public-services
+version: 0.1.0
+description: Opt-in VPS HTTPS, TCP, and UDP forwarding to OpenShift over Tailscale
+type: application
