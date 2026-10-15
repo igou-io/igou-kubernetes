@@ -8,11 +8,12 @@ The existing OpenShift instance owns secret delivery through its
 NGINX Gateway Fabric and the Tailscale operator. Argo CD, cert-manager,
 Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/all`.
 
-- `seed/`: seven namespaces and the cluster-admin `argocd/argocd-manager`
+- `seed/`: only the `argocd` namespace and cluster-admin `argocd/argocd-manager`
   ServiceAccount, binding and generated-token Secret. AAP submits only this
   bundle through the Kubernetes API, reading the native system:admin kubeconfig
   into memory. It stages no manifest or Secret files. No workload is seeded.
-- `bootstrap/`: adopts only the namespace and Argo identity seed.
+- `bootstrap/`: adopts the access seed and creates the six platform/application
+  namespaces at wave 0. Add new workload namespaces here; AAP need not run again.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
 - `nginx-gateway-fabric/`, `tailscale-operator/` and

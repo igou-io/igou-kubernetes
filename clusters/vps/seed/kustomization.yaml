@@ -2,14 +2,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# AAP needs only this namespace and access identity to hand control to Argo.
+# Workload namespaces belong in ../bootstrap.
 resources:
   - argocd-namespace.yaml
-  - external-secrets-namespace.yaml
-  - node-exporter-namespace.yaml
-  - tailscale-namespace.yaml
-  - nginx-gateway-namespace.yaml
-  - igou-io-namespace.yaml
-  - gotify-namespace.yaml
   - argocd-manager-serviceaccount.yaml
   - argocd-manager-token-secret.yaml
   - argocd-manager-clusterrolebinding.yaml
