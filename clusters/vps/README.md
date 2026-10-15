@@ -12,8 +12,12 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
   ServiceAccount, binding and generated-token Secret. AAP submits only this
   bundle through the Kubernetes API, reading the native system:admin kubeconfig
   into memory. It stages no manifest or Secret files. No workload is seeded.
-- `bootstrap/`: adopts the access seed and creates the six platform/application
+- `bootstrap/`: adopts the access seed and creates the platform/application
   namespaces at wave 0. Add new workload namespaces here; AAP need not run again.
+- `monitoring/`: the dedicated metrics-reader identity and scoped proxy access;
+  its namespace and the `kube-state-metrics` namespace are also GitOps-owned.
+- `kube-state-metrics/`: the official Prometheus community chart, restricted to
+  the collectors needed for node, workload and PVC state.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
 - `nginx-gateway-fabric/`, `tailscale-operator/` and
@@ -76,6 +80,22 @@ host-network/host-PID access and read-only host mounts. The image digest and
 resource limits remain pinned in its Kustomization. Ansible does not manage
 an exporter service on the VPS.
 OpenShift monitoring retains its existing Tailscale scrape endpoint.
+
+OpenShift UWM also scrapes k3s `/metrics`, kubelet cAdvisor and the
+kube-state-metrics/NGINX Services through the existing private API egress path.
+The metrics-reader ServiceAccount and generated token live in `monitoring`.
+Central ESO imports only its token/CA into OpenShift `tailscale/vps-metrics`;
+Prometheus does not use the Argo cluster-admin token. Its permissions cover
+`/metrics`, the named `vps` node proxy and the named metrics Service proxies.
+Node proxy access is broader than a metrics-only permission; protect this token.
+No new public listener, host configuration or local Prometheus is required.
+
+The default Tailscale ProxyClass `metrics` enables client metrics and disables
+debug endpoints for future service proxies, retaining `tag:vps-app` as the
+default tag. It creates no proxies by itself. There is no Prometheus operator
+on the VPS, so the class does not request local ServiceMonitor creation.
+OpenShift monitors public HTTP and HTTPS for `igou.io`, `www.igou.io` and
+`gotify.igou.io` with its existing blackbox exporter.
 
 The architecture, migration acceptance checks, resource measurements and
 legacy AAP retirement live in

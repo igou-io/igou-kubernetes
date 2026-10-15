@@ -1,0 +1,16 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: metrics-reader-nginx
+  namespace: nginx-gateway
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - services/proxy
+    resourceNames:
+      - http:nginx-gateway-nginx-gateway-fabric:metrics
+      - http:public-nginx-metrics:metrics
+    verbs:
+      - get

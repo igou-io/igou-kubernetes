@@ -5,6 +5,7 @@ namespace: tailscale
 
 resources:
   - operator-oauth-externalsecret.yaml
+  - metrics-proxyclass.yaml
 
 helmCharts:
   - name: tailscale-operator
@@ -31,6 +32,7 @@ helmCharts:
       proxyConfig:
         defaultTags: tag:vps-app
         firewallMode: auto
+        defaultProxyClass: metrics
       apiServerProxyConfig:
         mode: 'false'
         allowImpersonation: 'false'

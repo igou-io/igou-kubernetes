@@ -1,0 +1,13 @@
+---
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: metrics
+spec:
+  metrics:
+    enable: true
+  statefulSet:
+    pod:
+      tailscaleContainer:
+        debug:
+          enable: false
