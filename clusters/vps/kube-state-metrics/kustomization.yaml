@@ -1,0 +1,41 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kube-state-metrics
+
+resources:
+  - kube-state-metrics-namespace.yaml
+  - metrics-reader-kube-state-role.yaml
+  - metrics-reader-kube-state-rolebinding.yaml
+
+helmCharts:
+  - name: kube-state-metrics
+    releaseName: kube-state-metrics
+    namespace: kube-state-metrics
+    version: 8.6.0
+    repo: https://prometheus-community.github.io/helm-charts
+    valuesInline:
+      fullnameOverride: kube-state-metrics
+      image:
+        tag: v2.20.0
+        sha: sha256:42cfe3723a5f058171c627537fb57a3ea0f26e4380fa18555a95cb1a1b4cfc5b
+      prometheusScrape: false
+      collectors:
+        - cronjobs
+        - daemonsets
+        - deployments
+        - jobs
+        - namespaces
+        - nodes
+        - persistentvolumeclaims
+        - persistentvolumes
+        - poddisruptionbudgets
+        - pods
+        - replicasets
+        - statefulsets
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi

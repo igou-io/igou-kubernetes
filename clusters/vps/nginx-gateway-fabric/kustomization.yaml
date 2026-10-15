@@ -5,6 +5,9 @@ namespace: nginx-gateway
 
 resources:
   - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2
+  - public-nginx-metrics-service.yaml
+  - metrics-reader-nginx-role.yaml
+  - metrics-reader-nginx-rolebinding.yaml
 
 helmCharts:
   - name: nginx-gateway-fabric
@@ -26,7 +29,7 @@ helmCharts:
         productTelemetry:
           enable: false
         metrics:
-          enable: false
+          enable: true
       nginx:
         replicas: 1
         container:
