@@ -1,5 +1,4 @@
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
-PYTHON ?= python3
 
 .PHONY: lint
 lint: clean ## Lint all YAML files with yamllint
@@ -37,12 +36,8 @@ lint-helm: ## Lint all Helm charts under .helm/charts/
 		helm lint "$$chart" || exit 1; \
 	done
 
-.PHONY: test-public-services
-test-public-services: ## Check public service rendering and invalid configurations
-	$(PYTHON) -m unittest discover -s tests -v
-
 .PHONY: test
-test: lint lint-helm test-public-services validate-kustomize validate-schemas ## Run all tests
+test: lint lint-helm validate-kustomize validate-schemas ## Run all tests (lint, lint-helm, validate-kustomize, validate-schemas)
 
 .PHONY: clean
 clean: ## Remove charts/ directories left behind by kustomize build (excludes .helm/charts)

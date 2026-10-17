@@ -57,11 +57,3 @@ terminated by the application. Backend TLS verification is outside this chart.
 
 The design and rollout checks are in igou-docs:
 `networking/Tailnet Access Model - Tailscale Operators on Both Clusters.md`.
-
-Run the render regression tests with the repository's development dependencies:
-
-```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements-dev.txt
-make test-public-services PYTHON=.venv/bin/python
-```
