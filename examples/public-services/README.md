@@ -21,7 +21,7 @@ kustomize build examples/public-services
 
 The examples are staged and have no registered Argo Applications. The VPS
 platform must first provide the namespaces, Tailscale operator, `metrics`
-ProxyClass, public Gateway, experimental route CRDs, listener/host-port pool,
+ProxyClass, public Gateway, standard `v1` route CRDs, listener/host-port pool,
 and HTTPS certificate. OpenShift provides the matching workload and stable
 Tailscale endpoint. Configure DNS, tailnet tag ownership/grants, and the host
 firewall before public checks. Open only the selected public listener ports.
