@@ -1,0 +1,9 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ocp-public-web-test-service.yaml
+  - ocp-public-web-test-bridge-service.yaml
+  - public-web-test-http-httproute.yaml
+  - ocp-public-web-test-referencegrant.yaml
+  - ocp-public-web-test-networkpolicy.yaml

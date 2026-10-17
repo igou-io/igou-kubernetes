@@ -1,74 +1,30 @@
-# VPS forwarding to OpenShift
+# VPS forwarding chart
 
-This chart creates a Tailscale egress Service, a bridge in the operator's
-namespace, named ReferenceGrants, and HTTPS/TCP/UDP routes. The default empty
-service list renders nothing. It does not register an Application or publish
-a port by itself.
+This reusable chart creates a Tailscale egress Service, a bridge in the
+operator's namespace, a named ReferenceGrant, proxy ingress policy, and native HTTPRoute, TCPRoute,
+or UDPRoute objects. The empty default service list renders nothing.
 
-Render the HTTPS example for OpenShift's deployed `public-web-test` fixture:
+The three complete sharing examples live in `examples/public-services/http`,
+`tcp`, and `udp` at the repository root. They pair with the three workloads in
+`igou-openshift/test-workloads/public-services/` and use plain manifests so
+the native routes and supporting objects are visible together. Those examples
+are the manual entry point; the chart remains available for reusable Helm
+configuration. Do not manage the same forwarding object through both sources.
 
-```bash
-helm template public-services .helm/charts/tailscale-public-services \
-  -f .helm/charts/tailscale-public-services/examples/web-test-values.yaml
-```
+Each service entry declares its tailnet FQDN and ports. Port `protocol` is
+`HTTP`, `TCP`, or `UDP`; HTTP also requires public `hostnames`. Every port names
+an existing Gateway listener. HTTP hostnames can share an HTTPS listener;
+each TCP/UDP route needs its own listener. Backend ports are independent of
+public listener ports. Review `values.schema.json` for the accepted values.
 
-Each service names a full tailnet MagicDNS endpoint and its backend ports.
-Port `protocol` is `HTTP`, `TCP`, or `UDP`; HTTP is forwarded over TCP and
-requires public `hostnames`. Each port names an existing Gateway listener.
-Multiple HTTP hostnames can share a listener; each TCP/UDP route needs its
-own listener. The HTTPS example maps `web-test.igou.io:443` to backend TCP
-8080. Use `examples/web-test-tcp-values.yaml` instead for raw TCP on public
-port 27010 to the same backend; test that with
-`curl http://web-test.igou.io:27010/`. These are alternative values files,
-not files to install together. Both require the OpenShift chart's staged
-`examples/web-test-values.yaml` endpoint, `public-web-test-public`.
+`proxyNamespace` must match the Tailscale operator's namespace. The bridge
+selects its exact parent Service name and namespace. The chart uses the VPS
+`metrics` ProxyClass by default. If using Argo, ignore `/spec/externalName` on
+the generated egress Services because Tailscale owns that field.
 
-For plain manifests using a native Gateway API `TCPRoute`, use
-`examples/native-tcp/`. Its Kustomization includes the egress Service, bridge,
-named ReferenceGrant, and `web-test-tcp-tcproute.yaml`. Render it with:
-
-```bash
-kustomize build .helm/charts/tailscale-public-services/examples/native-tcp
-```
-
-This is another way to manage the same TCP example objects; choose it or the
-Helm TCP values. The existing Gateway listener `tcp-27010` selects the public
-port and the route selects backend port 8080. Its README lists prerequisites
-and the manual connection check.
-
-`examples/udp-values.yaml` maps public UDP 27018 to backend UDP 9000. It matches
-the OpenShift UDP endpoint and the staged `udp-echo` workload in
-`igou-openshift/test-workloads/public-services-udp`. That `agnhost netexec`
-server answers `echo hello` and `hostname`; after rollout and DNS setup, check
-with `printf 'echo hello\n' | nc -u -w 3 udp-test.igou.io 27018` and expect `hello`.
-
-The VPS platform configuration includes the `public-services` namespace,
-namespace-scoped AAP identity, and a fixed pool: TCP 27010–27017 and UDP
-27018–27025. Gateway listeners are named `tcp-<port>` and `udp-<port>`, with
-matching host-port mappings. The TCP and UDP examples use those listener
-names directly; they do not require extra Gateway listeners.
-
-The AAP implementation is in `igou-ansible/playbooks/kubernetes/public-share.yaml`.
-It creates equivalent temporary Services, grants, policies, and routes with
-expiration metadata. Its scheduled cleanup runs hourly. Those runtime objects
-must not also be reconciled by Argo. The platform RBAC lives in
-`clusters/vps/public-sharing` and is registered by OpenShift's VPS catalog.
-
-Before publishing, configure the exact Tailscale publication grants and operator
-tag ownership, DNS, and the approved OpenShift endpoint. Keep management ports
-private. If adopting this chart directly through Argo instead of AAP, ignore
-only `/spec/externalName` on generated egress Services because Tailscale owns it.
-
-`proxyNamespace` must match the operator's namespace. The bridge selects both
-the parent Service name and namespace so identically named Services elsewhere
-cannot match. The chart uses the VPS's existing `metrics` ProxyClass by default;
-review proxy memory use before adding many endpoints to the 2 GiB host.
-
-HTTP backend traffic crosses an encrypted tailnet connection. Public user
-authentication remains the application's responsibility. Verify forwarded
-header handling, WebSockets, real TCP connections, and UDP replies before
-opening production access. TLS passthrough can use a TCP route with TLS
-terminated by the application. Backend TLS verification is outside this chart.
-
-The design and rollout checks are in igou-docs:
-`networking/Tailnet Access Model - Tailscale Operators on Both Clusters.md`.
+AAP creates temporary forwarding with the same native route kinds, plus
+expiration metadata. Its scheduled cleanup runs hourly. Runtime AAP objects
+must not also be reconciled by Argo. Baseline RBAC is in
+`clusters/vps/public-sharing`; the platform listener pool is TCP 27010–27017
+and UDP 27018–27025. See `examples/public-services/README.md` for the paired
+examples, prerequisites, and manual checks.

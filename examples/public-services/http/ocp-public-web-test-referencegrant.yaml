@@ -2,14 +2,14 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
-  name: ocp-web-test
+  name: ocp-public-web-test
   namespace: tailscale
 spec:
   from:
     - group: gateway.networking.k8s.io
-      kind: TCPRoute
+      kind: HTTPRoute
       namespace: public-services
   to:
     - group: ''
       kind: Service
-      name: ocp-web-test-bridge
+      name: ocp-public-web-test-bridge
