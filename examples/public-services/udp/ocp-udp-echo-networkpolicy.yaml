@@ -1,0 +1,23 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ocp-udp-echo
+  namespace: tailscale
+spec:
+  podSelector:
+    matchLabels:
+      tailscale.com/managed: 'true'
+      tailscale.com/parent-resource-type: svc
+      tailscale.com/parent-resource: ocp-udp-echo
+      tailscale.com/parent-resource-ns: public-services
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: nginx-gateway
+      ports:
+        - port: 9000
+          protocol: UDP

@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "namespace",
+    "proxyNamespace",
+    "proxyTag",
+    "proxyClassName",
+    "gateway",
+    "services"
+  ],
+  "properties": {
+    "namespace": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+    },
+    "proxyNamespace": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+    },
+    "proxyTag": {
+      "type": "string",
+      "pattern": "^tag:vps-public-[a-z0-9-]+$"
+    },
+    "proxyClassName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+    },
+    "gateway": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "namespace"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+        },
+        "namespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "tailnetFQDN",
+          "ports"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+          },
+          "tailnetFQDN": {
+            "type": "string",
+            "maxLength": 253,
+            "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?[.][a-z0-9-]+[.]ts[.]net$"
+          },
+          "ports": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "port",
+                "protocol",
+                "listener"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10,
+                  "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "protocol": {
+                  "enum": [
+                    "HTTP",
+                    "TCP",
+                    "UDP"
+                  ]
+                },
+                "listener": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+                },
+                "hostnames": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 253,
+                    "pattern": "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$"
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "protocol": {
+                        "const": "HTTP"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "hostnames"
+                    ]
+                  },
+                  "else": {
+                    "not": {
+                      "required": [
+                        "hostnames"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

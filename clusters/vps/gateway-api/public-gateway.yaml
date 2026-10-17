@@ -31,3 +31,195 @@ spec:
           selector:
             matchLabels:
               vps.igou.io/public-ingress: 'true'
+    - name: tcp-27010
+      protocol: TCP
+      port: 27010
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27011
+      protocol: TCP
+      port: 27011
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27012
+      protocol: TCP
+      port: 27012
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27013
+      protocol: TCP
+      port: 27013
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27014
+      protocol: TCP
+      port: 27014
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27015
+      protocol: TCP
+      port: 27015
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27016
+      protocol: TCP
+      port: 27016
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: tcp-27017
+      protocol: TCP
+      port: 27017
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: TCPRoute
+    - name: udp-27018
+      protocol: UDP
+      port: 27018
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27019
+      protocol: UDP
+      port: 27019
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27020
+      protocol: UDP
+      port: 27020
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27021
+      protocol: UDP
+      port: 27021
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27022
+      protocol: UDP
+      port: 27022
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27023
+      protocol: UDP
+      port: 27023
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27024
+      protocol: UDP
+      port: 27024
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute
+    - name: udp-27025
+      protocol: UDP
+      port: 27025
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              vps.igou.io/public-ingress: 'true'
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: UDPRoute

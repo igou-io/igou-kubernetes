@@ -1,0 +1,27 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: public-web-test-http
+  namespace: public-services
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
+      namespace: nginx-gateway
+      sectionName: https
+  hostnames:
+    - web-test.igou.io
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''
+          kind: Service
+          name: ocp-public-web-test-bridge
+          namespace: tailscale
+          port: 8080
+          weight: 1

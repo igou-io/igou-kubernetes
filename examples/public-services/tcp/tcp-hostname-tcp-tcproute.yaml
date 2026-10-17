@@ -1,0 +1,21 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: TCPRoute
+metadata:
+  name: tcp-hostname-tcp
+  namespace: public-services
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
+      namespace: nginx-gateway
+      sectionName: tcp-27010
+  rules:
+    - backendRefs:
+        - group: ''
+          kind: Service
+          name: ocp-tcp-hostname-bridge
+          namespace: tailscale
+          port: 9000
+          weight: 1

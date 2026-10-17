@@ -1,0 +1,59 @@
+{{- $names := dict }}
+{{- range $service := .Values.services }}
+{{- if hasKey $names $service.name }}
+{{- fail (printf "duplicate service name: %s" $service.name) }}
+{{- end }}
+{{- $_ := set $names $service.name true }}
+{{- $ports := dict }}
+{{- $portNames := dict }}
+{{- range $port := $service.ports }}
+{{- $protocol := eq $port.protocol "UDP" | ternary "UDP" "TCP" }}
+{{- $key := printf "%s/%v" $protocol $port.port }}
+{{- $name := eq $port.protocol "HTTP" | ternary (printf "http-%s" $port.name) $port.name }}
+{{- if or (hasKey $ports $key) (hasKey $portNames $name) }}
+{{- fail (printf "duplicate backend port or port name in %s" $service.name) }}
+{{- end }}
+{{- $_ := set $ports $key true }}
+{{- $_ := set $portNames $name true }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocp-{{ $service.name }}
+  namespace: {{ $.Values.namespace | quote }}
+  annotations:
+    tailscale.com/tailnet-fqdn: {{ $service.tailnetFQDN | quote }}
+    tailscale.com/hostname: vps-egress-{{ $service.name }}
+    tailscale.com/tags: {{ $.Values.proxyTag | quote }}
+    tailscale.com/proxy-class: {{ $.Values.proxyClassName | quote }}
+spec:
+  type: ExternalName
+  externalName: placeholder
+  ports:
+    {{- range $port := $service.ports }}
+    - name: {{ if eq $port.protocol "HTTP" }}http-{{ end }}{{ $port.name }}
+      port: {{ $port.port }}
+      protocol: {{ eq $port.protocol "UDP" | ternary "UDP" "TCP" }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocp-{{ $service.name }}-bridge
+  namespace: {{ $.Values.proxyNamespace | quote }}
+spec:
+  type: ClusterIP
+  selector:
+    tailscale.com/managed: 'true'
+    tailscale.com/parent-resource-type: svc
+    tailscale.com/parent-resource: ocp-{{ $service.name }}
+    tailscale.com/parent-resource-ns: {{ $.Values.namespace | quote }}
+  ports:
+    {{- range $port := $service.ports }}
+    - name: {{ if eq $port.protocol "HTTP" }}http-{{ end }}{{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.port }}
+      protocol: {{ eq $port.protocol "UDP" | ternary "UDP" "TCP" }}
+    {{- end }}
+{{- end }}

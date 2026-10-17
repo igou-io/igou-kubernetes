@@ -2,13 +2,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: nginx-gateway
-
 resources:
-  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2
+  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/experimental?ref=v2.7.2
   - public-nginx-metrics-service.yaml
   - metrics-reader-nginx-role.yaml
   - metrics-reader-nginx-rolebinding.yaml
-
 helmCharts:
   - name: nginx-gateway-fabric
     releaseName: nginx-gateway
@@ -20,6 +18,8 @@ helmCharts:
       nginxGateway:
         replicas: 1
         gatewayClassName: nginx
+        gwAPIExperimentalFeatures:
+          enable: true
         resources:
           requests:
             cpu: 10m
@@ -38,6 +38,38 @@ helmCharts:
               containerPort: 80
             - port: 443
               containerPort: 443
+            - port: 27010
+              containerPort: 27010
+            - port: 27011
+              containerPort: 27011
+            - port: 27012
+              containerPort: 27012
+            - port: 27013
+              containerPort: 27013
+            - port: 27014
+              containerPort: 27014
+            - port: 27015
+              containerPort: 27015
+            - port: 27016
+              containerPort: 27016
+            - port: 27017
+              containerPort: 27017
+            - port: 27018
+              containerPort: 27018
+            - port: 27019
+              containerPort: 27019
+            - port: 27020
+              containerPort: 27020
+            - port: 27021
+              containerPort: 27021
+            - port: 27022
+              containerPort: 27022
+            - port: 27023
+              containerPort: 27023
+            - port: 27024
+              containerPort: 27024
+            - port: 27025
+              containerPort: 27025
           resources:
             requests:
               cpu: 10m
