@@ -1,5 +1,6 @@
 ---
-# Raw TCP alternative to web-test-values.yaml, targeting the same HTTP server.
+# Renders a native Gateway API TCPRoute to the web server on backend TCP 8080.
+# Equivalent plain manifests: examples/native-tcp/.
 services:
   - name: web-test
     tailnetFQDN: ocp-public-web-test.weasel-alioth.ts.net

@@ -23,6 +23,19 @@ port 27010 to the same backend; test that with
 not files to install together. Both require the OpenShift chart's staged
 `examples/web-test-values.yaml` endpoint, `public-web-test-public`.
 
+For plain manifests using a native Gateway API `TCPRoute`, use
+`examples/native-tcp/`. Its Kustomization includes the egress Service, bridge,
+named ReferenceGrant, and `web-test-tcp-tcproute.yaml`. Render it with:
+
+```bash
+kustomize build .helm/charts/tailscale-public-services/examples/native-tcp
+```
+
+This is another way to manage the same TCP example objects; choose it or the
+Helm TCP values. The existing Gateway listener `tcp-27010` selects the public
+port and the route selects backend port 8080. Its README lists prerequisites
+and the manual connection check.
+
 `examples/udp-values.yaml` maps public UDP 27018 to backend UDP 9000. It matches
 the OpenShift UDP endpoint and the staged `udp-echo` workload in
 `igou-openshift/test-workloads/public-services-udp`. That `agnhost netexec`
