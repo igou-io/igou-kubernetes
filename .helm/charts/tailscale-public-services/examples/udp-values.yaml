@@ -1,0 +1,11 @@
+---
+# Matches the separate OpenShift udp-values.yaml illustration.
+# Requires a UDP server; public-web-test does not serve UDP.
+services:
+  - name: udp-echo
+    tailnetFQDN: ocp-public-udp-echo.weasel-alioth.ts.net
+    ports:
+      - name: udp
+        port: 9000
+        protocol: UDP
+        listener: udp-27018

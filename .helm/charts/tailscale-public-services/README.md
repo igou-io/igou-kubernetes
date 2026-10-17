@@ -5,25 +5,33 @@ namespace, named ReferenceGrants, and HTTPS/TCP/UDP routes. The default empty
 service list renders nothing. It does not register an Application or publish
 a port by itself.
 
-Render the example, which matches the OpenShift chart's example values:
+Render the HTTPS example for OpenShift's deployed `public-web-test` fixture:
 
 ```bash
 helm template public-services .helm/charts/tailscale-public-services \
-  -f .helm/charts/tailscale-public-services/examples/arena-values.yaml
+  -f .helm/charts/tailscale-public-services/examples/web-test-values.yaml
 ```
 
 Each service names a full tailnet MagicDNS endpoint and its backend ports.
 Port `protocol` is `HTTP`, `TCP`, or `UDP`; HTTP is forwarded over TCP and
 requires public `hostnames`. Each port names an existing Gateway listener.
 Multiple HTTP hostnames can share a listener; each TCP/UDP route needs its
-own listener. The example uses HTTPS 443, TCP 27015, and UDP 27016.
+own listener. The HTTPS example maps `web-test.igou.io:443` to backend TCP
+8080. Use `examples/web-test-tcp-values.yaml` instead for raw TCP on public
+port 27010 to the same backend; test that with
+`curl http://web-test.igou.io:27010/`. These are alternative values files,
+not files to install together. Both require the OpenShift chart's staged
+`examples/web-test-values.yaml` endpoint, `public-web-test-public`.
+
+`examples/udp-values.yaml` is a separate illustration mapping public UDP
+27018 to backend UDP 9000. It matches the OpenShift UDP example and requires
+a UDP server that has not been deployed. The nginx web fixture cannot test UDP.
 
 The VPS platform configuration includes the `public-services` namespace,
 namespace-scoped AAP identity, and a fixed pool: TCP 27010–27017 and UDP
 27018–27025. Gateway listeners are named `tcp-<port>` and `udp-<port>`, with
-matching host-port mappings. The example above is manual wiring with dedicated
-`arena-tcp`/`arena-udp` listener names; provide those listeners or change its
-values to use the fixed pool.
+matching host-port mappings. The TCP and UDP examples use those listener
+names directly; they do not require extra Gateway listeners.
 
 The AAP implementation is in `igou-ansible/playbooks/kubernetes/public-share.yaml`.
 It creates equivalent temporary Services, grants, policies, and routes with

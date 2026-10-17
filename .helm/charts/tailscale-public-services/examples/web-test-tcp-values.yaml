@@ -1,0 +1,10 @@
+---
+# Raw TCP alternative to web-test-values.yaml, targeting the same HTTP server.
+services:
+  - name: web-test
+    tailnetFQDN: ocp-public-web-test.weasel-alioth.ts.net
+    ports:
+      - name: tcp
+        port: 8080
+        protocol: TCP
+        listener: tcp-27010
