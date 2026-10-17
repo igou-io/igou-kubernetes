@@ -24,7 +24,7 @@ ports; adding a service requires no tailnet policy edits.
 
 `proxyNamespace` must match the Tailscale operator's namespace. The bridge
 selects its exact parent Service name and namespace. The chart uses the VPS
-`metrics` ProxyClass by default. If using Argo, ignore `/spec/externalName` on
+`public-services` ProxyClass by default. If using Argo, ignore `/spec/externalName` on
 the generated egress Services because Tailscale owns that field.
 
 AAP creates temporary forwarding with the same native route kinds, plus
@@ -33,3 +33,11 @@ must not also be reconciled by Argo. Baseline RBAC is in
 `clusters/vps/public-sharing`; the platform listener pool is TCP 27010–27017
 and UDP 27018–27025. See `examples/public-services/README.md` for the paired
 examples, prerequisites, and manual checks.
+
+Install `clusters/vps/public-sharing` before sharing. It owns the permanent
+public-proxy ingress/egress boundary, independently of expiring objects. Proxy
+transport permits DNS, the fixed Kubernetes API endpoints, public TCP 443 and
+UDP 3478/41641; private direct peer paths may fall back to DERP. The public
+ProxyClass sets CPU/memory budgets. Public proxies still use the operator's
+privileged shared service account; these policies do not contain a host escape
+or prevent reads of management state through that identity.

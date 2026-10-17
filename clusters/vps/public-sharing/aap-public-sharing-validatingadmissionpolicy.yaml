@@ -1,0 +1,160 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: aap-public-sharing
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ''
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - services
+      - apiGroups:
+          - networking.k8s.io
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - networkpolicies
+      - apiGroups:
+          - gateway.networking.k8s.io
+        apiVersions:
+          - v1
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - httproutes
+          - tcproutes
+          - udproutes
+          - referencegrants
+  matchConditions:
+    - name: sharing-identity
+      expression: request.userInfo.username == "system:serviceaccount:public-services:aap-public-share"
+  variables:
+    - name: meta
+      expression: 'request.operation == "DELETE" ? oldObject.metadata : object.metadata'
+    - name: id
+      expression: 'has(variables.meta.labels) && "sharing.igou.io/id" in variables.meta.labels ? variables.meta.labels["sharing.igou.io/id"]
+        : ""'
+  validations:
+    - expression: variables.meta.namespace in ["public-services", "tailscale"] && has(variables.meta.labels) &&
+        variables.meta.labels["app.kubernetes.io/managed-by"] == "public-share-aap" && variables.id.matches("^ps-[a-z0-9-]{1,30}$")
+        && has(variables.meta.annotations) && variables.meta.annotations["sharing.igou.io/owner"].matches("^aap-user-[0-9]+$")
+      message: Only stamped public-sharing objects may be changed or deleted.
+    - expression: request.operation == "DELETE" || (object.metadata.annotations["sharing.igou.io/expires-at"].matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
+        && timestamp(string(object.metadata.annotations["sharing.igou.io/expires-at"])) > timestamp("1970-01-01T00:00:00Z"))
+      message: A valid UTC expiration is required.
+    - expression: request.operation != "UPDATE" || (object.spec == oldObject.spec && object.metadata.labels["sharing.igou.io/id"]
+        == oldObject.metadata.labels["sharing.igou.io/id"] && object.metadata.annotations["sharing.igou.io/owner"]
+        == oldObject.metadata.annotations["sharing.igou.io/owner"] && oldObject.metadata.labels["app.kubernetes.io/managed-by"]
+        == "public-share-aap")
+      message: Existing specs and share identities cannot be replaced or adopted.
+    - expression: 'variables.meta.name == (request.kind.kind.endsWith("Route") ? variables.id + "-" + request.kind.kind.replace("Route",
+        "").lowerAscii() : "ocp-" + variables.id + ((request.kind.kind == "Service" && variables.meta.namespace
+        == "tailscale") ? "-bridge" : ""))'
+      message: Names must be derived from the stamped share ID.
+    - expression: request.operation == "DELETE" || request.kind.kind != "Service" || (object.spec.ports.size() >
+        0 && object.spec.ports.size() <= 3 && object.spec.ports.all(p, p.port >= 1 && p.port <= 65535 && p.protocol
+        in ["TCP", "UDP"]))
+      message: Service must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "Service" || (!has(object.spec.externalIPs)
+        || object.spec.externalIPs.size() == 0)
+      message: Service must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "Service" || (!has(object.spec.loadBalancerClass)
+        && (!has(object.spec.externalTrafficPolicy) || object.spec.externalTrafficPolicy == "Cluster"))
+      message: Service must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "Service" || ((object.metadata.namespace
+        == "public-services" && object.spec.type == "ExternalName" && (request.operation != "CREATE" || object.spec.externalName == "placeholder")
+        && !has(object.spec.selector) && object.metadata.annotations["tailscale.com/tags"] == "tag:vps-public-service"
+        && object.metadata.annotations["tailscale.com/proxy-class"] == "public-services" && object.metadata.annotations["tailscale.com/hostname"]
+        == "vps-egress-" + variables.id && object.metadata.annotations["tailscale.com/tailnet-fqdn"].matches("^ocp-public-[a-z0-9-]+[.]weasel-alioth[.]ts[.]net$"))
+        || (object.metadata.namespace == "tailscale" && object.spec.type == "ClusterIP" && object.spec.selector
+        == {"tailscale.com/managed":"true", "tailscale.com/parent-resource-type":"svc", "tailscale.com/parent-resource":"ocp-"
+        + variables.id, "tailscale.com/parent-resource-ns":"public-services"}))
+      message: Service must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "Service" || (object.metadata.annotations.all(k,
+        k in ["sharing.igou.io/owner", "sharing.igou.io/expires-at", "tailscale.com/tags", "tailscale.com/proxy-class",
+        "tailscale.com/hostname", "tailscale.com/tailnet-fqdn"]))
+      message: Service must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "Service" || (object.metadata.namespace
+        != "tailscale" || object.metadata.annotations.all(k, k in ["sharing.igou.io/owner", "sharing.igou.io/expires-at"]))
+      message: Service must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "ReferenceGrant" || (object.metadata.namespace
+        == "tailscale" && object.spec.from.size() > 0 && object.spec.from.size() <= 3 && object.spec.from.all(f,
+        f.group == "gateway.networking.k8s.io" && f.kind in ["HTTPRoute", "TCPRoute", "UDPRoute"] && f.namespace
+        == "public-services") && object.spec.to.size() == 1 && object.spec.to[0].group == "" && object.spec.to[0].kind
+        == "Service" && object.spec.to[0].name == "ocp-" + variables.id + "-bridge")
+      message: ReferenceGrant must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "NetworkPolicy" || (object.metadata.namespace
+        == "tailscale" && object.spec.podSelector.matchLabels == {"tailscale.com/managed":"true", "tailscale.com/parent-resource-type":"svc",
+        "tailscale.com/parent-resource":"ocp-" + variables.id, "tailscale.com/parent-resource-ns":"public-services"}
+        && (!has(object.spec.podSelector.matchExpressions) || object.spec.podSelector.matchExpressions.size() ==
+        0))
+      message: NetworkPolicy must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "NetworkPolicy" || (object.spec.policyTypes
+        == ["Ingress"] && (!has(object.spec.egress) || object.spec.egress.size() == 0) && object.spec.ingress.size()
+        == 1 && object.spec.ingress[0].from.size() == 1)
+      message: NetworkPolicy must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "NetworkPolicy" || (object.spec.ingress[0].from[0]
+        == {"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"nginx-gateway"}},"podSelector":{"matchLabels":{"gateway.networking.k8s.io/gateway-name":"public"}}})
+      message: NetworkPolicy must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "NetworkPolicy" || (object.spec.ingress[0].ports.size()
+        > 0 && object.spec.ingress[0].ports.size() <= 3 && object.spec.ingress[0].ports.all(p, type(p.port) == int
+        && p.port >= 1 && p.port <= 65535 && p.protocol in ["TCP", "UDP"] && !has(p.endPort)))
+      message: NetworkPolicy must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "HTTPRoute" || (object.metadata.namespace
+        == "public-services" && object.spec.parentRefs.size() == 1 && object.spec.parentRefs[0].group == "gateway.networking.k8s.io"
+        && object.spec.parentRefs[0].kind == "Gateway" && object.spec.parentRefs[0].name == "public" && object.spec.parentRefs[0].namespace
+        == "nginx-gateway")
+      message: HTTPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "HTTPRoute" || (object.spec.rules.size()
+        == 1 && !has(object.spec.rules[0].filters) && object.spec.rules[0].backendRefs.size() == 1 && object.spec.rules[0].backendRefs[0].group
+        == "" && object.spec.rules[0].backendRefs[0].kind == "Service" && object.spec.rules[0].backendRefs[0].name
+        == "ocp-" + variables.id + "-bridge" && object.spec.rules[0].backendRefs[0].namespace == "tailscale" &&
+        object.spec.rules[0].backendRefs[0].port >= 1 && object.spec.rules[0].backendRefs[0].port <= 65535 && !has(object.spec.rules[0].backendRefs[0].filters))
+      message: HTTPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "HTTPRoute" || (object.spec.parentRefs[0].sectionName
+        == "https" && object.spec.hostnames == [variables.id + ".igou.io"])
+      message: HTTPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "TCPRoute" || (object.metadata.namespace
+        == "public-services" && object.spec.parentRefs.size() == 1 && object.spec.parentRefs[0].group == "gateway.networking.k8s.io"
+        && object.spec.parentRefs[0].kind == "Gateway" && object.spec.parentRefs[0].name == "public" && object.spec.parentRefs[0].namespace
+        == "nginx-gateway")
+      message: TCPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "TCPRoute" || (object.spec.rules.size()
+        == 1 && !has(object.spec.rules[0].filters) && object.spec.rules[0].backendRefs.size() == 1 && object.spec.rules[0].backendRefs[0].group
+        == "" && object.spec.rules[0].backendRefs[0].kind == "Service" && object.spec.rules[0].backendRefs[0].name
+        == "ocp-" + variables.id + "-bridge" && object.spec.rules[0].backendRefs[0].namespace == "tailscale" &&
+        object.spec.rules[0].backendRefs[0].port >= 1 && object.spec.rules[0].backendRefs[0].port <= 65535 && !has(object.spec.rules[0].backendRefs[0].filters))
+      message: TCPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "TCPRoute" || (object.spec.parentRefs[0].sectionName.matches("^tcp-2701[0-7]$"))
+      message: TCPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "UDPRoute" || (object.metadata.namespace
+        == "public-services" && object.spec.parentRefs.size() == 1 && object.spec.parentRefs[0].group == "gateway.networking.k8s.io"
+        && object.spec.parentRefs[0].kind == "Gateway" && object.spec.parentRefs[0].name == "public" && object.spec.parentRefs[0].namespace
+        == "nginx-gateway")
+      message: UDPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "UDPRoute" || (object.spec.rules.size()
+        == 1 && !has(object.spec.rules[0].filters) && object.spec.rules[0].backendRefs.size() == 1 && object.spec.rules[0].backendRefs[0].group
+        == "" && object.spec.rules[0].backendRefs[0].kind == "Service" && object.spec.rules[0].backendRefs[0].name
+        == "ocp-" + variables.id + "-bridge" && object.spec.rules[0].backendRefs[0].namespace == "tailscale" &&
+        object.spec.rules[0].backendRefs[0].port >= 1 && object.spec.rules[0].backendRefs[0].port <= 65535 && !has(object.spec.rules[0].backendRefs[0].filters))
+      message: UDPRoute must use only its approved public forwarding shape.
+    - expression: request.operation == "DELETE" || request.kind.kind != "UDPRoute" || (object.spec.parentRefs[0].sectionName.matches("^udp-(2701[89]|2702[0-5])$"))
+      message: UDPRoute must use only its approved public forwarding shape.

@@ -2,11 +2,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: tailscale
-
 resources:
   - operator-oauth-externalsecret.yaml
   - metrics-proxyclass.yaml
-
+  - public-services-proxyclass.yaml
 helmCharts:
   - name: tailscale-operator
     releaseName: tailscale

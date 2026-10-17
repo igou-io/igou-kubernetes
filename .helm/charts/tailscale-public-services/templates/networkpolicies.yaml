@@ -19,6 +19,9 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: {{ $.Values.gateway.namespace | quote }}
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: {{ $.Values.gateway.name | quote }}
       ports:
         {{- range $port := $service.ports }}
         - port: {{ $port.port }}

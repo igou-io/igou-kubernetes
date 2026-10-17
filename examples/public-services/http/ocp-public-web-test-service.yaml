@@ -8,7 +8,7 @@ metadata:
     tailscale.com/tailnet-fqdn: ocp-public-web-test.weasel-alioth.ts.net
     tailscale.com/hostname: vps-egress-public-web-test
     tailscale.com/tags: tag:vps-public-service
-    tailscale.com/proxy-class: metrics
+    tailscale.com/proxy-class: public-services
 spec:
   type: ExternalName
   externalName: placeholder

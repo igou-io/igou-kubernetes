@@ -3,10 +3,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - aap-public-share-serviceaccount.yaml
-  - aap-public-share-token-secret.yaml
   - aap-public-share-public-services-role.yaml
   - aap-public-share-public-services-rolebinding.yaml
   - aap-public-share-tailscale-role.yaml
   - aap-public-share-tailscale-rolebinding.yaml
   - aap-public-share-nginx-gateway-role.yaml
   - aap-public-share-nginx-gateway-rolebinding.yaml
+  - public-proxy-boundary-networkpolicy.yaml
+  - aap-public-sharing-validatingadmissionpolicy.yaml
+  - aap-public-sharing-validatingadmissionpolicybinding.yaml
