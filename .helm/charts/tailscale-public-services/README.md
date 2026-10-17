@@ -23,9 +23,11 @@ port 27010 to the same backend; test that with
 not files to install together. Both require the OpenShift chart's staged
 `examples/web-test-values.yaml` endpoint, `public-web-test-public`.
 
-`examples/udp-values.yaml` is a separate illustration mapping public UDP
-27018 to backend UDP 9000. It matches the OpenShift UDP example and requires
-a UDP server that has not been deployed. The nginx web fixture cannot test UDP.
+`examples/udp-values.yaml` maps public UDP 27018 to backend UDP 9000. It matches
+the OpenShift UDP endpoint and the staged `udp-echo` workload in
+`igou-openshift/test-workloads/public-services-udp`. That `agnhost netexec`
+server answers `echo hello` and `hostname`; after rollout and DNS setup, check
+with `printf 'echo hello\n' | nc -u -w 3 udp-test.igou.io 27018` and expect `hello`.
 
 The VPS platform configuration includes the `public-services` namespace,
 namespace-scoped AAP identity, and a fixed pool: TCP 27010–27017 and UDP

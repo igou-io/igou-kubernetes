@@ -1,6 +1,6 @@
 ---
-# Matches the separate OpenShift udp-values.yaml illustration.
-# Requires a UDP server; public-web-test does not serve UDP.
+# Matches OpenShift's udp-values.yaml and test-workloads/public-services-udp.
+# The workload and forwarding remain staged.
 services:
   - name: udp-echo
     tailnetFQDN: ocp-public-udp-echo.weasel-alioth.ts.net
