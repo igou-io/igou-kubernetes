@@ -24,8 +24,11 @@ platform must first provide the namespaces, Tailscale operator, `metrics`
 ProxyClass, public Gateway, experimental route CRDs, listener/host-port pool,
 and HTTPS certificate. OpenShift provides the matching workload and stable
 Tailscale endpoint. Configure DNS, tailnet tag ownership/grants, and the host
-firewall before public checks. Open only the selected public listener ports;
-tailnet grants use the backend ports in the table.
+firewall before public checks. Open only the selected public listener ports.
+All VPS proxies use `tag:vps-public-service`; all OpenShift endpoints use
+`tag:ocp-public-service`. One grant allows TCP and UDP on all ports from the
+VPS tag to the OpenShift tag. The Services and NetworkPolicies still limit
+each proxy to its declared backend ports.
 
 If adopting an example through Argo, ignore `/spec/externalName` on its
 Tailscale egress Service in `public-services`; the operator owns that field.

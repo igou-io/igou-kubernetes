@@ -1,7 +1,7 @@
 ---
 namespace: public-services
 proxyNamespace: tailscale
-proxyTag: tag:vps-public-egress
+proxyTag: tag:vps-public-service
 proxyClassName: metrics
 gateway:
   name: public

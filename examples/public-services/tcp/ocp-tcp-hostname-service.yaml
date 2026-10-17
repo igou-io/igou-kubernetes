@@ -7,7 +7,7 @@ metadata:
   annotations:
     tailscale.com/tailnet-fqdn: ocp-public-tcp-hostname.weasel-alioth.ts.net
     tailscale.com/hostname: vps-egress-tcp-hostname
-    tailscale.com/tags: tag:vps-public-egress
+    tailscale.com/tags: tag:vps-public-service
     tailscale.com/proxy-class: metrics
 spec:
   type: ExternalName

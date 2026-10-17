@@ -17,6 +17,11 @@ an existing Gateway listener. HTTP hostnames can share an HTTPS listener;
 each TCP/UDP route needs its own listener. Backend ports are independent of
 public listener ports. Review `values.schema.json` for the accepted values.
 
+All egress proxies use the chart-wide `proxyTag`, defaulting to
+`tag:vps-public-service`. Authorize `tag:vps-operator` to mint it. One tailnet
+grant allows this tag to reach `tag:ocp-public-service` on all TCP and UDP
+ports; adding a service requires no tailnet policy edits.
+
 `proxyNamespace` must match the Tailscale operator's namespace. The bridge
 selects its exact parent Service name and namespace. The chart uses the VPS
 `metrics` ProxyClass by default. If using Argo, ignore `/spec/externalName` on
