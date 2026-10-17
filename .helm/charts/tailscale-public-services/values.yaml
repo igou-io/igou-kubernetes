@@ -1,0 +1,10 @@
+---
+namespace: public-services
+proxyNamespace: tailscale
+proxyTag: tag:vps-public-service
+proxyClassName: metrics
+gateway:
+  name: public
+  namespace: nginx-gateway
+# Empty until an application is selected for publication.
+services: []

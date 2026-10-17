@@ -10,3 +10,4 @@ resources:
   - nginx-gateway-namespace.yaml
   - igou-io-namespace.yaml
   - gotify-namespace.yaml
+  - public-services-namespace.yaml

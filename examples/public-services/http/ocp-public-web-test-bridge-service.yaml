@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocp-public-web-test-bridge
+  namespace: tailscale
+spec:
+  type: ClusterIP
+  selector:
+    tailscale.com/managed: 'true'
+    tailscale.com/parent-resource-type: svc
+    tailscale.com/parent-resource: ocp-public-web-test
+    tailscale.com/parent-resource-ns: public-services
+  ports:
+    - name: http-http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
