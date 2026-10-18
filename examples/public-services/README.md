@@ -45,3 +45,7 @@ when the static examples already occupy the example ports.
 The `public-services` ProxyClass and permanent `public-proxy-boundary` policy
 are platform prerequisites. Temporary example policies never grant egress or
 change that baseline.
+
+Replace `example.ts.net` in the Service annotations with your own tailnet
+suffix before installing these examples. Keep configured backend FQDNs in
+private inventory; the public source contains illustrative names only.

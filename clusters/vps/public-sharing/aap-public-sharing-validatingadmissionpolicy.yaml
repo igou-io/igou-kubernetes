@@ -83,7 +83,7 @@ spec:
         == "public-services" && object.spec.type == "ExternalName" && (request.operation != "CREATE" || object.spec.externalName == "placeholder")
         && !has(object.spec.selector) && object.metadata.annotations["tailscale.com/tags"] == "tag:vps-public-service"
         && object.metadata.annotations["tailscale.com/proxy-class"] == "public-services" && object.metadata.annotations["tailscale.com/hostname"]
-        == "vps-egress-" + variables.id && object.metadata.annotations["tailscale.com/tailnet-fqdn"].matches("^ocp-public-[a-z0-9-]+[.]weasel-alioth[.]ts[.]net$"))
+        == "vps-egress-" + variables.id && object.metadata.annotations["tailscale.com/tailnet-fqdn"].matches("^ocp-public-[a-z0-9-]+[.][a-z0-9-]+[.]ts[.]net$"))
         || (object.metadata.namespace == "tailscale" && object.spec.type == "ClusterIP" && object.spec.selector
         == {"tailscale.com/managed":"true", "tailscale.com/parent-resource-type":"svc", "tailscale.com/parent-resource":"ocp-"
         + variables.id, "tailscale.com/parent-resource-ns":"public-services"}))

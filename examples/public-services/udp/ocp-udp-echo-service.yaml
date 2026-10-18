@@ -5,7 +5,7 @@ metadata:
   name: ocp-udp-echo
   namespace: public-services
   annotations:
-    tailscale.com/tailnet-fqdn: ocp-public-udp-echo.weasel-alioth.ts.net
+    tailscale.com/tailnet-fqdn: ocp-public-udp-echo.example.ts.net
     tailscale.com/hostname: vps-egress-udp-echo
     tailscale.com/tags: tag:vps-public-service
     tailscale.com/proxy-class: public-services

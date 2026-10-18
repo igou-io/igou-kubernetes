@@ -5,7 +5,7 @@ metadata:
   name: ocp-public-web-test
   namespace: public-services
   annotations:
-    tailscale.com/tailnet-fqdn: ocp-public-web-test.weasel-alioth.ts.net
+    tailscale.com/tailnet-fqdn: ocp-public-web-test.example.ts.net
     tailscale.com/hostname: vps-egress-public-web-test
     tailscale.com/tags: tag:vps-public-service
     tailscale.com/proxy-class: public-services
