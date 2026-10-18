@@ -1,0 +1,11 @@
+---
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: vps-public-egress
+spec:
+  hostname: vps-public-egress
+  exitNode: true
+  tags:
+    - tag:vps-public-service
+  proxyClass: vps-public-egress

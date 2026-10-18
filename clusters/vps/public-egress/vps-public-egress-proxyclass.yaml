@@ -1,0 +1,26 @@
+---
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: vps-public-egress
+spec:
+  statefulSet:
+    pod:
+      labels:
+        networking.igou.io/role: public-egress-exit
+      tailscaleContainer:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
+      tailscaleInitContainer:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
