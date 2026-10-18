@@ -4,7 +4,7 @@ This folder pairs with `igou-openshift/test-workloads/public-services/udp/`.
 The native `UDPRoute` attaches to `nginx-gateway/public` and selects the bridge
 Service in `tailscale`. The bridge selects the Tailscale egress proxy for
 `ocp-udp-echo` in `public-services`, targeting
-`ocp-public-udp-echo.weasel-alioth.ts.net` on UDP 9000.
+`ocp-public-udp-echo.example.ts.net` on UDP 9000.
 
 After installing the prerequisites in `../README.md` and rolling out both
 sides, check from outside the tailnet:

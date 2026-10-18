@@ -18,6 +18,9 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: nginx-gateway
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: public
       ports:
         - port: 9000
           protocol: TCP

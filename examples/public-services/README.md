@@ -35,9 +35,17 @@ Tailscale egress Service in `public-services`; the operator owns that field.
 The bridge selects only the proxy for its exact parent Service and namespace.
 The named ReferenceGrant permits only the matching route kind to reference
 that bridge in `tailscale`. The ingress policy selects only that bridge
-proxy and permits the Gateway namespace on the selected backend port.
+proxy and permits only the public Gateway data-plane pods on the selected backend port.
 
 These are static sharing examples. The AAP catalog has matching `http`, `tcp`,
 and `udp` backends and creates its own temporary forwarding objects with
 expiration metadata. Use AAP for expiring shares; choose free TCP/UDP listeners
 when the static examples already occupy the example ports.
+
+The `public-services` ProxyClass and permanent `public-proxy-boundary` policy
+are platform prerequisites. Temporary example policies never grant egress or
+change that baseline.
+
+Replace `example.ts.net` in the Service annotations with your own tailnet
+suffix before installing these examples. Keep configured backend FQDNs in
+private inventory; the public source contains illustrative names only.
