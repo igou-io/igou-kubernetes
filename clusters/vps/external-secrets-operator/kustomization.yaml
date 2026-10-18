@@ -14,7 +14,7 @@ helmCharts:
   - name: external-secrets
     releaseName: external-secrets
     namespace: external-secrets
-    version: 2.11.0
+    version: 2.12.0
     repo: https://charts.external-secrets.io
     includeCRDs: true
     valuesInline:
