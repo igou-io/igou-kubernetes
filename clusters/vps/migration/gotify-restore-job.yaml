@@ -13,7 +13,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: restore
-          image: quay.io/igou/igou.io:vps@sha256:6c559e265c2c6c8890a0d1639b668252add5a6aa64de73d0cb12d0a77a5dff69
+          image: quay.io/igou/igou.io:vps@sha256:89aa045c36b03b15d9f9c5147ae5160fa36913f904187c5a72fa6df07903de44
           command:
             - /bin/sh
             - -ec
