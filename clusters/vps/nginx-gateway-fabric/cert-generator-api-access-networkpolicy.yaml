@@ -1,0 +1,31 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cert-generator-api-access
+  namespace: nginx-gateway
+  annotations:
+    # The chart's PreSync Job lacks the gateway-controller policy's pod labels.
+    # Install its API access first and retain it until the next sync begins.
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: '-1'
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  podSelector:
+    matchLabels:
+      batch.kubernetes.io/job-name: nginx-gateway-nginx-gateway-fabric-cert-generator
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.43.0.1/32
+      ports:
+        - protocol: TCP
+          port: 443
+    - to:
+        - ipBlock:
+            cidr: 192.129.238.44/32
+      ports:
+        - protocol: TCP
+          port: 6443
