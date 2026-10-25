@@ -6,7 +6,7 @@ resources:
   - gateway-controller-networkpolicy.yaml
   - public-data-plane-networkpolicy.yaml
   - default-deny-networkpolicy.yaml
-  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2
+  - https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.8.0
   - public-nginx-metrics-service.yaml
   - metrics-reader-nginx-role.yaml
   - metrics-reader-nginx-rolebinding.yaml
