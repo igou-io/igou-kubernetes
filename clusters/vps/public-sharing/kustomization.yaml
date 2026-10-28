@@ -12,3 +12,10 @@ resources:
   - public-proxy-boundary-networkpolicy.yaml
   - aap-public-sharing-validatingadmissionpolicy.yaml
   - aap-public-sharing-validatingadmissionpolicybinding.yaml
+  - rhdh-public-sharing-reader-serviceaccount.yaml
+  - rhdh-public-sharing-public-services-role.yaml
+  - rhdh-public-sharing-public-services-rolebinding.yaml
+  - rhdh-public-sharing-tailscale-role.yaml
+  - rhdh-public-sharing-tailscale-rolebinding.yaml
+  - rhdh-public-sharing-nginx-gateway-role.yaml
+  - rhdh-public-sharing-nginx-gateway-rolebinding.yaml
