@@ -1,0 +1,14 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rhdh-public-sharing-nginx-gateway
+  namespace: nginx-gateway
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rhdh-public-sharing-nginx-gateway
+subjects:
+  - kind: ServiceAccount
+    name: rhdh-public-sharing-reader
+    namespace: public-services
