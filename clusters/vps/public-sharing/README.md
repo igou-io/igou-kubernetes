@@ -7,6 +7,16 @@ other Services, policies, grants and routes from that credential. New forwarding
 objects must use stamped share names, owner and expiry, public tags, the
 `public-services` ProxyClass, the approved Gateway listeners and their own bridge.
 Specs and owner/share IDs cannot change after creation; only expiry is renewed.
+New routes require an immutable `sharing.igou.io/hostname` annotation selecting
+a single lowercase DNS label under `sharing.igou.io`. The generated `ps-`
+prefix is reserved for the route's own share ID. A route's HTTP hostname
+must equal that annotation. Existing root-domain routes retain their hostname;
+expiry updates and deletion remain allowed, with specs and hostname presence
+and value immutable. Legacy routes without the annotation retain `<id>.igou.io`.
+The serialized AAP Create job checks hostname conflicts before writing resources.
+Keep permanent applications outside this dedicated sharing namespace. Before
+enabling new names, issue and mirror the Gateway certificate with
+`*.sharing.igou.io` coverage using the existing OpenShift cert-manager pipeline.
 The hostname check accepts the public-service prefix in any tailnet; actual
 backend FQDNs belong in private inventory. Tailnet membership and grants still
 authorize the connection.
