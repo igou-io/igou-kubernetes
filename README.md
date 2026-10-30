@@ -38,6 +38,7 @@ Its OpenShift-hosted Argo CD and Application catalog are maintained in
 | loki | grafana.github.io/helm-charts | 11 |
 | tailscale-operator | pkgs.tailscale.com/helmcharts | 12 |
 | gateway | raw Gateway API manifests (NGF Gateway + routes) | 15 |
+| rhacs-secured-cluster | RHACS Operator Helm chart + SecuredCluster connected to OCP Central | 20 |
 | kubevirt | upstream release manifests (kustomize) | 50 |
 
 **metallb** carries the cluster's BGP load-balancer setup (peering with the

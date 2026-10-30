@@ -1,0 +1,57 @@
+---
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: rk8s
+  namespace: stackrox
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  clusterName: rk8s
+  centralEndpoint: central-passthrough-stackrox.apps.ocp.igou.systems:443
+  imagePullSecrets:
+    - name: rhacs-registry
+  monitoring:
+    openshift:
+      enabled: false
+  sensor:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 2560Mi
+      limits:
+        memory: 4Gi
+  admissionControl:
+    enforcement: Disabled
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 160Mi
+      limits:
+        memory: 500Mi
+  perNode:
+    collector:
+      collection: CORE_BPF
+      resources:
+        requests:
+          cpu: 100m
+          memory: 320Mi
+        limits:
+          memory: 1Gi
+    compliance:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+    nodeInventory:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 10Mi
+  # Central's existing Scanner V4 indexes and matches rk8s images on OCP.
+  scanner:
+    scannerComponent: Disabled
+  scannerV4:
+    scannerComponent: Disabled
