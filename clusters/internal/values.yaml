@@ -138,6 +138,16 @@ applications:
     source:
       path: components/whoami
 
+  # Connect to ACS Central on OCP. Image scanning remains on OCP.
+  rhacs-secured-cluster:
+    annotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous
+      argocd.argoproj.io/sync-wave: '20'
+    destination:
+      namespace: stackrox
+    source:
+      path: components/stackrox-secured-cluster-services
+
   kubevirt:
     annotations:
       argocd.argoproj.io/compare-options: IgnoreExtraneous

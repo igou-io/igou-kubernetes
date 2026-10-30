@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stackrox
+  annotations:
+    argocd.argoproj.io/sync-wave: '-3'
+  labels:
+    # Collector requires privileged access to the node for CORE_BPF.
+    pod-security.kubernetes.io/enforce: privileged
