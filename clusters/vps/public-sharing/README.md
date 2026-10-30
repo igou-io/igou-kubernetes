@@ -7,6 +7,13 @@ other Services, policies, grants and routes from that credential. New forwarding
 objects must use stamped share names, owner and expiry, public tags, the
 `public-services` ProxyClass, the approved Gateway listeners and their own bridge.
 Specs and owner/share IDs cannot change after creation; only expiry is renewed.
+Routes may carry an immutable `sharing.igou.io/hostname` annotation selecting
+a single lowercase DNS label under `igou.io`. The platform labels `www` and
+`gotify` and the generated `ps-` prefix are reserved. A route's HTTP hostname
+must equal that annotation; routes without it retain their generated hostname.
+The serialized AAP Create job checks hostname conflicts before writing resources.
+Add future permanent application labels to the reserved-name checks here and
+in the Ansible renderer and RHDH plugins before exposing those applications.
 The hostname check accepts the public-service prefix in any tailnet; actual
 backend FQDNs belong in private inventory. Tailnet membership and grants still
 authorize the connection.

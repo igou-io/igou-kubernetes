@@ -52,6 +52,9 @@ spec:
     - name: id
       expression: 'has(variables.meta.labels) && "sharing.igou.io/id" in variables.meta.labels ? variables.meta.labels["sharing.igou.io/id"]
         : ""'
+    - name: hostname
+      expression: 'has(variables.meta.annotations) && "sharing.igou.io/hostname" in variables.meta.annotations ?
+        variables.meta.annotations["sharing.igou.io/hostname"] : variables.id + ".igou.io"'
   validations:
     - expression: variables.meta.namespace in ["public-services", "tailscale"] && has(variables.meta.labels) &&
         variables.meta.labels["app.kubernetes.io/managed-by"] == "public-share-aap" && variables.id.matches("^ps-[a-z0-9-]{1,30}$")
@@ -60,6 +63,16 @@ spec:
     - expression: request.operation == "DELETE" || (object.metadata.annotations["sharing.igou.io/expires-at"].matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
         && timestamp(string(object.metadata.annotations["sharing.igou.io/expires-at"])) > timestamp("1970-01-01T00:00:00Z"))
       message: A valid UTC expiration is required.
+    - expression: 'request.operation == "DELETE" || !request.kind.kind.endsWith("Route") ||
+        (variables.hostname.matches("^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?[.]igou[.]io$") &&
+        (variables.hostname == variables.id + ".igou.io" ||
+        (!(variables.hostname in ["www.igou.io", "gotify.igou.io"]) && !variables.hostname.startsWith("ps-"))))'
+      message: Endpoint hostname must be a single non-reserved subdomain of igou.io.
+    - expression: 'request.operation != "UPDATE" ||
+        (("sharing.igou.io/hostname" in object.metadata.annotations) == ("sharing.igou.io/hostname" in oldObject.metadata.annotations) &&
+        (!("sharing.igou.io/hostname" in object.metadata.annotations) ||
+        object.metadata.annotations["sharing.igou.io/hostname"] == oldObject.metadata.annotations["sharing.igou.io/hostname"]))'
+      message: An existing endpoint hostname cannot be changed.
     - expression: request.operation != "UPDATE" || (object.spec == oldObject.spec && object.metadata.labels["sharing.igou.io/id"]
         == oldObject.metadata.labels["sharing.igou.io/id"] && object.metadata.annotations["sharing.igou.io/owner"]
         == oldObject.metadata.annotations["sharing.igou.io/owner"] && oldObject.metadata.labels["app.kubernetes.io/managed-by"]
@@ -130,7 +143,7 @@ spec:
         object.spec.rules[0].backendRefs[0].port >= 1 && object.spec.rules[0].backendRefs[0].port <= 65535 && !has(object.spec.rules[0].backendRefs[0].filters))
       message: HTTPRoute must use only its approved public forwarding shape.
     - expression: request.operation == "DELETE" || request.kind.kind != "HTTPRoute" || (object.spec.parentRefs[0].sectionName
-        == "https" && object.spec.hostnames == [variables.id + ".igou.io"])
+        == "https" && object.spec.hostnames == [variables.hostname])
       message: HTTPRoute must use only its approved public forwarding shape.
     - expression: request.operation == "DELETE" || request.kind.kind != "TCPRoute" || (object.metadata.namespace
         == "public-services" && object.spec.parentRefs.size() == 1 && object.spec.parentRefs[0].group == "gateway.networking.k8s.io"
