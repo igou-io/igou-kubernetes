@@ -35,7 +35,7 @@ spec:
       # collector component (v1.18.0), so both aggregators run the same Alloy.
       containers:
         - name: alloy
-          image: docker.io/grafana/alloy:v1.20.1@sha256:2aa2099af76c0098d4af7a4d6e48f86cb66dc1a000222ad927a1c67c6542d13f
+          image: docker.io/grafana/alloy:v1.21.1@sha256:4039c971193053a84e53dd9ed3e7d4561c069256b024631cd3498a353ed7ece8
           args:
             - run
             - /etc/alloy/config.alloy
