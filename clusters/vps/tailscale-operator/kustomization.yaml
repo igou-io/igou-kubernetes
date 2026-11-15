@@ -10,7 +10,7 @@ helmCharts:
   - name: tailscale-operator
     releaseName: tailscale
     namespace: tailscale
-    version: 1.104.2
+    version: 1.104.4
     repo: https://pkgs.tailscale.com/helmcharts
     includeCRDs: true
     valuesInline:
