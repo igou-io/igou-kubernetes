@@ -15,5 +15,5 @@ helmCharts:
   includeCRDs: true
   releaseName: metallb
   namespace: metallb-system
-  version: 0.16.1
+  version: 0.16.2
   repo: https://metallb.github.io/metallb
