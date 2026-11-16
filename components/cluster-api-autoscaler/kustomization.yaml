@@ -16,7 +16,7 @@ helmCharts:
   - name: cluster-autoscaler
     releaseName: cluster-api-autoscaler
     namespace: cluster-api-autoscaler-system
-    version: 9.59.0
+    version: 9.60.0
     repo: https://kubernetes.github.io/autoscaler
     includeCRDs: true
     valuesInline:
