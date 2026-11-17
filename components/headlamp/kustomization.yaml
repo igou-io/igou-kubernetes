@@ -4,6 +4,8 @@ namespace: headlamp
 resources:
   - headlamp-namespace.yaml
   - headlamp-httproute.yaml
+  - headlamp-admin-serviceaccount.yaml
+  - headlamp-admin-clusterrolebinding.yaml
 helmCharts:
 - name: headlamp
   includeCRDs: true
@@ -12,10 +14,11 @@ helmCharts:
   version: 0.46.0
   repo: https://kubernetes-sigs.github.io/headlamp/
   valuesInline:
-    # Token login (Headlamp's default): the chart creates the `headlamp`
-    # ServiceAccount bound to cluster-admin; sessions authenticate with a
-    # short-lived token minted via `kubectl create token headlamp -n
-    # headlamp`. No OIDC provider on this cluster, and
+    # Token login (Headlamp's default): sessions authenticate with a
+    # short-lived token minted via `kubectl create token headlamp-admin -n
+    # headlamp` (headlamp-admin-*.yaml). The pod's own `headlamp`
+    # ServiceAccount has no RBAC, so a compromised UI pod does not hold
+    # cluster-admin. No OIDC provider on this cluster, and
     # unsafeUseServiceAccountToken stays off so the trusted-lan exposure
     # still requires a token.
     config:
@@ -27,8 +30,20 @@ helmCharts:
     serviceAccount:
       create: true
     clusterRoleBinding:
-      create: true
-      clusterRoleName: cluster-admin
+      create: false
+
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 100
+      runAsGroup: 101
+      privileged: false
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      seccompProfile:
+        type: RuntimeDefault
+      capabilities:
+        drop:
+          - ALL
 
     replicaCount: 1
 
