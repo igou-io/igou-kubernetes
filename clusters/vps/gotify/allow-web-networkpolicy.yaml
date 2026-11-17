@@ -14,9 +14,6 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: nginx-gateway
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: tailscale
       ports:
         - protocol: TCP
           port: 8080
