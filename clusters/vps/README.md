@@ -5,7 +5,7 @@ Only manifests installed on the VPS live here. The dedicated
 OpenShift Argo CD instance `vps` in `vps-gitops` reconciles remote workloads.
 The existing OpenShift instance owns secret delivery through its
 `openshift-gitops/vps-secrets` Application. The VPS runs one ESO controller,
-NGINX Gateway Fabric and the Tailscale operator. Argo CD, cert-manager,
+and NGINX Gateway Fabric. Argo CD, cert-manager,
 Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/all`.
 
 - `seed/`: only the `argocd` namespace and cluster-admin `argocd/argocd-manager`
@@ -21,19 +21,19 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
   and metrics-proxy RBAC. NGINX metrics-proxy RBAC lives with NGINX Gateway Fabric.
 - `external-secrets-operator/` and `external-secrets-config/`: one ESO controller
   and the local mirrored-Secret ClusterSecretStore.
-- `nginx-gateway-fabric/`, `tailscale-operator/` and
-  `node-exporter/`: the other pinned cluster components.
+- `nginx-gateway-fabric/` and `node-exporter/`: the other pinned cluster
+  components.
 - `gateway-api/`: mirrored TLS ExternalSecret, public Gateway and redirects.
 - `igou-io/` and `gotify/`: application Deployments, Services, HTTPRoutes,
   NetworkPolicies, and Gotify's local PVC/ExternalSecret.
 - `migration/`: one-time Gotify restoration Job, excluded from the normal root.
   It refuses a nonempty destination and mounts only protected staged Gotify data.
 
-OpenShift PushSecrets mirror `vps-public-tls`, `vps-tailscale` and `vps-gotify`
+OpenShift PushSecrets mirror `vps-public-tls` and `vps-gotify`
 into the VPS `external-secrets` namespace. Local `ClusterSecretStore/local-mirrors`
 reads that namespace using TokenRequest authentication as `mirror-reader`.
 Its reader can only read mirror Secrets and review its permissions; its consumer
-namespace allowlist is `nginx-gateway`, `tailscale` and `gotify`. Local
+namespace allowlist is `nginx-gateway` and `gotify`. Local
 ExternalSecrets create the final application Secrets. OpenShift uses the seeded
 cluster-admin Argo credential for remote pushes as well as remote registration;
 `remoteNamespace` controls delivery and does not restrict that token's privileges.
@@ -52,9 +52,8 @@ on OpenShift and Tailscale. No DNS API credential or ACME controller runs here.
 
 The private API is reached through OpenShift's
 `vps-k3s-api.vps-secrets.svc.cluster.local:6443` Tailscale egress Service.
-The host has `tag:vps`, the operator `tag:vps-operator`, and optional service
-proxies default to `tag:vps-app`. API proxy mode is off. Public web ingress
-uses ports 80/443; the public-interface guard blocks API and metrics access.
+The host has `tag:vps`; no Tailscale operator runs in the cluster. Public web
+ingress uses ports 80/443 only; the public-interface guard blocks API and metrics access.
 
 The OpenShift controller definitions and Application catalog live in
 `igou-openshift/clusters/ocp/vps-gitops/` and `clusters/ocp/vps/`; registration,
@@ -71,8 +70,8 @@ The website pins a public `quay.io/igou/igou.io:vps` digest. CI publishes succes
 master builds; Renovate proposes digest updates. Application auto-sync starts
 disabled until the website is verified and Gotify's PVC is restored before startup.
 Host provisioning uses `vps_bootstrap_host` and `vps_publish_access` in AAP.
-Argo installs ESO at wave 3, the local store at 4, NGINX at 6,
-Tailscale at 8 and the Gateway at 10. Credentials synchronize independently;
+Argo installs ESO at wave 3, the local store at 4, NGINX at 6
+and the Gateway at 10. Credentials synchronize independently;
 verify mirror and local ExternalSecret readiness before application acceptance.
 
 The separate `node-exporter` Application renders the Prometheus community
@@ -91,10 +90,6 @@ Prometheus does not use the Argo cluster-admin token. Its permissions cover
 Node proxy access is broader than a metrics-only permission; protect this token.
 No new public listener, host configuration or local Prometheus is required.
 
-The default Tailscale ProxyClass `metrics` enables client metrics and disables
-debug endpoints for future service proxies, retaining `tag:vps-app` as the
-default tag. It creates no proxies by itself. There is no Prometheus operator
-on the VPS, so the class does not request local ServiceMonitor creation.
 OpenShift monitors public HTTP and HTTPS for `igou.io`, `www.igou.io` and
 `gotify.igou.io` with its existing blackbox exporter.
 

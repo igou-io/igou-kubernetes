@@ -23,16 +23,6 @@ spec:
       ports:
         - protocol: TCP
           port: 8443
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: tailscale
-          podSelector:
-            matchLabels:
-              tailscale.com/managed: 'true'
-      ports:
-        - protocol: TCP
-          port: 9113
   egress:
     - to:
         - ipBlock:
