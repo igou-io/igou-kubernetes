@@ -25,7 +25,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: igou-io
-          image: quay.io/igou/igou.io:vps@sha256:89aa045c36b03b15d9f9c5147ae5160fa36913f904187c5a72fa6df07903de44
+          image: quay.io/igou/igou.io:vps@sha256:72bddd77bc5d207735b3ae4068f2d706e3cfb0bfdaf9dc91ca20931c1d53b69f
           resources:
             requests:
               cpu: 10m
