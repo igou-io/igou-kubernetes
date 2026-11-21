@@ -1,0 +1,15 @@
+---
+# CDI cannot infer access/volume modes for the k3s local-path provisioner
+# (StorageProfile condition UnrecognizedProvisioner), which fires
+# CDIStorageProfilesIncomplete. local-path is node-local hostPath storage:
+# RWO Filesystem only, no snapshots, so CDI clones by host-assisted copy.
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: StorageProfile
+metadata:
+  name: local-path
+spec:
+  claimPropertySets:
+    - accessModes:
+        - ReadWriteOnce
+      volumeMode: Filesystem
+  cloneStrategy: copy
