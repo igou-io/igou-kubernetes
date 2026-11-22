@@ -7,6 +7,7 @@ resources:
 - https://github.com/kubevirt/containerized-data-importer/releases/download/v1.65.0/cdi-operator.yaml
 - freenas-nfs-ssd-csi-storageprofile.yaml
 - freenas-iscsi-ssd-csi-storageprofile.yaml
+- local-path-storageprofile.yaml
 - virtualmachine-reader-clusterrole.yaml
 - virtualmachine-reader-clusterrolebinding.yaml
 - virtualmachine-reader-serviceaccount.yaml
