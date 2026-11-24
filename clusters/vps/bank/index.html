@@ -130,6 +130,10 @@ input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--accent); c
     <button data-preset="A" title="Ammo (minus dragon arrows), resources, runes, drop stacks, food">Option A: supplies</button>
     <button data-preset="B" title="Spare gear plus ammo, resources, drop stacks and food; keeps runes">Option B: spare gear + supplies</button>
     <button data-preset="half" title="Half of every rune, ammo and food stack (including dragon arrows); nothing else">Half runes/ammo/food</button>
+    <button data-preset="least" title="Everything you'd sell at a profit or got as a drop, then the smallest %-losers, until the target is reached">Least loss</button>
+    <button data-preset="keephalf" title="Half of every potion, rune, ammo and food stack, plus all resources, drop stacks and spare gear">Keep half of supplies</button>
+    <button data-preset="fewest" title="Biggest stacks first until the target is reached: the fewest GE trades">Fewest trades</button>
+    <button data-preset="nobelow" title="Only items at or above your average buy price, plus items you never bought (drops)">Never below buy price</button>
     <button data-preset="none">Clear all</button>
     <span class="grow"></span>
     <button id="live" title="Fetch current instant-sell prices from the OSRS Wiki">Refresh live prices</button>
@@ -185,7 +189,18 @@ const PRESETS = {
   A: ['ammo', 'resources', 'runes', 'misc', 'food'],
   B: ['ammo', 'resources', 'misc', 'food', 'gear'],
   half: ['runes', 'ammo', 'food'],
+  keephalf: ['potions', 'runes', 'ammo', 'food', 'resources', 'misc', 'gear'],
   none: []
+};
+const CONSUMABLES = ['potions', 'runes', 'ammo', 'food'];
+// Dynamic presets choose from everything except Keep, Check first and dragon arrows.
+const DYNAMIC = {
+  // profit/drop items first, then by % loss vs buy; stop at the target
+  least: { order: it => [lossRate(it), -netAt(it, it.s)], stop: true },
+  // biggest stacks first; stop at the target
+  fewest: { order: it => [0, -netAt(it, it.s)], stop: true },
+  // only items at or above your buy price (or never bought)
+  nobelow: { filter: it => lossRate(it) === 0, stop: false }
 };
 const KEY = 'bank-sell-planner-v1';
 const $ = id => document.getElementById(id);
@@ -201,11 +216,32 @@ const short = n => {
 const tax = p => p < 50 ? 0 : Math.min(Math.floor(p * 0.02), 5e6);
 const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+const netAt = (it, q) => { const p = priceOf(it); return q * (p - tax(p)); };
+const lossRate = it => {
+  if (!it.b) return 0;
+  const p = priceOf(it), g = p - tax(p) - it.b[0];
+  return g >= 0 ? 0 : -g / Math.max(p - tax(p), 1);
+};
+function dynamicState(name) {
+  const cfg = DYNAMIC[name], on = {}, qty = {}, need = S.target - S.coins;
+  let list = D.items.filter(it => it.g !== 'keep' && it.g !== 'unclear' && !it.noA && (!cfg.filter || cfg.filter(it)));
+  if (cfg.order) list = list.map(it => [cfg.order(it), it])
+    .sort((a, b) => a[0][0] - b[0][0] || a[0][1] - b[0][1]).map(x => x[1]);
+  let sum = 0;
+  for (const it of list) {
+    if (cfg.stop && sum >= need) break;
+    on[it.id] = 1; sum += netAt(it, it.s);
+  }
+  return { on, qty };
+}
 function presetState(name) {
-  const on = {}, qty = {}, half = name === 'half';
+  if (DYNAMIC[name]) return dynamicState(name);
+  const on = {}, qty = {}, half = name === 'half', keephalf = name === 'keephalf';
   for (const it of D.items) {
     if (!PRESETS[name].includes(it.g) || (it.noA && !half)) continue;
-    if (half) { const q = Math.floor(it.q / 2); if (!q) continue; qty[it.id] = q; }
+    if (half || (keephalf && CONSUMABLES.includes(it.g))) {
+      const q = Math.floor(it.q / 2); if (!q) continue; qty[it.id] = q;
+    }
     on[it.id] = 1;
   }
   return { on, qty };
