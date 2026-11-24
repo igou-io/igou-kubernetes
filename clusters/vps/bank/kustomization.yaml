@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - allow-web-networkpolicy.yaml
+  - bank-deployment.yaml
+  - bank-service.yaml
+  - bank-httproute.yaml
+
+# Static OSRS bank sell planner. index.html is generated from a RuneLite bank
+# export; the content hash in the ConfigMap name rolls the Deployment on change.
+configMapGenerator:
+  - name: bank-html
+    namespace: bank
+    files:
+      - index.html

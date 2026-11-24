@@ -9,3 +9,4 @@ resources:
   - nginx-gateway-namespace.yaml
   - igou-io-namespace.yaml
   - gotify-namespace.yaml
+  - bank-namespace.yaml

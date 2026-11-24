@@ -26,6 +26,8 @@ Connect, MetalLB and monitoring servers remain off-host. Do not include `groups/
 - `gateway-api/`: mirrored TLS ExternalSecret, public Gateway and redirects.
 - `igou-io/` and `gotify/`: application Deployments, Services, HTTPRoutes,
   NetworkPolicies, and Gotify's local PVC/ExternalSecret.
+- `bank/`: static OSRS bank sell planner at `bank.igou.io`, served by pinned
+  `nginx-unprivileged` from a generated `index.html` ConfigMap. No credentials.
 - `migration/`: one-time Gotify restoration Job, excluded from the normal root.
   It refuses a nonempty destination and mounts only protected staged Gotify data.
 
