@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank
+  namespace: bank
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: bank
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
